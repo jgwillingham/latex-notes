@@ -1,0 +1,635 @@
+\documentclass[onecolumn]{gwclass}
+\usepackage[utf8]{inputenc}
+\usepackage{physics}
+\usepackage{mathrsfs}
+\usepackage{amssymb}
+\usepackage{simpler-wick}
+\usepackage{slashed}
+\usepackage{bbm}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\def \*#1{\boldsymbol{#1}}
+\renewcommand{\t}[1]{\text{#1}}
+\def \timeorder{\t{T}}
+\def \normalorder{\t{N}}
+
+\newcommand{\header}[1]{
+	\vspace{1em}
+	\noindent\raisebox{-0.5em}{\Large\textbf{#1}}\\
+	\noindent\rule{\textwidth}{2pt}\\
+}
+
+\newcommand{\man}{\mathcal{M}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\title{Quantum Field Theory}
+\author{--- George Willingham ---}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents 
+
+\section{General Formalism}
+Scattering is a dynamical process. A particle in some initial state $\ket{\psi_\t{i}}$ is incident on some other system, it experiences some sort of temporary interaction, and then it stabilizes in some final state $\ket{\psi_\t{f}}$. While there are time-independent approaches to scattering that are powerful, we will be interested in the time-dependent formalism which is required in quantum field theory. Everything begins with the Schr\"odinger equation
+$$ i\frac{d}{dt}\ket{\psi} = H(t)\ket{\psi} $$
+where the Hamiltonian generally has explicit time dependence. In scattering problems (and time-dependent phenomena in general), we will be interested in transition probabilities between initial and final states. The natural quantity to compute then is the amplitude $\bra{\psi_\t{f}}U(t, t_0)\ket{\psi_\t{i}}$ where $U$ is the time-evolution operator which is itself a solution to the Schr\"odinger equation. When the Hamiltonian is independent of time, the solution is easily found: $U(t, t_0) = e^{-i H (t-t_0)}$. But when $H=H(t)$, we have to get a bit more involved. To begin, we can integrate the Schr\"odinger equation to write
+$$ \ket{\psi(t)} = \ket{\psi_\t{i}} - i \int_{t_0}^{t} dt'\;H(t')\ket{\psi(t')} $$
+The time-dependent state appears on both the left side of this equation and in the integral on the right so we have merely converted a differential equation into an integral equation. However, a solution can be approached by iterating --- we can plug in the equation for $\ket{\psi(t)}$ into the $\ket{\psi(t')}$ appearing in the integral. Doing so once produces
+$$ \ket{\psi(t)} = \ket{\psi_\t{i}} - i\int_{t_0}^t dt'\;H(t')\ket{\psi_\t{i}} +  (-i)^2 \int_{t_0}^t dt'\int_{t_0}^{t'}dt''\;H(t')H(t'')\ket{\psi(t'')}$$
+Clearly we pick up an additional "second order" term, but more importantly the previous "first-order" term has now become properly first-order --- it depends on only the initial state $\ket{\psi_\t{i}}$. In general, the $n^\t{th}$ iteration of this equation produces an $n^\t{th}$-order term which depends only on the initial state. The result of infinite iterations is a nice equation $\ket{\psi(t)}= U(t,t_0)\ket{\psi_\t{i}}$ where
+$$ U(t,t_0) \equiv \sum_{n=0}^\infty (-i)^n \int_{t_0}^t dt_1 \int_{t_0}^{t_1}dt_2\dots \int_{t_0}^{t_{n-1}}dt_n\;H(t_1)\dots H(t_n) $$
+We can recast this expansion into a nicer compact form by making an important observation. Notice that the limits on the integrals dictate that $t>t_1 > t_2 > \dots > t_n$. The operators are naturally time-ordered. With this in mind, it will prove useful to define the \textbf{\emph{time-ordering operator}}\footnote{$\timeorder$ is not really an operator since it acts on operators themselves} $\timeorder$ such that:
+$$\timeorder\{A(t)B(s)\} = 
+\begin{cases}
+	A(t)B(s) & t > s \\
+	B(s)A(t) & t < s \\
+\end{cases}
+$$
+For more operators, it acts similarly --- arranging them in time order. The benefit of introducing the time-ordering operation is it \emph{symmetrizes} the result. For example consider the operator product $F(t, s)=A(t)B(s)$ and its time-ordered version $F_\timeorder(t,s)=\timeorder\{A(t)B(s)\}$. Generally, it is \textbf{not} necessarily true that $F(t,s)=F(s,t)$, but it \textbf{is} true that $F_\timeorder(t,s)=F_\timeorder(s,t)$. 
+
+So knowing that the integrals in $U$ are naturally time-ordered, we can inconsequentially replace the operator products $H(t_1)\dots H(t_n)$ with their time-ordered versions $\timeorder\{H(t_1)\dots H(t_n)\}$. To emphasize, the benefit here is that we have \emph{symmetrized} the integrand. As a result, we can extend the domain of integration to $[t_0, t]^n$ so that
+
+$$ U(t,t_0) = \sum_{n=0}^\infty \frac{(-i)^n}{n!} \int_{t_0}^t dt_1\dots \int_{t_0}^t dt_n\;\timeorder\{H(t_1)\dots H(t_n)\} $$
+Note the $n!$ factor and the integral limits. This is true since we can split $[t_0, t]^n$ into $n!$ regions corresponding to the different permutations of time orderings $t_{\sigma(1)}>t_{\sigma(2)} > \dots > t_{\sigma(n)}$. Then by symmetry of the time-ordered product, the integrals over all of these regions are the same. So the new integral on $[t_0,t]^n$ is just $n!$ copies of our original integral --- hence the factor of $1/n!$. Finally, we can pull the time-ordering operation out and write 
+$$ U(t,t_0) = \timeorder\left\{\sum_{n=0}^\infty \frac{1}{n!}\left[-i\int_{t_0}^t dt'\;H(t')\right]^n\right\} $$
+And this appears to be just the power series expansion of an exponential. So we have derived the formal solution:
+$$ U(t,t_0) = \timeorder\exp{-i\int_{t_0}^t dt'\;H(t')} $$
+This is known as the \textbf{\emph{Dyson series}}. Note that the time-independent case is naturally recovered from this expression: $U(t,t_0)=e^{-iH(t-t_0)}$.
+
+Typically, the Hamiltonian can be written $H=H_\t{free} + H_\t{int}(t)$ where $H_\t{free}$ is the free Hamiltonian which is exactly diagonalizable while $H_\t{int}$ is an interaction term which is not. When this is naively plugged into the Dyson series, the result is formally correct but it is a practical nightmare. Since in general $[H_\t{free}, H_\t{int}]\neq 0$, the expansion becomes a mess of tangled operators that have to be unraveled in a calculation via the Baker-Campbell-Hausdorff formula. While this is possible, there is a much cleaner alternative approach via the \textbf{\emph{interaction picture}}.
+
+\subsection{The Interaction Picture}
+The standard view of quantum mechanics in which a state/wavefunction evolves in time while observables are time-independent operators is called the \textbf{\emph{Schr\"odinger picture}}. Fully equivalently, there is the converse view in which the state is time-independent and the observables possess all the time dependence. This is called the \textbf{\emph{Heisenberg picture}}. Somewhere in between these two is the \textbf{\emph{interaction picture}}.
+
+As the name suggests, the interaction picture is most useful when the Hamiltonian is in the common form $H=H_\t{free} + H_\t{int}$. The idea is to try and isolate the effect of $H_\t{int}$ on $\ket{\psi}$ by removing any dependence on $H_\t{free}$. Since presumably the free time-dependence is through the usual $e^{-iH_\t{free}t}$, we construct a new state $\ket{\sigma}$ defined by $\ket{\sigma}\equiv e^{iH_\t{free}t}\ket{\psi}$. This is clearly equivalent to writing the ansatz: $\ket{\psi}=e^{-iH_\t{free}t}\ket{\sigma}$ --- we are "pulling out" the free evolution. In doing so, when we plug into $i\frac{d}{dt}\ket{\psi}$, we find a term which exactly cancels the free term on the right: $H_\t{free}\ket{\psi}$. Indeed, with this ansatz, the Schr\"odinger equation becomes
+$$ i\frac{d}{dt}\ket{\sigma} = \mathcal{H}(t)\ket{\sigma} \hspace{0.5in}  \mathcal{H}(t)\equiv e^{-iH_\t{free}t}H_\t{int}(t)e^{iH_\t{free}t}$$
+So $\ket{\sigma}$ itself satisfies the Schr\"odinger equation with Hamiltonian $\mathcal{H}(t)$ (Throughout these notes, operators in the interaction picture will be denoted in a calligraphic font, e.g. $\mathcal{H}$). With the above Schr\"odinger equation, there is a corresponding Dyson series which gives the interaction-picture time-evolution operator:
+$$ \mathcal{U}(t,t_0) \equiv \timeorder\exp\left\{ -i\int_{t_0}^t dt'\;\mathcal{H}(t') \right\} $$
+Notice how this solves the problem mentioned previously. Before, we had a time evolution operator which contained a Hamiltonian of the form $H_\t{free}+H_\t{int}$ and the sum of non-commuting operators lead to a headache a la Baker-Campbell-Hausdorff. Now, however, the interaction picture has solved that problem. We only have a single operator (not a sum) appearing in the exponential.
+
+Usually, $H_\t{int}$ is time-independent so that $\mathcal{H}(t)=e^{iH_\t{free}t}H_\t{int}e^{-iH_\t{free}t}$ only depends on time through the free evolution. In this case, there is another useful expression for $\mathcal{U}$ which is easily found by stringing together definitions of the interaction picture. First writing the definition $\ket{\sigma(t)}=e^{iH_\t{free}t}\ket{\psi(t)}$, we can use the fact that $\ket{\psi}$ evolves through the full time-independent Hamiltonian to write $\ket{\sigma(t)}=e^{iH_\t{free}t}e^{-iH(t-s)}\ket{\psi(s)}$. Then using the definition again, we have $\ket{\psi(s)}=e^{-iH_\t{free}s}\ket{\sigma(s)}$ which leaves an equation of the form $\ket{\sigma(t)}=\mathcal{U}(t,s)\ket{\sigma(s)}$ where we can identify the time evolution operator as
+$$ \mathcal{U}(t,s) = e^{iH_\t{free}t}e^{-iH(t-s)}e^{-iH_\t{free}s} $$
+
+
+\subsection{Propagators}
+The evolution operator is a central part of quantum dynamics and from it, we can find another very useful object called the \textbf{propagator}. We consider a single particle state $\ket{\psi}$ which evolves from time $s$ to $t$ so that $\ket{\psi(t)}=U(t,s)\ket{\psi(s)}$ and then we project this onto space and insert a resolution of the identity to obtain:
+
+$$ \psi(y,t) = \int d^3x\; \underbrace{\bra{y}U(t,s)\ket{x}}_{K(y,t;x,s)}\psi(x,s) $$
+where recall $\bra{x}\ket{\psi}=\psi(x)$. As indicated, the quantity $K(y,t;x,s)\equiv \bra{y}U(t,s)\ket{x}$ defines the propagator. It tells us the probability amplitude that a particle at $x$ at time $s$ evolves to position $y$ at time $t$. Observe that it is a kernel of an integral transform and it must necessarily satisfy the condition
+$$ \lim_{t\to s} K(y,t;x,s) = \delta(x-y) $$
+It is illustrative to compute the free propagator for which we may write $ K_0(y,t;x,s) = \bra{y}e^{-iH_\t{free}(t-s)}\ket{x} $. Diagonalizing in the momentum basis with $\ket{x} = \int \frac{d^3p}{(2\pi)^3}\;e^{ip\cdot x}\ket{p}$, we find
+$$ K_0(y,t;x,s) = \int\frac{d^3p}{(2\pi)^3}\;e^{-iE_p(t-s)}e^{i\*p\cdot(\*y-\*x)} $$
+
+
+\newpage
+
+\section{Many-Body Theory --- Second Quantization}
+In single particle quantum mechanics, we work in a Hilbert space $\mathscr{H}$ which contains all possible states of a particle. When we consider $k$ such particles, the Hilbert space grows as the tensor product: $\mathscr{H}^{\otimes k}$. However there is a crucial caveat --- the total space must be \textbf{\emph{symmetrized}} or \textbf{\emph{antisymmetrized}} to respect the particle statistics. For bosons, the total space must be symmetrized so that any exchange of particles leaves the state invariant. For fermions it must be antisymmetrized so that every exchange of two particles yields a sign-flipped state. In general, the appropriate $k$-particle states can be constructed from the elements of $\mathscr{H}^{\otimes k}$ with symmetrizing and antisymmetrizing (a.k.a. alternating) maps:
+\begin{align*}
+	\ket{\psi_1}\otimes \dots \otimes\ket{\psi_k} \:\:\mapsto\:\: \frac{1}{k!}\sum_{\sigma\in S_k} (\pm 1)^{N(\sigma)}|\psi_{\sigma(1)}\rangle \otimes \dots \otimes |\psi_{\sigma(k)}\rangle
+\end{align*}
+where $S_k$ is the symmetric group\footnote{$S_k= \{\t{all permutations of $k$ items}\}$} and $N(\sigma)$ is the number of pairwise swaps (a.k.a. inversions) in the permutation $\sigma$. The $+$ case is for bosons and the $-$ is for fermions. The space of all such symmetrized $k$-particle states is denoted $\t{Sym}^k(\mathscr{H})$ while the space of all antisymmetrized $k$-particle states is denoted $\t{Alt}^k(\mathscr{H})$ or $\wedge^k(\mathscr{H})$. When we consider all possible particle numbers together, we get the bosonic and fermionic \textbf{\emph{Fock spaces}}\footnote{These spaces are also called the symmetric and antisymmetric tensor algebras. They are \emph{algebras} because they each inherit a natural vector product operation from the tensor product $\otimes$. The antisymmetric space is also known as the \textbf{\emph{exterior algebra}} or \emph{Grassman algebra} and it has important use in geometry. The antisymmetrized tensor product is called the \emph{exterior product} (a.k.a. wedge product) and is denoted $\wedge$. The symmetric tensor algebra has a product denoted $\odot$ but it does not seem to get as much use.}:
+\begin{align*}
+	\overbrace{\t{Sym}(\mathscr{H})\equiv\bigoplus_{k=0}^\infty \t{Sym}^k(\mathscr{H})}^{\t{bosonic Fock space}} && \overbrace{\t{Alt}(\mathscr{H}) \equiv \bigoplus_{k=0}^\infty \t{Alt}^k(\mathscr{H})}^{\t{fermionic Fock space}} 
+\end{align*}
+Importantly, note that the zero particle space $k=0$ is included in the direct sums. This is called the \textbf{\emph{non-interacting vacuum state}} and we denote it as $\ket{0}$. 
+
+By definition, every element of $\t{Sym}^k(\mathscr{H})$ is invariant under any permutation of particles. As a consequence, the only information we need to specify a unique element is how many particles appear in each state, i.e. the \emph{occupation numbers}. In this \textbf{\emph{occupation number representation}}, a bosonic state can be written $\ket{n_1\dots n_i\dots}$ where $n_i$ is the number of particles in state $\ket{\phi_i}$. 
+
+We can do something similar for fermions, but notice that the antisymmetry dictates that if two fermions are in the same state, then the total state must be identically zero. This constrains the occupation numbers to be only 0 or 1. So then the only information we need to specify a fermionic many-body state is the occupied states. If $\ket{\phi_{i_1}},\dots,\ket{\phi_{i_k}}$ are occupied by $k$ fermions, we denote the total state as simply $\ket{\phi_{i_1}\dots \phi_{i_k}}$. However note that antisymmetry must still be enforced so that any exchange of state labels must produce a minus sign, e.g. $\ket{\phi_{i_2} \phi_{i_1}}=-\ket{ \phi_{i_1} \phi_{i_2}}$.
+
+The standard way to work with Fock space is to use \textbf{\emph{creation and annihilation operators}}. As the name suggests, a creation operator \emph{creates} a particle while an annihilation operator \emph{destroys} a particle. More formally this means these are maps between a $k$-particle space and a $k\pm 1$ particle space. As it turns out, any operator can be written in terms of the creation and annihilation operators so they are of general interest. 
+
+Focusing first on bosons, we have the following definition:
+
+\noindent\rule{\textwidth}{1pt}\\
+\textbf{Bosonic Creation and Annihilation Operators:} \emph{A bosonic creation operator $a_i^\dagger$ and its adjoint, the annihilation operator $a_i$, are maps}
+\begin{align*}
+	a_i^\dagger : \t{Sym}^k(\mathscr{H}) \to \t{Sym}^{k+1}(\mathscr{H}) && a_i : \t{Sym}^k( \mathscr{H}) \to \t{Sym}^{k-1}(\mathscr{H})
+\end{align*}
+\emph{where the subscript $i$ indicates that the particle that is created/destroyed is in the state $\ket{\phi_i}$. The general action of these operators is best written in terms of the occupation numbers:}
+\begin{align*}
+	a_i^\dagger \ket{\dots n_i \dots} = \sqrt{n_i+1}\ket{\dots n_i + 1\dots} && a_i\ket{\dots n_i\dots} = \sqrt{n_i} \ket{\dots n_i-1\dots}
+\end{align*}
+\noindent\rule{\textwidth}{1pt}\\
+Note that for any state with $n_i=0$, we have $a_i\ket{\dots}=0$. In particular this means that every annihilation operator maps the vacuum state to zero: $a_i\ket{0}=0$. From this definition, it is easy to find that the bosonic creation and annihilation operators satisfy what are called the \textbf{\emph{canonical commutation relations}} (CCR):
+\begin{align*}
+	[a_i, a_j^\dagger]=\delta_{ij} && [a_i, a_j]= 0 && [a_i^\dagger, a_j^\dagger]=0
+\end{align*}
+In fact the second and third relation here are related as the adjoints of each other so are in truth only one relation. In practice, this is the defining characteristic of the creation and annihilation operators. 
+
+Note that because of the factors of $\sqrt{n_i+1}$ or $\sqrt{n_i}$, we can construct a \textbf{\emph{number operator}} $a_i^\dagger a_i$ which acts on a state as $a_i^\dagger a_i \ket{\dots n_i \dots} = n_i \ket{\dots n_i\dots}$. So it simply produces the number of particles in a particular state. We can get the total number of particles with $N=\sum_i a_i^\dagger a_i$. Also note that because of those same factors, the states produced by $a_i^\dagger$ and $a_i$ are not normalized. But we can act on the vacuum to create any possible state as 
+$$ \ket{n_1\dots n_i \dots} = \prod_i\frac{(a_i^\dagger)^{n_i}}{\sqrt{n_i}}\ket{0} $$
+
+Now turning to fermions, the creation and annihilation operators must behave differently. Particularly, since fermions are antisymmetric in nature, we must take care to keep proper track of any signs that change when we permute our states.
+
+\noindent\rule{\textwidth}{1pt}\\
+\textbf{Fermionic Creation and Annihilation Operators:} \emph{A fermionic creation operator $c_i^\dagger$ and its adjoint, the annihilation operator $c_i$, are maps}
+\begin{align*}
+	c_i^\dagger : \t{Alt}^k(\mathscr{H})\to \t{Alt}^{k+1}(\mathscr{H}) && c_i:\t{Alt}^k(\mathscr{H})\to \t{Alt}^{k-1}(\mathscr{H})
+\end{align*}
+\emph{where the subscript $i$ indicates the state of the particle that is created/destroyed. On a general $k$-particle state} $\ket{\phi_{i_1}\dots \phi_{i_k}}\in \t{Alt}^k(\mathscr{H})$ \emph{where $\ket{\phi_{i_1}}\dots\ket{\phi_{i_k}}$ are the occupied single particle states, then the general action of $c_i$ and $c_i^\dagger$ is:}
+\begin{align*}
+	c_s^\dagger\ket{\phi_{i_1}\dots \phi_{i_k}}= \ket{\phi_{i_1}\dots \phi_{i_k} \phi_s} &&\quad\quad
+	c_s\ket{\phi_{i_1}\dots \phi_{i_k}}= 
+	\begin{cases}
+		|\phi_{i_1}\dots \phi_{i_{k-1}} \rangle & \t{if } s = i_k \\
+		0 & \t{if } s \notin \{i_1\dots i_k\}
+	\end{cases}
+\end{align*}
+\emph{Note the annihilation operator is defined to destroy the last state label but generally, the labels can be permuted so that $\phi_s$ goes to the last position (picking up the appropriate sign).}\\
+\noindent\rule{\textwidth}{1pt}\\
+In this case, we find that the creation and annihilation operators satisfy \textbf{\emph{canonical anticommutation relations}} (CAR):
+\begin{align*}
+	\{c_i,c_j^\dagger\} = \delta_{ij} && \{c_i,c_j\}=0 && \{c_i^\dagger, c_j^\dagger\}=0
+\end{align*}
+
+
+
+\subsection{Field Operators}
+Of particular importance are \textbf{\emph{field operators}}. Field operators are just creation/annihilation operators for continuous states, e.g. position or momentum. So we define $\psi^\dagger(\*x)\ket{0}=\ket{\*x}$ where $\ket{\*x}$ is the ``position eigenstate" or more properly, an arbitrarily close approximation to one. This can be expressed
+\begin{align*}
+	c_i^\dagger = \int_{\mathbb{R}^3}d^3x\;\phi_i(\*x)\psi^\dagger(\*x) && \psi^\dagger(\*x)= \sum_i \phi_i^*(\*x) c_i^\dagger
+\end{align*}
+where $\phi_i(\*x) = \bra{\*x}\ket{\phi_i}$ is a one particle wavefunction. In continuum field theories, we will often write a field operator in terms of momentum states as
+$$ \psi^\dagger(\*x) = \int \frac{d^3p}{(2\pi)^3}\; e^{i\*p\cdot\*x} c_p^\dagger $$
+When relativistic effects are relevant like in high energy physics, we will want to write this in a Lorentz invariant way. This is typically done with the invariant measure $\frac{d^3p}{(2\pi)^32E_p}$ where $E_p=\sqrt{p^2 + m^2}$.
+
+\subsection{Lorentz-Invariant Phase Space Measure (LIPS)}
+It will be highly useful to keep all relativistic calculations expressed in a manifestly Lorentz covariant way. To this end, consider the \textbf{Lorentz-invariant phase space} (LIPS) measure
+$$ d\Pi = \frac{d^4p}{(2\pi)^3}\theta(p^0)\delta(p^2 - m^2) $$
+This measure is manifestly invariant under any transformation in $\t{SO}^+(1,3)$. 
+
+
+
+\section{Quantization of Classical Fields}
+In a classical field theory, we may write down a Lagrangian density $\mathscr{L} = \mathscr{L}(\phi, \partial_\mu\phi)$ which is a function of some field(s) $\phi$ and its derivatives. The action integral is then given by
+$$ S = \int d^4x\;\mathscr{L}(\phi,\partial_\mu\phi) $$ 
+By Hamilton's principle, we want the stationary points for the action which are given by the field-theoretic Euler-Lagrange equation:
+$$ \frac{\partial\mathscr{L}}{\partial \phi} - \partial_\mu\frac{\partial \mathscr{L}}{\partial(\partial_\mu\phi)} = 0 $$
+We also can define a canonical momentum by $\pi=\frac{\partial\mathscr{L}}{\partial(\partial_t\phi)}$. The procedure we follow to transform this into a \emph{quantum field theory} is called canonical quantization. We replace $\phi$ and $\pi$ with operator-valued fields which satisfy the equal-time commutation relation:
+$$[\phi(x), \pi(y)]= i\delta(x-y) \quad\quad\quad\t{with }\: x^0=y^0$$
+where also $\phi$ and $\pi$ commute with themselves. We can then write a Hamiltonian operator as $ H = \pi\partial_t\phi - \mathscr{L} $. This is all well and good and the same procedure we go through for canonical quantization of non-field theories. But now we will do something which unites many-body quantum mechanics with quantum field theory --- we write the field operator in terms of creation and annihilation operators:
+$$ \phi_\pm(x) = \int\frac{d^3p}{(2\pi)^3}\;e^{\pm i\*p\cdot\*x}a^\pm_p $$
+It turns out that for Lorentz invariance, many-body quantum mechanics is absolutely inevitable and we have to write fields as equal-weighted combinations: $\phi = \phi_+ + \phi_-$.
+
+\subsection{Interacting Theories \& the Poincar\'e Algebra}
+Consider a generic interaction $\mathscr{H}_\t{int}$ that is a function of the $\phi_+$ and $\phi_-$ fields
+$$ H_\t{int} = \int d^3x\;\mathscr{H}_\t{int}(\phi_+, \phi_-)$$
+The full Hamiltonian $H=H_\t{free}+H_\t{int}$ must be consistent with the Poincar\'e algebra so that $[H, K_\mu] = iP_\mu$. It can be shown that the free Hamiltonian satisfies $[H_\t{free}, K_\mu]=iP_\mu$ and therefore any interaction terms must commute with the boost generator
+$$ [H_\t{int},K]=0 $$
+Consider now an arbitrary Lorentz scalar $O(x)$. As a scalar, this transforms under a boost with unitary representation $U(\Lambda)=e^{i\beta K}$ as $ e^{i\beta K}O(x)e^{-i\beta K} = O(\Lambda x) $.
+Expanding this to first order on both sides and using the fact that $i\frac{\partial O}{\partial t} = [H,O]$, we arrive at
+$$[K, O(x)] = x[H, O(x)]$$
+So then thinking of $O(x)=H_\t{int}$, we have
+
+\subsection{Free Fields}
+Consider a scalar free field theory with Lagrangian density given by
+$$ \mathscr{L} = \frac{1}{2}\partial_\mu\phi \partial^\mu\phi - \frac{1}{2}m^2\phi^2 $$
+As a classical theory, the equation of motion for this field is derived from Euler-Lagrange. It is the \textbf{Klein-Gordon equation}
+$$ (\partial_\mu\partial^\mu + m^2)\phi= 0 $$
+Following our quantization procedure, we find the canonical momentum $ \pi = \frac{\partial\mathscr{L}}{\partial(\partial_t \phi)}= \dot\phi $. Imposing the commutation relations,
+\begin{align*}
+	\phi(x) &= \int\frac{d^3p}{(2\pi)2E_p}(e^{ipx}a_p^\dagger + e^{-ipx}a_p) \\
+	\pi(x) =\dot\phi(x) &= \int\frac{d^3p}{(2\pi)2}(ie^{ipx}a_p^\dagger - ie^{-ipx}a_p) 
+\end{align*}
+
+
+\section{Spin-Statistics Theorem}
+Consider the free theory for a arbitrary spin field:
+$$ \mathscr{L} = \frac{1}{2}\partial_\mu\*\Psi\partial^\mu\*\Psi - \frac{1}{2}m^2\*\Psi^2 $$
+$$  $$
+It is a fascinating fact that the spin of a particle is tied to the symmetry or antisymmetry of its wavefunction. This is ultimately what makes fermions (half-integer spin particles) behave as matter while bosons (integer spin particles) behave as waves or collective modes. Consider now a quantum field $\*\Psi$ with arbitrary spin. Any free particle must have $E_p = \pm \sqrt{p^2 + m^2}$ with corresponding positive energy solutions $\*u_s(p)$ and negative energy solutions $\*v_s(p)$. For respective operators $a_{ps}^\dagger$ and $b_{ps}^\dagger$
+
+$$ \*\Psi(x) = \int\frac{d^3p}{(2\pi)^32E_p} \sum_s\left( \*u_s(p)e^{ipx} \, a_{ps}^\dagger + \*v_s(p)e^{-ipx}\,b_{ps} \right) $$
+The creation and annihilation operators must satisfy commutation or anticommutation relations $[a_p, a_k^\dagger]_\pm=\delta(p-k)$ and $[b_p, b_k^\dagger]_\pm=\delta(p-k)$. We can write the vacuum expectation values 
+$$ \bra{0} a_{ps} a_{ks'}^\dagger \ket{0} = \bra{0}b_{ps}b_{ks'}^\dagger\ket{0} = (2\pi)^3 2E_p\delta(p-k)\delta_{ss'} $$
+and all other VEVs are zero. Consequently
+$$ \bra{0} \Psi_i(x)\Psi_j^\dagger(y) \ket{0} = \int \frac{d^3p}{(2\pi)^32E_p}e^{-ip(x-y)}\sum_s u_{s,i}(p)u^*_{s,j}(p) $$
+$$ \bra{0} \Psi_i^\dagger(x)\Psi_j(y) \ket{0} = \int \frac{d^3p}{(2\pi)^32E_p}e^{ip(x-y)}\sum_s v_{s,i}(p)v^*_{s,j}(p) $$
+
+
+
+
+
+
+\section{The S-Matrix}
+For scattering, we will typically be interested in the case where the initial state is known at $t_0\to-\infty$ and the final state at $t\to\infty$ is of particular interest. This motivates the definition of the \textbf{\emph{scattering matrix}} $ \displaystyle S\equiv \lim_{t\to\infty}\lim_{t_0\to-\infty}\mathcal{U}(t,t_0) $. With this, the scattering transition amplitudes are associated with the matrix elements which can be expanded perturbatively
+$$\bra{\sigma_\t{f}}S\ket{\sigma_\t{i}} = S_\t{fi}^{(0)} + S^{(1)}_\t{fi} + S^{(2)}_\t{fi} + \dots$$
+where $S_\t{fi}^{(n)}$ denotes the $n^\t{th}$-order term in the Dyson series given explicitly by
+$$S_\t{fi}^{(n)} = \frac{(-i)^n}{n!}\int_\mathbb{R} dt_1\dots \int_\mathbb{R} dt_n\; \bra{\sigma_\t{f}} \timeorder\{ \mathcal{H}(t_1)\dots\mathcal{H}(t_n)  \}\ket{\sigma_\t{i}}$$
+The zeroth order term is simply the scatterless event where the in and out states are identical: $S_\t{fi}^{(0)}=\delta_\t{fi}$. 
+\\
+
+\section{Correlation Functions}
+In general, in quantum field theory, we will be interested in computing \textbf{\emph{correlation functions}}. The reason being all of the physical information of a theory can be extracted from the correlation functions and importantly, they are computationally easier than alternative approaches. Consider for example, the single-particle Green's function defined by
+$$ iG_{ij}(t,s) \equiv \bra{\Omega}\timeorder\{ a_i(t) a_j^\dagger(s) \}\ket{\Omega} $$
+To see that any observable's ground state expectation can be computed from the Green's function, consider the correlator $\bra{\Omega}a_i^\dagger a_j\ket{\Omega}$. This can be expressed in terms of the time-ordered Green's function by introducing some time-dependence to get the time ordering correct and taking a limit to remove it:
+$$ \bra{\Omega}a_i^\dagger a_j\ket{\Omega} = \lim_{s\to t^+} \bra{\Omega}\timeorder\{ a_j(t)a_i^\dagger(s) \}\ket{\Omega} = \lim_{s\to t^+} iG_{ji}(t,s) $$
+So for an arbitrary single-body operator $O=\sum_{ij} O_{ij}a_i^\dagger a_j$:
+
+$$ \bra{\Omega}O\ket{\Omega} = \sum_{ij}O_{ij}\bra{\Omega}a_i^\dagger a_j\ket{\Omega} = i\lim_{s\to t^+} \sum_{ij}O_{ij}G_{ji}(t,s) = i\lim_{s\to t^+} \tr OG(t,s) $$
+\\
+
+
+\newpage 
+
+\section{The Gell-Man--Low Theorem}
+One of the most foundational theorems in quantum field theory is the Gell-Man--Low Theorem because it provides an avenue to calculate observables in an interacting theory using the well-understood free theory. The fundamental idea stems from considering a Hamiltonian which interpolates between the free and interacting Hamiltonians in a smooth way. In particular, we consider 
+$$H_\epsilon(t) = H_\t{free} + e^{-\epsilon\abs{t}}H_\t{int}$$
+Clearly, as $t\to -\infty$ we recover the free Hamiltonian while at $t=0$, we recover the full interacting theory. Presumably then, if we start with the non-interacting ground state $\ket{0}$ at $t=-\infty$ and evolve \textbf{\emph{adiabatically}} to $t=0$, then we may hope to obtain the interacting ground state. This is an application of the quantum adiabatic theorem where the condition we need for sufficiently slow evolution is $\epsilon\sim 0$. This motivates us to consider a possible expression for the interacting ground state $\ket{\Omega}$. In the interaction picture, we write
+$$\ket{\Omega}\stackrel{?}{=} \lim_{\epsilon\to 0}\mathcal{U}_\epsilon(0,-\infty)\ket{0}$$ 
+The reality, however, is that this limit does not exist as written. But the concept is sound; we just need to include a denominator. The proper limit is exactly what is provided by the Gell-Man--Low theorem:
+$$ \ket{\Omega} = \lim_{\epsilon\to 0}\frac{\mathcal{U}_\epsilon(0,-\infty)\ket{0}}{\bra{0}\mathcal{U}_\epsilon(0,-\infty)\ket{0}} $$
+This expression is true as long as the ground state is non-degenerate and there are no level crossings during the adiabatic evolution. Note that this state is not properly normalized. The squared norm is 
+$$ \bra{\Omega}\ket{\Omega} = \lim_{\epsilon\to 0} \frac{\bra{0}\mathcal{U}_\epsilon(\infty,-\infty)\ket{0}}{|\bra{0}\mathcal{U}_\epsilon(0,-\infty)\ket{0}|^2} $$
+Normalizing $\ket{\Omega}$ with this, the expectation values of observables in the interacting ground state can be computed:
+$$ \bra{\Omega}O(t)\ket{\Omega} = \lim_{\epsilon\to 0}\frac{\bra{0}\mathcal{U}_\epsilon(\infty, t)\mathcal{O}(t)\mathcal{U}_\epsilon(t,-\infty) \ket{0}}{\bra{0}\mathcal{U}_\epsilon(\infty,-\infty)\ket{0}} $$
+So then for time-ordered correlation functions, the time-ordering $\timeorder$ allows us to move operators as we please to combine $\mathcal{U}_\epsilon(\infty,t)$ with $\mathcal{U}_\epsilon(t,-\infty)$ to obtain the scattering matrix $S_\epsilon=\mathcal{U}_\epsilon(\infty,-\infty)$. Finally, taking the limit $\epsilon\to 0$, we have the nice equation which relates the scattering matrix to correlation functions
+$$ \bra{\Omega}\timeorder\{ \mathcal{H}(t_1)\dots\mathcal{H}(t_n) \}\ket{\Omega} =  \frac{\bra{0}\timeorder\{\mathcal{H}(t_1)\dots\mathcal{H}(t_n)S\} \ket{0}}{\bra{0}S\ket{0}} $$
+
+$$ \bra{\Omega}\timeorder\{O(t)\}\ket{\Omega} = \frac{\bra{0}\timeorder\{  O(t)S\}\ket{0}}{\bra{0}S\ket{0}} $$
+
+\newpage
+
+\section{Wick's Theorem}
+While the time-ordering operator helps us to write an easy to remember expansion for the time-evolution operator, it is generally cumbersome to work with. A solution to this comes from \emph{Wick's theorem}. It is stated as follows:
+
+\noindent\rule{\textwidth}{1pt}
+\\
+\textbf{Wick's Theorem:} \emph{Consider an arbitrary string of creation and annihilation operators $a_1^\pm\dots a_p^\pm$. If there are $k$ creation operators and $p-k$ annihilation operators, then the \textbf{normal ordering operator}} $\normalorder$ \emph{is defined by}
+$$ \normalorder\{a_1^\pm\dots a_m^\pm\} \equiv a_{i_1}^+ \dots a_{i_k}^+ a_{i_{k+1}}^-\dots a_{i_{p}}^- $$	
+\emph{Let a \textbf{contraction} of two operators be denoted and defined by} 
+$$\wick{\c1 A \c1 B}\equiv AB - \normalorder\{AB\}$$
+\emph{When $A$ and $B$ are linear combinations of creation and annihilation operators, their contraction is just a complex number arising from the canonical commutation relations\footnote{If $A_i=\alpha a_i^+ + \beta a_i^-$, then it is easy to find $\wick{\c1 A_i \c1 A_j} = A_iA_j - \normalorder\{A_iA_j\}= \alpha\beta [a_i^-, a_j^+]=\alpha\beta\delta_{ij}$ }}.
+
+\emph{\textbf{Wick's theorem} states that an arbitrary operator string can be written as}
+\begin{align*}
+	a_1^\pm\dots a_p^\pm  = \normalorder\{a_1^\pm\dots a_m^\pm\} &\wick{+ \:\:\: \sum_{(i,j)}\:\:\:\normalorder\{\dots \c1 a_i^\pm \dots \c1 a_j^\pm\dots\} } \\ &\wick{+\sum_{(i,j),(k,l)}\normalorder\{\dots \c1 a_i^\pm \dots \c2 a_k^\pm \dots\c1 a_j^\pm \dots \c2 a_l^\pm\dots\}}  \\
+	&\wick{+\sum_{\substack{(i,j),(k,l)\\(m,n)}}\normalorder\{\dots \c1 a_i^\pm \dots \c2 a_k^\pm\dots \c3 a_m^\pm \dots\c1 a_j^\pm \dots \c3 a_n^\pm\dots \c2 a_l^\pm\dots\}} \\
+	&+ \:\dots 
+\end{align*}
+\emph{In words, the operator string is the normal-ordered sum of all possible ways to contract $n$ pairs for $n=0$ to $p$}.
+
+\noindent\rule{\textwidth}{1pt}
+
+
+\newpage
+
+\section{Calculating Correlation Functions}
+Now we turn to actually calculating correlation functions with the tools of the Gell-Mann Lowe and Wick's theorems. Consider the one particle Green's function (i.e. the 2-point function) in an interacting theory: $iG_{ij}(t,s)=\bra{\Omega} \timeorder\{ a_i(t) a_j^\dagger(s)\} \ket{\Omega}$. With the Gell-Mann-Lowe theorem, we may write
+$$ iG_{ij}(t,s)  = \frac{\bra{0} \timeorder\{a_i(t)a_j^\dagger(s)S\}\ket{0}}{\bra{0}S\ket{0}} $$
+Expanding the S-matrix, we have
+$$ iG_{ij}(t,s) = \frac{\displaystyle\sum_{n=0}^\infty \frac{(-i)^n}{n!}\int_\R dt_1\dots \int_\R dt_n \; \bra{0}\timeorder\{\mathcal{H}(t_1)\dots\mathcal{H}(t_n)a_i(t)a_j^\dagger(s)\}\ket{0}}{\displaystyle\sum_{n=0}^\infty \frac{(-i)^n}{n!}\int_\R dt_1\dots \int_\R dt_n \; \bra{0}\timeorder\{\mathcal{H}(t_1)\dots\mathcal{H}(t_n)\}\ket{0}} $$
+
+In a proper field theory, we must consider an interaction term of the form
+$$ H_\t{int} = \int d^3x\;\mathscr{H}[\phi(x)] $$
+where script notation will be used for all densities --- here, $\mathscr{H}$ is the Hamiltonian density for the interaction. In this case, 
+
+$$ iG(x,y) = \frac{\displaystyle\sum_{n=0}^\infty \frac{(-i)^n}{n!}\int dz_1\dots \int dz_n \; \bra{0}\timeorder\{\mathscr{H}(z_1)\dots\mathscr{H}(z_n)\phi(x)\phi(y)\}\ket{0}}{\displaystyle\sum_{n=0}^\infty \frac{(-i)^n}{n!}\int_\R dz_1\dots \int_\R dz_n \; \bra{0}\timeorder\{\mathscr{H}(z_1)\dots\mathscr{H}(z_n)\}\ket{0}} $$
+
+\section{$\*\phi^4$ Theory}
+
+We are interested in computing the one-particle Green's function $iG(x,y) = \bra{\Omega}\timeorder\{\phi(x)\phi(y)S\}\ket{\Omega}$. Through the Gell-Mann-Lowe theorm, we have
+\begin{align*} 
+	iG(x,y) = &1 - \frac{i\lambda}{4!}\int d^4z_1\;\bra{0}\timeorder\{\phi(z_1)^4\phi(x)\phi(y)\}\ket{0}  \\
+	&+ \frac{1}{2}\left(\frac{-i\lambda}{4!}\right)^2 \int d^4z_1 \int d^4z_2\;\bra{0}\timeorder\{\phi(z_1)^4\phi(z_2)^4\phi(x)\phi(y)\}\ket{0}
+\end{align*}
+Consider the field mode expansion
+$$ \phi(x) = \int \frac{d^3p}{(2\pi)^32E_p}\;(e^{ip x}a_p^\dagger + e^{-ip x}a_p)	$$
+and its contraction
+$$ \wick{ \c1 \phi(x) \c1 \phi(y)} = \int\frac{d^3p}{(2\pi)^32E_p} e^{ip	(x-y)} $$
+In momentum space,
+$$ iG(p,k) = 1 - \frac{i\lambda}{4!} $$
+
+\newpage
+
+\section{The Poincar\'e and Lorentz Groups}
+The physical symmetries of nature are codified in the \textbf{\emph{Poincar\'e group}}, which we will denote by $\t{P}$. This group contains all the translations, rotations, and boosts which we know leave the laws of nature invariant. Each element of the Poincar\'e group is a pair $\{\Lambda|a\}$ where $\Lambda$ is a Lorentz transformation and $a\in\mathbb{R}^4$ is a translation. This acts on $x\in\mathbb{R}^4$ as
+$$ \{\Lambda|a\}\cdot x =\Lambda x + a $$
+The identity element is obviously $\{\mathbbm{1}|0\}$. Observe that this implies a group multiplication rule $\{\Lambda_2|a_2\}\{\Lambda_1|a_1 \} = \{\Lambda_2\Lambda_1| \Lambda_2a_1 +  a_2\}$ which implies the inverses: $\{\Lambda|a\}^{-1}=\{\Lambda^{-1}|-\Lambda^{-1}a\}$. There are two core subgroups of P --- the translation group $\mathbb{R}^4$ consisting of all pure translations $\{\mathbbm{1}|a\}$ and the \textbf{\emph{Lorentz group}}, denoted $\t{O}(1,3)$, consisting of all pure Lorentz transformations $\{\Lambda|0\}$. The Poincar\'e group decomposes as their semidirect product:
+$$ \t{P}\cong \mathbb{R}^4 \rtimes \t{O}(1,3) $$
+The translation subgroup is a normal subgroup\footnote{A pure translation $\{\mathbbm{1}|a\}$ when conjugated is another pure translation: $\{\Lambda|b\}\{\mathbbm{1}|a\}\{\Lambda|b\}^{-1}= \{\mathbbm{1}|\Lambda a\}$} and is easily understood since it is abelian. The Lorentz group on the other hand is nonabelian and is generally less familiar. It is defined by	
+$$ \t{O}(1,3) \equiv \{ \Lambda \in \t{GL}(\mathbb{R}^4) \:|\: \Lambda^\t{T} g\Lambda = g \} $$
+where $g=\t{diag}(1,-1,-1,-1)$ is the flat Minkowski metric. In words, this is the group of all $4\times 4$ real invertible matrices which preserve the metric. The defining relation $\Lambda^\t{T}g\Lambda=g$ implies that this group is actually disconnected and made up of four disjoint parts. That this is true comes from two observations\footnote{The first is found by just taking a determinant and the second one is found from $\Lambda_0^\mu g_{\mu\nu}\Lambda_0^\nu=g_{00} \implies (\Lambda_0^0)^2 - \sum_i (\Lambda_0^i)^2 = 1$}: $\det(\Lambda)=\pm 1$ and $\Lambda_0^0 = \pm\sqrt{1 + \Sigma_{i=1}^3(\Lambda_0^i)^2}$. The two choices of sign here lead to the four disjoint parts. There are the \textbf{\emph{proper}} Lorentz transformations with positive determinant and the \textbf{\emph{improper}} transformations with negative determinant. Each of these sets is further divided as being either \textbf{\emph{orthochronous}} with $\Lambda_0^0 \geq 0$ or \textbf{\emph{non-orthochronous}} with $\Lambda_0^0 < 0$.
+
+The most important of these four parts is the \textbf{\emph{proper orthochronous Lorentz group}}, or \emph{restricted Lorentz group}, $\t{SO}^+(1,3)$ defined by
+$$ \t{SO}^+(1,3) \equiv \{ \Lambda \in \t{O}(1,3) \:|\: \det\Lambda=1 \:\t{ and }\:\Lambda^0_0 \geq 0 \} $$
+This is the component which contains the identity element and in general, these are the Lorentz transformations which preserve the orientation of space and also the direction of time. Perhaps unsurprisingly then, the other three connected parts of the Lorentz group can be obtained by combining SO$^+(1,3)$ with time or space inversions. We can define three discrete symmetries which map $\t{SO}^+(1,3)$ to the other connected components: \textbf{\emph{time-reversal}} $\mathcal{T}$, \textbf{\emph{parity}} $\mathcal{P}$, and their combination $\mathcal{PT}$. They are defined by
+\begin{align*}
+	\mathcal{T} \equiv \t{diag}(-1,1,1,1) && \mathcal{P}\equiv \t{diag}(1, -1, -1, -1) && \mathcal{PT}= - \mathbbm{1}
+\end{align*}
+Since the combination of the restricted Lorentz group and these discrete symmetries captures all of the Lorentz group, we will typically focus on only these transformations. Formally we have the group decomposition
+$$ \t{O}(1,3) \cong \t{SO}^+(1,3) \rtimes \{\mathbbm{1}, \mathcal{P}, \mathcal{T}, \mathcal{PT}\} $$
+\subsection{The Double Cover $\t{SL}_2\boldsymbol{(\mathbb{C})}$}
+It is a useful observation that $\mathbb{R}^4$ has a 1-to-1 correspondence with the space of $2\times 2$ Hermitian matrices $\t{H}_{2\times 2}\equiv \{ \sigma \in \mathbb{C}^{2\times 2}\:|\: \sigma^\dagger = \sigma \}$. This is easily shown by using the Pauli basis. For any $x\in\mathbb{R}^4$, there is an $X\in \t{H}_{2\times 2}$ given by $X=x_\mu\sigma^\mu$. More concretely, we have
+$$ x=(x_0, x_1, x_2, x_3) \quad\leftrightarrow\quad X=\begin{pmatrix}
+	x_0 + x_3 & x_1 - ix_2 \\
+	x_1 + i x_2 & x_0 - x_3
+\end{pmatrix} $$
+Notice that the determinant of the matrix is $\det(X)=x_0^2 - x_1^2 - x_2^2 - x_3^2$ which is clearly related to the flat Minkowski metric $g^{\mu\nu}x_\mu x_\nu$. This suggests that there should be a correspondence between the metric-preserving Lorentz transformations on $\mathbb{R}^4$ and the determinant-preserving transformations on $\t{H}_{2\times 2}$. Such determinant-preserving transformations belong in general to\footnote{The special linear group is defined by $\t{SL}_2(\mathbb{C}) \equiv \{ g\in\mathbb{C}^{2\times 2} \:|\: \det(g)=1\}$} $\t{SL}_2(\mathbb{C})$ where the action of $g\in\t{SL}_2(\mathbb{C})$ on any $X\in\t{H}_{2\times 2}$ is given by
+$$X\:\mapsto\: X'=g^\dagger X g$$
+Indeed, since $\det(g)=1$, we have $\det(g^\dagger X g) = \det(g^\dagger)\det(X)\det(g)=\det(X)$. By the Pauli mapping, this transformation $X\mapsto X'$ must correspond to a Lorentz transformation $x\mapsto x'$. So then, there is a mapping $\Lambda: \t{SL}_2(\mathbb{C})\to\t{O}(1,3)$ such that $g\mapsto \Lambda(g)$ and
+$$    [\Lambda(g) x]_\mu \sigma^\mu  = g^\dagger X g$$
+A few observations. First: this map is continuous and as a consequence, it is really only a map to the identity component $\t{SL}_2(\mathbb{C})\to\t{SO}^+(1,3)$. Second: it is surjective as a map onto $\t{SO}^+(1,3)$. Third: it is a group homomorphism. And Fourth: the kernel $\{g\:|\:\Lambda(g)=\mathbbm{1}\}$ consists of all $g$ such that $g^\dagger Xg = X$ for all $X\in\t{H}_{2\times 2}$, but this is only satisfied for $g=\pm\mathbbm{1}$. Combining these observations, the first group isomorphism theorem\footnote{Theorem: If $f:G\to H$ is a group homomorphism, then $\t{im}(f)\cong G/\t{ker}(f)$} provides us with the important conclusion:
+$$  \t{SO}^+(1,3) \cong \t{SL}_2(\mathbb{C})/ \mathbb{Z}_2 $$
+This mapping realizes a 2-to-1 correspondence which makes $\t{SL}_2(\mathbb{C})$ a double cover of the restricted Lorentz group. This fact establishes $\t{SL}_2(\mathbb{C})$ as a \textbf{\emph{spin group}}\footnote{Spin groups are double covers of the special orthogonal groups} $\t{Spin}(1,3)$. In hindsight, this is perhaps expected since clearly $\Lambda(-g)=\Lambda(g)$. 
+
+\subsection{Projective Representations of $\boldsymbol{\t{SO}^+(1,3)}$}
+With $\t{SL}_2(\mathbb{C})$ identified as a double cover of the restricted Lorentz group, its representations will descend onto \emph{projective} representations of $\t{SO}^+(1,3)$ which is exactly what we need for a general relativistic quantum theory. In fact, the irreducible representations will have special physical relevance --- classical or quantum --- since they form the mathematical ``atoms" of a Lorentz invariant theory. To find these representations, we will appeal to the connectedness of $\t{SL}_2(\mathbb{C})$ which allows us to focus on the representations of its Lie algebra $\mathfrak{sl}_2(\mathbb{C})$ since they are 1-to-1 with the Lie group representations via the exponential map.
+
+The Lorentz algebra $\mathfrak{so}(1,3)$ is easily derived using the exponential map. If $g$ is the flat Minkowski metric, we find:
+$$ \mathfrak{so}(1,3) = \left\{ m\in \mathbb{R}^{4\times 4} \:|\: gm + m^\t{T}g = 0 \right\} $$
+This makes $\mathfrak{so}(1,3)$ a 6-dimensional real Lie algebra. Consider also that since the restricted Lorentz group has double cover $\t{SL}_2(\mathbb{C})$, we must have the following isomorphism of Lie algebras: $\mathfrak{so}(1,3)\cong \mathfrak{sl}_2(\mathbb{C})$. The special linear Lie algebra is given by
+$$ \mathfrak{sl}_2(\mathbb{C}) = \left\{ \tau\in\mathbb{C}^{2\times 2}\:|\: \tr(\tau) = 0 \right\} $$
+This can be viewed as either a 3-dimensional space over $\mathbb{C}$ or a 6-dimensional space over $\mathbb{R}$. Importantly, the isomorphism with the Lorentz algebra is only true in the latter view --- indeed, vector spaces over different fields are never isomorphic. When considered as a Lie algebra over $\mathbb{C}$, $\mathfrak{sl}_2(\mathbb{C})$ is spanned by the Pauli matrices and we can choose a special set of generators $\tau_1, \tau_2,$ and $\tau_3$ given by
+\begin{align*}
+	\tau_1 = (\sigma_1 + i\sigma_2)/2 && \tau_2 = (\sigma_1 - i\sigma_2)/2 && \tau_3 = \sigma_3
+\end{align*}
+These may be recognized as the ladder operators used in the representation theory of $\mathfrak{su}(2)$. In fact, the representations found there are exactly those of $\mathfrak{sl}_2(\mathbb{C})$ (as a complex Lie algebra). This is true since $\mathfrak{sl}_2(\mathbb{C})$ is actually the \textbf{\emph{complexification}} of the \emph{real} Lie algebra $\mathfrak{su}(2)$, i.e. the space of formal sums $x+iy$ for all $x,y\in\mathfrak{su}(2)$. Formally, we write
+$$ \mathfrak{sl}_2(\mathbb{C}) \cong \mathfrak{su}(2) \oplus i\,\mathfrak{su}(2)$$
+It is easy to show this is true by starting with the definition of $\mathfrak{su}(2)$ (the set of trace-zero, skew-Hermitian matrices) and showing that by allowing elements of the form $x+iy$, the skew-Hermiticity is lost but the trace-zero property remains. Going forward, complexification will be denoted by a subscript $\mathbb{C}$, e.g. $\mathfrak{su}(2)_\mathbb{C}\cong\mathfrak{sl}_2(\mathbb{C})$.
+
+This is all well and good, but since the isomorphism $\mathfrak{so}(1,3)\cong\mathfrak{sl}_2(\mathbb{C})$ is an isomorphism of 6-dimensional real algebras and not 3-dimensional complex ones, we are blocked from directly applying the familiar representation theory of $\mathfrak{su}(2)$. Instead however, we can mimic the procedure done there and make use of the following theorem:\\
+\rule{\textwidth}{1pt}
+\textbf{Theorem:} \emph{The finite-dimensional complex representations of a \textbf{real} Lie algebra $\mathfrak{g}$ are in 1-to-1 correspondence with the complex representations of its complexification $\mathfrak{g}_\mathbb{C}$.}\\
+\noindent\rule{\textwidth}{1pt}
+So we will take the complexification of the Lorentz group $\mathfrak{so}(1,3)_\mathbb{C} \cong \mathfrak{sl}_2(\mathbb{C})_\mathbb{C}$ and find representations of the resulting complex algebra, knowing they are 1-to-1 with the complex representations of the real Lorentz algebra. It is easy to see that the complexification of the special linear algebra is just two copies of itself. That is:
+$$ \mathfrak{so}(1,3)_\mathbb{C} \cong \mathfrak{sl}_2(\mathbb{C}) \oplus \mathfrak{sl}_2(\mathbb{C}) $$
+where in the direct sum, $\mathfrak{sl}_2(\mathbb{C})$ is now understood as the 3-dimensional complex Lie algebra. Indeed, the complexification $\mathfrak{so}(1,3)_\mathbb{C}$ has complex dimension 6=3+3.
+
+So now with the familiar irreducible representations $\pi_m:\mathfrak{sl}_2(\mathbb{C})\to\mathfrak{gl}(V)$, we can construct the irreducible representations of the complexified algebra $\mathfrak{so}(1,3)_\mathbb{C}$ by taking tensor products in a standard way for Lie algebras\footnote{The product group $G\times H$ has Lie algebra $\mathfrak{g}\oplus\mathfrak{h}$ and representations of these groups/algebras are related through $(\Pi_1\otimes\Pi_2)(g)=e^{t \pi_{1,2}(X)}$ where $\pi_{1,2}=\pi_1\otimes\mathbbm{1} + \mathbbm{1}\otimes\pi_2$ is the corresponding Lie algebra representation}:
+$$ \pi_{m,n} \equiv \pi_m\otimes\mathbbm{1} \:+\: \mathbbm{1}\otimes \pi_n $$
+These are the famous $(m,n)$ representations which feature prominently in texts on relativistic field theory. Through the tensor product they have dimension $(2m+1)(2n+1)$. For any choice of $m$ and $n$, we can construct the representation by noting how the rotation and boost generators are represented:
+\begin{align*}
+	\pi_{m,n}(J_i) &= \pi_m(J_i)\otimes\mathbbm{1} \;+\; \mathbbm{1}\otimes \pi_n(J_i) \\
+	\pi_{m,n}(K_i) &= i\left[ \pi_m(J_i)\otimes\mathbbm{1} \;-\; \mathbbm{1}\otimes\pi_n(J_i)\right]
+\end{align*}
+
+
+\subsection{Lorentz Scalars}
+The simplest representation is the trivial one $\pi_{0,0}=0$. It is identically zero so a Lorentz transformation is represented by $e^{t\pi_{0,0}}=1$.
+
+\subsection{Weyl Spinors}
+The smallest of the nontrivial $(m,n)$-representations are $(\frac{1}{2},0)$ and its conjugate representation $(0,\frac{1}{2})$. Recalling the spin $\frac{1}{2}$ irreducible representation of $\mathfrak{su}(2)$, the rotation and boost generators are represented in the $(\frac{1}{2},0)$ representation as
+$$ \pi_{\frac{1}{2},0}(J_i) = \frac{1}{2}\sigma_i \qquad\qquad \pi_{\frac{1}{2},0}(K_i) = \frac{i}{2}\sigma_i $$
+where we have suppressed the tensor product with the unaffected space harboring the trivial representation. So then an arbitrary Lorentz transformation in $\t{SO}^+(1,3)$ looks like
+$$ \Pi_{\frac{1}{2},0}(\Lambda) = e^{\frac{1}{2}\*\varphi\cdot\*\sigma + \frac{i}{2}\*u\cdot\*\sigma} $$
+for some $\*\varphi, \*u \in\mathbb{R}^3$. This is a 2-dimensional representation and the vectors which transform this way are called \textbf{Weyl spinors}.
+
+\section{Lorentz Representations from Clifford Algebras}
+There is a standard trick for writing down spinor representations of the Lorentz algebra. We first find a representation of the Clifford algebra consisting of elements $\gamma^\mu$ which satisfy the anticommutation relations
+$$ \{ \gamma^\mu, \gamma^\nu \} = 2g^{\mu\nu} $$
+Observe that this implies $(\gamma^0)^2=\mathbbm{1}$ and $(\gamma^i)^2=-\mathbbm{1}$ for $i=1,2,3$ and $\gamma^\mu\gamma^\nu=-\gamma^\nu\gamma^\mu$ for $\mu\neq \nu$. To generate a representation of the Lorentz group with this, we\textbf{} consider the commutators
+$$ M^{\mu\nu} \equiv \frac{1}{4}[\gamma^\mu, \gamma^\nu]  = \frac{1}{2}(\gamma^\mu\gamma^\nu -  g^{\mu\nu})  $$
+It can then be shown that these satisfy the Lorentz algebra commutation relations:
+$$ [M^{\mu\nu}, M^{\rho\sigma}] = M^{\mu\sigma}g^{\nu\rho} - M^{\nu\sigma}g^{\mu\rho} + M^{\rho\mu}g^{\nu\sigma} - M^{\rho\nu}g^{\sigma\mu} $$ 
+
+
+\section{Dirac Fields}
+In his attempts to develop a relativistic quantum theory of a single particle, Paul Dirac wrote down the \textbf{\emph{Dirac equation}}:
+$$ (i\gamma^\mu\partial_\mu - m)\psi = 0 $$
+where $\psi$ is a 4-component spinor and the $\gamma^\mu$ are the \textbf{\emph{gamma matrices}} which satisfy the anticommutation relations $\{\gamma^\mu,\gamma^\nu\}=2g^{\mu\nu}\mathbbm{1}$ where $g^{\mu\nu}$ is the flat Minkowski metric with signature (+ $- - -$). More formally, the gamma matrices form a representation of the Clifford algebra $\t{Cl}_{1,3}(\mathbb{C})$. Canonically, in the so-called Dirac representation, they take the form:
+\begin{align*}
+	\gamma^0 = \sigma^3\otimes\mathbbm{1} =\begin{pmatrix}
+		\mathbbm{1} & 0 \\
+		0 & -\mathbbm{1}
+	\end{pmatrix} && 
+	\gamma^i = i\sigma^2\otimes \sigma^i=\begin{pmatrix}
+		0 & \sigma^i \\
+		-\sigma^i & 0
+	\end{pmatrix}
+\end{align*}
+where the $\sigma^i$ denote the Pauli matrices. Using Feynman's slash notation, the gamma matrices are often incorporated into a variable by writing $\slashed{v}=\gamma^\mu v_\mu$. With this notation, the Dirac equation is often written in a slightly more succinct form: $(i\slashed{\partial} - m)\psi=0$. 
+
+\subsection{Free Solutions to the Dirac Equation}
+Consider a Dirac field of the form $\psi(x) = u_pe^{-ipx}$ where $u_p$ is a four-component spinor that we split into two two-component spinors $u_p=(\,\chi_1\hspace{0.1in}\chi_2\,)^\t{T}$. Here we also use the simplified notation $px \equiv p_\mu x^\mu = p^0x^0 - \*p\cdot\*x$. Plugging this into the Dirac equation produces an equation $ (\gamma^\mu p_\mu - m)u_p=0 $ which can be written as the block matrix equation:
+$$ 
+\begin{pmatrix}
+		p^0 - m & - \*\sigma\cdot \*p \\
+		\*\sigma\cdot\*p &  -(p^0 + m)
+\end{pmatrix}\begin{pmatrix}
+\chi_1\\
+\chi_2
+\end{pmatrix} = 0 $$
+For nontrivial solutions, the matrix must be singular and therefore have determinant zero. So then, by computing the determinant and setting it to zero, we reveal an expected result:
+$$ p^0 = \pm \sqrt{|\*p|^2 + m^2} $$
+We will write this as $p^0=\pm E_p$ where $E_p$ is taken as always positive. Crucially, there are two solutions  $u_p^+$ and $u_p^-$ corresponding to the positive and negative energies and we have to consider both. In each case, we can derive a relationship between the components $\chi_1$ and $\chi_2$ and obtain
+\begin{align*}
+	u^+_{ps} \propto \begin{pmatrix}
+		\phi_s \\
+		\frac{\*\sigma\cdot\*p}{E_p+m}\phi_s
+	\end{pmatrix}
+	&&
+	u^-_{ps} \propto \begin{pmatrix}
+		-\frac{\*\sigma\cdot\*p}{E_p+m}\phi_s\\
+		\phi_s
+	\end{pmatrix}
+\end{align*}
+where $\phi_s$ is any two-component spinor. In general then, the solution space is spanned by the choice $\phi_\uparrow = (1\:\:0)^\t{T}$ and $\phi_\downarrow = (0\:\:1)^\t{T}$ for both positive and negative energy solutions. Indeed, as this notation might suggest, the index $s$ has to do with the spin orientation of the field. This can be seen by considering the rest frame where $\*p=0$ and then acting on these spinors with the spin operator $S_z=\frac{1}{2}\t{diag}(\sigma_z, \sigma_z)$. One finds that $u^\pm_{0s}$ are eigenvectors with eigenvalue $\pm\frac{1}{2}$ depending on the choice of $s$. More generally, the free Dirac fields are eigenstates of the \textbf{\emph{helicity operator}} defined by
+$$ h \equiv \hat{\*p}\cdot\*S $$
+
+The negative energy solutions found above can be obtained another way which offers some physical intuition. If we had started with the alternative ansatz $\psi(x)=v_pe^{ipx}$, we would arrive at an equation $(\gamma^\mu p_\mu +m )v_p=0$. In this case, the negative energy solutions are exactly $v_p^- = u_{-p}^+$ and similarly $u_p^- = v_{-p}^+$. So in fact, we can rewrite the negative energy solutions so that they have positive energy but opposite momentum and a different spinor structure.
+
+
+\subsection{Quantization of the Dirac Field}
+The Lagrangian density for a spin-1/2 Dirac field is given by
+$$ \mathscr{L} = \bar{\psi}(i\slashed{\partial} - m)\psi  $$
+Writing this more explicitly as $\mathscr{L} = \psi^\dagger\gamma^0(i\gamma^\mu\partial_\mu - m)\psi$, it is easier to see that the canonical momentum field is by $\frac{\partial\mathscr{L}}{\partial(\partial_0 \psi)}=i\psi^\dagger$. To quantize, we promote the field and its momentum to operator-valued fields and we enforce the canonical anticommutation relation $\{\psi, i\psi^\dagger\}=i\delta$. Doing so component-wise, we arrive at the form
+$$ \{\psi_i(x), \psi_j^\dagger(y)\} = \delta_{ij}\delta(x-y) $$
+Expanding $\psi$ in the basis of positive and negative energy solutions, we have
+$$ \psi(x) = \sum_s \int\frac{d^3p}{(2\pi)^32E_p}\left[ c_{ps}\;u_{ps} e^{-ipx} + b_{ps}^\dagger\;v_{ps} e^{ipx} \right] $$
+where $u_{ps}$ and $v_{ps}$ are the free solutions to the Dirac equation with momentum $p$ and spin $s=\pm 1/2$. Note that the operators appearing here $c_{ps}$ and $b_{ps}^\dagger$ are \emph{not} adjoints as suggested by the notation. The adjoint $\bar{\psi}=\psi^\dagger\gamma^0$ becomes
+$$ \bar{\psi}(x) = \sum_s \int\frac{d^3p}{(2\pi)^32E_p}\left[ c^\dagger_{ps}\;\bar{u}_{ps} e^{ipx} + b_{ps}\;\bar{v}_{ps} e^{-ipx} \right] $$
+
+
+
+\newpage
+
+\section{Yang-Mills Theory}
+\subsection{Principal Bundles over Spacetime}
+All of the fundamental interactions in nature aside from gravity can be formulated as \textbf{gauge theories}. The formal way to construct such a theory begins with a fiber bundle $\pi:E\to\mathcal{M}$ over spacetime $\mathcal{M}$. In particular, consider a principal bundle with structure group $G$. So over each point $x\in\mathcal{M}$, we attach a copy of $G$ and consider it to be a \textbf{gauge symmetry} and \emph{not a spacetime symmetry}. In other words, the group $G$ acts on the fibers (copies of $G$) and there is no group action defined on spacetime. It is a purely \emph{internal} symmetry. We require that the right group action is closed within each fiber, i.e. for any $p$ in the fiber over $x$, we have $\pi(pg)=\pi(p)=x$ for any $g\in G$.
+
+It will help to visualize an example in 1-dimensional spacetime $\man=\R$. Let the gauge group be the 2D translation group $\R^2$ so that we can visualize the total bundle as an infinite cylinder --- the central axis is the base space and the orthogonal planes through each point define the fibers. In these terms, the group action is a translation within each plane. Observe that the Lie algebra associated with each fiber is just the tangent space within the fiber at the identity (i.e. at 0). If we consider the tangent bundle for the full space, the special tangent vectors that have zero component along the base space are said to belong to the \textbf{vertical subbundle} and can be identified as belonging to the Lie algebra.
+
+More generally, the projection $\pi$ admits a differential $d\pi :TE\to T\mathcal{M}$ which maps from the tangents of the total space to tangent vectors on spacetime. The vertical subspace can be formally defined by those tangent vectors which have no component along spacetime (and can in fact be identified with elements of the Lie algebra $\mathfrak{g}$):
+$$ \ker d\pi \simeq \mathfrak{g}$$
+This is the space containing tangent elements that are ``parallel to the fiber" so that the projection onto $\mathcal{M}$ does not change in their direction. The full tangent bundle $TE$ can then be constructed as the combination of the vertical subbundle and a ``horizontal" subbundle which is fully contained as the tangent bundle of $\man$. We may write the tangent space over $p\in E$ as the orthogonal decomposition:
+$$ T_pE = \underbrace{T_{\pi(p)}\man}_{\t{horizontal}}\:\:\oplus\underbrace{ \mathfrak{g}}_{\t{vertical}} $$
+Whereas $d\pi$ projects onto the horizontal space, this orthogonal decomposition suggests we can define an alternative projection onto the vertical space. We will call it the \textbf{connection} $\omega:TE\to \mathfrak{g}$ and it is defined so that
+$$ \ker\omega = T\man $$
+Observe that this mapping can be viewed as a differential 1-form with values in the lie algebra. For this reason, we call $\omega$ the connection 1-form. 
+
+\subsection{Covariant Derivatives}
+Consider now a field $\Psi:E\to \C^n$ where $\C^n$ is the vector space defining the physical state. Note that we have defined this as a field over the total space $E$ rather than over spacetime $\man$ so that the gauge symmetry is realized by $\Psi$ being multivalued over any spacetime point $x\in\man$. Ultimately, we will need to project onto only spacetime by making a choice of gauge, but for now the fields must be defined on the larger space so that gauge transformations can be properly formulated. Precisely, we want the field to transform equivariantly. For a group representation $\rho$ on $\C^n$, we must have
+$$ \rho(g)\Psi(p) = \Psi(pg^{-1})$$
+The exterior derivative of the vector-valued 0-form $\Psi$ is a function $d\Psi:TE\to \C^n$. To compute this, we will decompose its action on $TE$ into the horizontal and vertical components so that
+$$ d\Psi(v) = d\Psi(\t{hor}(v)) + d\Psi(\t{ver}(v)) $$
+where $\t{hor}$ and $\t{ver}$ are the horizontal and vertical projections respectively. The horizontal projection precisely drops out any explicit dependence on the gauge group $G$ leaving only spacetime --- we will call this $D\Psi$. 
+
+The vertical projection on the other hand is $d\Psi(\t{ver}(v)) = d\Psi(\omega(v))$. Since $\omega(v)$ lives in the Lie algebra $\mathfrak{g}$, we will find that the equivariant structure of the field will bring the Lie algebra into the forefront here. In fact, one finds:
+$$ d\Psi(\omega(v)) = -\rho_*(\omega(v)) \Psi $$
+where $\rho_*$ is a representation of the Lie algebra $\mathfrak{g}$ on $\C^n$. So then, we have the full derivative
+$$ d\Psi(v) = D\Psi(v) - \rho_*(\omega(v))\Psi(v) $$
+This $d\Psi$ is a vector-valued 1-form on the total space including all gauge freedom. To translate this to a physically measurable field $\psi:\man\to\C^n$, we must remove any gauge ambiguity. A choice of gauge is equivalent to a section of the principal bundle $s:\man\to E$. Our physical field is then the pullback of $\Psi$ by that section $s$:
+$$ \psi(x) = \Psi(s(x)) $$
+The derivative then yields $d\psi = d\Psi(ds)$. The result is $ d\psi = D\psi - \rho_*(A)\psi $ which rearranges to give us the horizontal, or covariant, derivative. Componentwise:
+$$ D_\mu\psi = \partial_\mu\psi + A_\mu\psi $$
+We will usually include some additional factors in $A$ to make it behave the way we like:
+$$ D_\mu\psi = \partial_\mu\psi + igA_\mu\psi $$
+With this, we can construct gauge respecting equations of motion.
+
+\subsection{Curvature \& Invariants}
+$$  [D_\mu, D_\nu] = D_\mu D_\nu - D_\nu D_\mu $$
+$$ [D_\mu, D_\nu] = ig(\partial_\mu A_\nu - \partial_\nu A_\mu +ig[A_\mu, A_\nu]) $$
+$$ F = d\omega -ig\omega\wedge \omega $$
+
+
+\subsection{The Yang-Mills Lagrangian}
+Armed with the covariant derivative $D_\mu\psi = \partial_\mu\psi + igA_\mu\psi$ which captures the gauge symmetry of our choosing, we can now construct gauge invariant quantities to make up our Lagrangian. The Yang-Mills Lagrangian is given by
+$$ \mathscr{L} = \bar\psi(\gamma^\mu D_\mu - m)\psi + \frac{1}{2}F^{\mu\nu}F_{\mu\nu} $$
+where $F=D\omega = d\omega + \omega\wedge \omega$.
+
+
+
+
+
+\newpage
+\section{Appendices}
+
+\subsection{A1. The Adiabatic Theorem}
+Suppose we have a Hamiltonian which only depends on time through some parameter $g(t)$. Then the energy eigenstates will have implicit time-dependence also through $g$. By taking a time derivative of the eigenvalue equation $H\ket{m}=E_m\ket{m}$ and projecting onto another eigenstate $\ket{n}\neq \ket{m}$, we can derive:
+$$ \bra{n}\ket{\partial_g m} = -\frac{\bra{n}\partial_g H \ket{m}}{E_n - E_m} $$
+With this relationship in mind, we can write the Schr\"odinger equation for any arbitrary state $\ket{\psi}=\sum_m a_m\ket{m}$ in the following form
+$$  i\sum_m \bigg[\dot{a}_m\ket{m} + a_m |\dot{m}\rangle \bigg]= \sum_m a_m E_m\ket{m} $$
+Projecting onto an eigenstate $\ket{n}$, we can use $|\dot{m}\rangle=|\partial_gm\rangle \dot{g}$ along with the previous relationship to derive
+$$  \dot{a}_n = \underbrace{-i\bigg[E_n  - i\langle n|\dot{n}\rangle\bigg] a_n}_{\t{dynamical + geometric phase}} + \sum_{m\neq n} a_m \frac{\bra{n}\partial_gH\ket{m}}{E_n-E_m}\dot{g}  $$
+The first terms contain pure phases --- the dynamical and geometric (a.k.a. Berry) phases --- and as such, they do not contribute to any state transition probability. The last term containing $\dot{g}$ however is entirely responsible for state transitions and this leads to a nice conclusion known as the \textbf{\emph{adiabatic theorem}}: \emph{when the Hamiltonian changes sufficiently slowly (i.e. $\dot{g}$ is small), the probability of a state transition goes to zero}. Here "small" is with respect to the energy gaps $E_n-E_m$ in the system. A large energy gap suppresses transitions as expected. When the change is slow enough, we call it \emph{adiabatic evolution}.
+\\
+
+\subsection{A2. The Lorentz Algebra $\boldsymbol{\mathfrak{so}(1,3)}$}
+The Lorentz group is defined by $\t{O}(1,3)\equiv \{ \Lambda \in \t{GL}(\mathbb{R}^4)\:|\: \Lambda^\t{T}g\Lambda = g \}$ where $g$ is the flat Minkowski metric $g=\t{diag}(1,-1,-1,-1)$. In terms of the Lie group-Lie algebra correspondence, we can write any $\Lambda$ in the identity component $\t{SO}^+(1,3)$ as an exponential: $\Lambda = e^{mt}$. As $t\to 0$, the defining relation $\Lambda^\t{T}g\Lambda = g$ takes the infinitesimal form
+$$ \Lambda^\t{T}g\Lambda = g \:+\: t(m^\t{T}g + gm)  \:+\: \dots  $$
+This implies the condition $m^\t{T}g + gm = 0$. Therefore the Lorentz algebra can then be written as
+$$ \mathfrak{so}(1,3) = \left\{ m\in\mathbb{R}^{4\times 4} \:|\: gm +m^\t{T}g=0 \right\}$$
+Using $gg=\mathbbm{1}$, the condition can be written component-wise as $g_{\mu\mu}m_{\mu\nu}g_{\nu\nu}=-m_{\nu\mu}$. This implies that a general element of the Lie algebra has the form
+$$ m = \begin{pmatrix}
+	0 & x_1 & x_2 & x_3 \\
+	x_1 & 0 & x_4 & x_5 \\
+	x_2 & -x_4 & 0 & x_6 \\
+	x_3 & -x_5 & -x_6 & 0
+\end{pmatrix} $$
+So there are 6 degrees of freedom here and therefore 6 generators of the Lie algebra. The conventional choice for these generators is the obvious one. These are the rotations $J_i$ and the boosts $K_i$ defined so that the boost generators are
+\begin{align*}
+	K_1 = \begin{pmatrix}
+		0&1&0&0\\
+		1&0&0&0\\
+		0&0&0&0\\
+		0&0&0&0
+	\end{pmatrix} && K_2 =\begin{pmatrix}
+	0&0&1&0\\
+	0&0&0&0\\
+	1&0&0&0\\
+	0&0&0&0
+\end{pmatrix} && K_3 = \begin{pmatrix}
+0&0&0&1\\
+0&0&0&0\\
+0&0&0&0\\
+1&0&0&0
+\end{pmatrix} 
+\end{align*}
+and the rotation generators are
+\begin{align*}
+J_1= \begin{pmatrix}
+	0&0&0&0\\
+	0&0&0&0\\
+	0&0&0&-1\\
+	0&0&1&0
+\end{pmatrix} && J_2= \begin{pmatrix}
+0&0&0&0\\
+0&0&0&1\\
+0&0&0&0\\
+0&-1&0&0
+\end{pmatrix} && J_3=\begin{pmatrix}
+0&0&0&0\\
+0&0&-1&0\\
+0&1&0&0\\
+0&0&0&0
+\end{pmatrix}
+\end{align*}
+So any element of the algebra can be expanded $ m = x_1K_1 + x_2K_2 + x_3K_3 - x_4J_3 + x_5 J_2 - x_6 J_1 $. Note the minus sign on $J_1$ and $J_3$. This allows us to write $(J_i)_{jk} = -\epsilon_{ijk}$. It can be checked that these generators satisfy the commutation relations
+\begin{align*}
+	[J_i,J_j] = \epsilon_{ijk}J_k && [J_i, K_j] = \epsilon_{ijk}K_k && [K_i, K_j] = -	\epsilon_{ijk}J_k
+\end{align*}
+Typically in the physics literature an additional factor of $i$ is included in these generators. 
+
+An important property of this algebra is that, over $\C$, it can be decoupled into two distinct $\mathfrak{su}(2)$ algebras. We need only define the two complex combinations:
+$$ J^\pm_i \equiv \frac{J_i \pm iK_i}{2} $$
+With these, it is straight forward to show that $[J^\pm_i, J^\pm_j] = \epsilon_{ijk}J^\pm_k$ and also $[J_i^+, J_j^-]=0$. So we have two distinct, commuting copies of $\mathfrak{su}(2)$ generated by $\{J^+_1, J^+_2, J^+_3\}$ and $\{J^-_1, J^-_2, J^-_3\}$. Formally, we may write
+$$ \mathfrak{so}(1,3)_\mathbb{C}=\mathfrak{sl}_2(\mathbb{C})\oplus\mathfrak{sl}_2(\mathbb{C}) $$
+
+\newpage
+\subsection{A3. Representation Theory of $\boldsymbol{\t{SU}(2)}$}
+The Lie group $\t{SU}(2)$ is a compact, simply connected group which means that every $g\in\t{SU}(2)$ can be written as $g=e^{tu}$ for some matrix $u$ in the Lie algebra $\mathfrak{su}(2)$. This also means that any irreducible representation $\pi$ of the Lie algebra lifts to an irreducible representation $\Pi$ of the full Lie group through $\Pi(e^{tu}) = e^{t\pi(u)}$. So then our attention shifts to finding the irreducible representations of the Lie algebra, a much more tractable goal. 
+\subsubsection{The Lie Algebra $\boldsymbol{\mathfrak{su}(2)}$ and its Complexification $\boldsymbol{\mathfrak{sl}_2(\mathbb{C})}$}
+The finite-dimensional irreducible representations of $\mathfrak{su}(2)$ are derived in every decent book on quantum mechanics though the rigor is often lacking. Most of the time, physicist authors leave out many details that are actually crucial to a proper understanding  First let's derive the Lie algebra. The Lie group $\t{SU}(2)$ is defined as the set of all $2\times 2$ complex matrices which are unitary and which have determinant 1. So for $g\in\t{SU}(2)$, through the exponential map $g=e^{tu}$, unitarity implies that $e^{tu^\dagger}=e^{-tu}$ so the elements of the Lie algebra must be skew-Hermitian ($u^\dagger=-u$). The unit determinant condition $\t{det}(e^{tu})=e^{t\,\t{tr}(u)}=1$ further implies that $u$ must have trace zero. So then the Lie algebra $\mathfrak{su}(2)$ is precisely the set of all traceless, skew-Hermitian $2\times 2$ complex matrices:\footnote{Note that in the physics convention, the exponential map includes a factor $i$ ($g=e^{itu}$). This leads to a Lie algebra of \emph{Hermitian} matrices rather than skew-Hermitian. }
+$$ \mathfrak{su}(2) = \{ u \in \mathbb{C}^{2\times 2} \:|\: \t{tr}(u)=0 \;\t{ and }\; u^\dagger =- u \} $$
+An arbitrary element of this Lie algebra must look like
+$ \scriptsize\begin{pmatrix}
+	iz & -y+ix \\
+	y +ix & -iz
+\end{pmatrix} $
+for $x,y,z\in\mathbb{R}$. As a real Lie algebra, $\mathfrak{su}(2)$ is therefore 3-dimensional and is spanned by matrices
+ \begin{align*}
+ 	u_1 = \begin{pmatrix}
+ 		0&i\\
+ 		i&0
+ 	\end{pmatrix}
+ &&
+ u_2 = \begin{pmatrix}
+ 	0&-1\\
+ 	1&0
+ \end{pmatrix}
+&&
+u_3 = \begin{pmatrix}
+	i&0\\
+	0&-i
+\end{pmatrix}
+ \end{align*}
+These are nothing but the ordinary Pauli matrices but scaled by a factor of $\pm i$ to form skew-Hermitian matrices rather than Hermitian ones. In particular we have $\sigma_1=-iu_1$, $\sigma_2=iu_2$, and $\sigma_3=-iu_3$. Note however that since the Lie algebra is real, the Pauli matrices themselves are \emph{not} in $\mathfrak{su}(2)$ --- they are Hermitian after all. These generators satisfy the bracket/commutation relations:
+$$ [u_i, u_j] = \epsilon_{ijk}\,2u_k $$
+It is worth emphasizing again that this is a \emph{real} Lie algebra, so complex linear combinations of these matrices are \emph{not} in $\mathfrak{su}(2)$. However, it is much easier to work with complex Lie algebras so will extend to the complexification $\mathfrak{su}(2)_\mathbb{C}$ which is precisely $\mathfrak{sl}_2(\mathbb{C}) = \{s\in\mathbb{C}^{2\times 2}\:|\: \t{tr}(s)=0\}$. In this new algebra over $\mathbb{C}$, we can take the generators to be the ordinary unscaled Pauli matrices $\sigma_1, \sigma_2$ and $\sigma_3$, but it will prove more useful to define different generators by taking some complex linear combinations --- we define $s_\pm = (\sigma_1 \pm i\sigma_2)/2 $ and $ s_3 = \sigma_3/2$. More explicitly, these are \begin{align*}
+	s_-=\begin{pmatrix}0&0\\1&0\end{pmatrix} && s_+=\begin{pmatrix}0&1\\0&0\end{pmatrix} && s_3=\begin{pmatrix}1/2&0\\0&-1/2\end{pmatrix}
+\end{align*} 
+These satisfy the commutation relations:
+\begin{align*}
+	[s_3, s_\pm] = \pm s_\pm  && [s_+, s_-] = 2s_3
+\end{align*}
+
+\subsubsection{Irreducible Representations of $\boldsymbol{\mathfrak{sl}_2(\mathbb{C})}$}
+With these relations in hand, we can construct finite-dimensional representations of $\mathfrak{sl}_2(\mathbb{C})$. For a linear map $\pi:\mathfrak{sl}_2(\mathbb{C})\to\mathfrak{gl}(V)$, if there exist operators $J_3=\pi(s_3)$ and $J_\pm=\pi(s_\pm)$ acting on $V$ which satisfy the commutation relations:
+\begin{align*}
+	[J_3, J_\pm] = \pm J_\pm && [J_+, J_-] = 2J_3
+\end{align*}
+then $\pi$ is a representation of $\mathfrak{sl}_2(\mathbb{C})$.
+
+Suppose we have such a representation $\pi$. Consider the eigenvalues of $J_3$. If $\ket{m}$ is an eigenvector of $J_3$ and $m$ is its eigenvalue, then we write $J_3\ket{m} = m \ket{m}$. Now construct the new vector $J_\pm v$ and act on this with $J_3$. By the commutation relations we find
+$$ J_3 J_\pm \ket{m} = \left(J_\pm J_3 \; \pm\; J_\pm\right)\ket{m} = (m \pm 1)J_\pm \ket{m} $$
+Evidently then, acting on an eigenvector $\ket{m}$ with $J_\pm$ produces another eigenvector but with a \emph{raised} or \emph{lowered} eigenvalue $m\pm 1$. In other words, for some coefficients $c_\pm$ (which generally depend on $m$) we may write
+$$ J_\pm \ket{m} = c_\pm\ket{m\pm 1} $$
+We therefore call $J_+$ a \emph{raising operator} and $J_-$ a \emph{lowering operator}. To find the coefficients, we can compute the norm $\bra{m}J_-J_+\ket{m}$, but first we will need another useful operator. Namely, we will want the Casimir operator
+$$ J^2 \equiv J_1^2 + J_2^2 + J_3^2 $$
+$$ (J_1 + iJ_2)(J_1 - iJ_2) = J_1^2 + J_2^2 - i[J_1,J_2] = J_1^2 + J_2^2 + 2J_3 = J^2 - J_3^2 - 2J_3 $$
+This process can be iterated so that after $n$ iterations, we have
+$$ J_\pm^n \ket{m} = c_\pm^n \ket{m\pm n} $$
+But of course as long as $J_3$ is a finite-dimensional matrix, it has a finite number of eigenvectors. Therefore there must exist some $N$ such that $J_\pm^N=0$ --- in jargon, the matrices $J_\pm$ are nilpotent with index $N$. So there must be a vector $\ket{m_\t{max}}$ 	
+
+
+
+\end{document}

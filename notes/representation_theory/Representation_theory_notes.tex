@@ -1,0 +1,1682 @@
+\documentclass[9 pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bbm}
+\usepackage{physics}
+\usepackage{tcolorbox}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\def\*#1{\boldsymbol{#1}}
+
+\title{Notes on Group Theory and Representation Theory}
+\author{George Willingham}
+
+
+
+\begin{document}
+	
+	
+\maketitle
+
+\tableofcontents
+\newpage
+
+
+\chapter*{Notes on Group Theory}
+\addcontentsline{toc}{chapter}{Notes on Group Theory}
+
+{\centering
+	\section*{GROUPS}}
+\addcontentsline{toc}{section}{Groups}
+\begin{tcolorbox}
+	A \textbf{\textit{group}} ($G, \cdot)$ is defined as a set $G$ together with a binary operation $\cdot$ which satisfies the following:
+	\begin{itemize}
+		\item Closure: $\forall g_1, g_2 \in G \:\: g_1 \cdot g_2 = g_3 \in G $
+		\item Associativity: $g_1\cdot  (g_2 \cdot g_3) = (g_1 \cdot g_2)\cdot g_3 $
+		\item Identity: $\exists e\in G $ such that $\forall g\in G$ $g\cdot e=e\cdot g=g $
+		\item Inverse: $\forall g\in G \:\:\exists \: g^{-1}$ such that $g^{-1}\cdot  g=e $
+	\end{itemize}
+\end{tcolorbox}
+Note that commutativity is not required so we can have groups where $g\cdot h\neq h\cdot g$. It is often the case that the group operation $\cdot$ will not be explicitly written and we will write $g\cdot h$ as just $gh$. This is done for most of these notes, but it should be remembered that the operation must be defined to have a group. 
+
+Some basic examples of groups include the reals under addition: $(\mathbb{R}, +)$ or the integers under addition modulo $n$: $(\mathbb{Z}_n , +)$. An example of a non-group is the reals under multiplication: $(\mathbb{R}, \times)$. This is not a group since there is no inverse for multiplication by 0.
+
+\begin{tcolorbox}
+	An \textbf{\emph{abelian}} group is one for which all group elements commute. So if $G$ is abelian then
+	$$ gh = hg \:\:\forall g,h\in G $$ 
+	Any group that is not abelian is \emph{non-abelian}.
+\end{tcolorbox}
+
+\begin{tcolorbox}
+	The number of elements in a group is called the \textbf{\emph{order}} of the group and will be denoted by the absolute value sign. So a group $G$ has order $|G|$.
+\end{tcolorbox}
+A finite group is one which has finite order. 
+
+{\centering 
+	\subsection*{SUBGROUPS AND COSETS}}
+
+\begin{tcolorbox}
+	A \textbf{\emph{subgroup}} $H\subseteq G$ is a subset of $G$ which is also a group under the same group operation.
+	\\
+	\\
+	The \textbf{\emph{trivial subgroups}} are $\{e\}$ and $G$ itself.
+	\\
+	\\
+	A \textbf{\emph{proper subgroup}} $H\subset G$ is a subgroup of $G$ which is not trivial.
+\end{tcolorbox}
+\begin{tcolorbox}
+	The \textbf{\emph{left coset}} of $g\in G$ of $H\subset G$ is denoted and defined by
+	$$ gH = \{gh \:\:\forall h\in H\} $$
+	
+\end{tcolorbox}
+The right coset is similarly defined just with $g$ acting on $H$ from the right. With these definitions we now prove a useful result:
+
+{\centering
+\section*{COSET DECOMPOSITION}}
+\addcontentsline{toc}{section}{Coset Decomposition}
+\begin{tcolorbox}
+	A group $G$ with subgroup $H$ can be decomposed as a \emph{disjoint} union of cosets:
+	$$ G = \bigcup_i \:g_iH $$
+	The $g_i$ are called \textbf{\emph{coset representatives}} and one must be the identity $e$.
+\end{tcolorbox}
+
+To prove this, we need two lemmas.
+
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+\textbf{LEMMA:} \emph{A subgroup $H\subset G$ and a coset $gH$ with $g\notin H$ have distinct elements.}
+\\
+Phrased another way, their intersection is the empty set: $H \cap gH = \emptyset$. The proof is by contradiction:
+\\
+\\
+Assume there is some $h_1\in H$ which is also in $gH$. Then by definition of the coset, there must exist some $h_2\in H$ such that $h_1 = gh_2$. But acting on the right with $h_2^{-1}$, this becomes $g=h_1h_2^{-1}\in H$. The right side is clearly in $H$. But by construction of $gH$, $g$ is not in $H$. Thus we have a contradiction and the lemma is proven.
+\\
+\\
+\textbf{LEMMA:} \emph{Any two cosets $g_1H$ and $g_2H$ where $g_1\notin g_2H$ and $g_2\notin g_1H$ must have distinct elements.}
+\\
+\\
+Assume there is an element $g_1 h_1 \in g_1H$ which is also in $g_2H$. Then there is some $h_2\in H$ such that $g_1h_1 = g_2h_2$. But acting on the right with $h_1^{-1}$ this becomes $g_1 = g_2h_2h_1^{-1}$. But the right side is clearly in $g_2H$ and by construction this is not true. So the lemma is proven.
+\\
+\\
+So by starting with a subgroup $H$ and building cosets by choosing $g_i\notin H$ which are also not in any other already built coset, we can write $G$ as a disjoint union $G = H \cup g_1H \cup g_2H \dots g_nH$ for some $n\in \mathbb{N}$.
+\\
+\\
+\textbf{q.e.d.}
+
+
+{\centering
+	\subsection*{LAGRANGE'S THEOREM}}
+\begin{tcolorbox}
+	If $H\subseteq G$ is a subgroup of $G$, then $|H|$ divides $|G|$ 
+\end{tcolorbox}
+That is to say that $|G| = n|H|$ for some $n\in\mathbb{Z}$. This statement is obviously true for trivial subgroups $G$ and $\{e\}$ so we prove it for nontrivial subgroups now:
+\\
+\\
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+We just need one lemma:
+\\
+\\
+\textbf{LEMMA:} \emph{All elements of a coset $gH$ are distinct}
+\\
+\\
+In other words there are no duplicates. Suppose for $h_1\neq h_2$, two elements $gh_1$ and $gh_2$ are the same. Then we would have $gh_1 = gh_2$, but acting on the left with $g^{-1}$ just leaves $h_1=h_2$. Thus for a coset element $g$, the only element it is equal to in the coset is itself.
+\\
+\\
+\emph{Corollary: Since all elements are dinstinct, the number of elements in $gH$ must be $|H|$} 
+\\
+\\
+So since $G$ can be decomposed as the disjoint union of cosets and now we know all those cosets must have size $|H|$, it must be true that $|G|=n|H|$ where $n\in \mathbb{N}$ is the number of cosets of $H$ in the decomposition of $G$.
+\\
+\\
+\textbf{q.e.d.}
+\\
+\\
+The integer $n$ is often denoted by $[G:H]$ and is called the \emph{index} of $H$ in $G$. 
+
+
+{\centering
+\section*{CONJUGACY CLASSES, NORMAL SUBGROUPS, AND QUOTIENT GROUPS}}
+\addcontentsline{toc}{section}{Conjugacy Classes, Normal Subgroups, and Quotient Groups}
+\begin{tcolorbox}
+	For $g,h \in G$, the \textbf{\emph{conjugation}} of $g$ by $h$ is given by $ h gh^{-1} $. 
+	\\
+	\\
+	A minimal subset of $G$ which is closed under conjugation forms a \emph{conjugacy class}. 
+\end{tcolorbox}
+
+\begin{tcolorbox}
+	A subgroup $H\subset G$ is called \textbf{\emph{normal}} if 
+	$$ gHg^{-1} = H \:\:\forall g\in G $$
+	To indicate $H$ is a normal subgroup, we use the notation $H \triangleleft G$. 
+\end{tcolorbox}
+Normal subgroups are also called \textbf{\emph{self-conjugate}} or \textbf{\emph{invariant}}. Note that for a subgroup to be normal, it must consist of complete conjugacy classes. Now we list some properties of normal subgroups to emphasize why they are important.
+
+\begin{center}
+	\textbf{PROPERTIES OF NORMAL SUBGROUPS}
+\end{center}
+If $N \triangleleft G$, then the following statements are equivalent:
+\begin{itemize}
+	\item The left and right cosets coincide: $gN = Ng \:\:\forall g\in G$
+	\item $N$ is a union of conjugacy classes
+	\item The cosets of $N$ form a group
+\end{itemize}
+Perhaps the most important of these properties is the last. In order to see the group structure in the cosets of normal subgroups, consider the multiplication of cosets defined by
+$$ (g N)( hN) = \{ gn_i hn_j \: \forall n_i, n_j \in N \} $$
+\\
+If we want this multiplication to satisfy our group axioms, we need this product to be closed i.e. we need it to be a coset. We know that all cosets have distinct elements and we also know that $e\in N$ which means that $g \in gN$. This tells us the product $(gN)(hN)$ must contain the element $gh$. So if the product gives a coset at all, it must be the coset $ghN$. We then have the condition:
+$$(gN)(hN) = gh N $$
+\\
+We can see that normal subgroups satisfy this condition by writing
+
+$$ gN \: hN = gh\:N $$
+$$ N\:hN = hN $$
+$$ N\:hNh^{-1} = N $$
+\\
+Since $N\triangleleft G$, $hNh^{-1} = N$ so the left side is just $NN$ which is clearly the same as $N$. So the equality holds and therefore \emph{if N is normal, then its cosets are closed under set multiplication}. Associativity can be seen easily by just writing it down. The identity element is just $N=eN$ since $(eN)(gN) = eg N = gN$. So the cosets form a group! The converse can also be proven making normal subgroups the only subgroups which have cosets which form a group. This is very useful since it allows us to define \emph{quotient groups}:
+
+\begin{tcolorbox}
+	For a group $G$ with normal subgroup $N\triangleleft G$, the \textbf{\emph{quotient group}} $G/N$ is the group of cosets $gN$. 
+	\\
+	It is a quotient in the sense that we introduce the equivalence relation that two elements of $G$ are equivalent if they are in the same coset of $N$.
+\end{tcolorbox}
+This is also called the \textbf{\emph{factor group}}. Importantly note that $G/N$ is \emph{not} a subgroup of $G$. It is an entirely distinct group.
+
+
+{\centering
+\section*{DIRECT AND SEMIDIRECT PRODUCTS}}
+\addcontentsline{toc}{section}{Direct and Semidirect Products}
+\begin{tcolorbox}
+	The \textbf{\emph{direct product}} of two groups $G$ and $H$, denoted by $G\otimes H$, is a group with underlying set the Cartesian product
+	$$ G\times H = \{ (g, h) \:|\:g\in G , \:h\in H \} $$
+	and which inherits its multiplication rules from $G$ and $H$ according to the elementwise operation:
+	$$ (g_1, h_1)\cdot(g_2, h_2) = (g_1g_2, h_1h_2) $$
+	
+\end{tcolorbox}
+
+It would be nice to be able to write a group as a product of its subgroups. In other words, if $N_1, N_2 \subset G$, then we want to write $G \simeq N_1\otimes N_2$ where we only concern ourselves with equality up to isomorphism. To write the group $G$ as a product in this way, it turns out we must have the following conditions satisfied:
+\\
+\begin{itemize}
+		\item The subgroups have minimal intersection: $N_1 \bigcup N_2 = \{e\}$
+		\item Any $g\in G$ can be written uniquely as the product of an element of $N_1$
+		and an element of $N_2$
+ 		\item Both $N_1$ and $N_2$ are normal in $G$
+\end{itemize}
+These conditions are fairly restrictive since only normal subgroups can be used in the products. It would be nicer if we could include non-normal subgroups in our products. To do so, we define the \emph{semidirect product}:
+
+\begin{tcolorbox}
+	Consider two groups $N$ and $H$ along with a homomorphic map 
+	$$ \varphi : H\to \text{Aut}(N)$$
+	where $\text{Aut}(N)$ is the group of automorphisms on $N$ under composition. The \textbf{\emph{semidirect product}}, denoted $N\rtimes_\varphi H$, is the group with underlying set the Cartesian product $N\times H$ which has the group operation $\cdot$ defined by
+	$$ (n_1, h_1)\cdot(n_2, h_2) = \left(n_1 \varphi_{h_1}(n_2), \:h_1h_2 \right) $$
+	where $\varphi_{h_1}=\varphi(h_1)$
+\end{tcolorbox}
+When $N$ and $H$ are unrelated, the above definition is the \emph{outer semidirect product}. On the other hand, if we are trying to write a group $G$ as a product of its subgroups $N$ and $H$, then we use the construction of the \emph{inner semidirect product} which really amounts to a particular choice of the homomorphism $\varphi$. 
+
+\begin{tcolorbox}
+	Consider a group $G$ with normal subgroup $N\triangleleft G$ and non-normal subgroup $H \subset G$. If every $g\in G$ can be written as a product of an element of $N$ and an element of $H$, we can write $G$ as the semidirect product $G\simeq N\rtimes_\varphi H$ where $\varphi:H\to\text{Aut}(N)$ is defined by conjugation
+	$$ \varphi_{h}(n) = h n  h^{-1} $$
+\end{tcolorbox}
+This is often the more useful form of a semidirect product. In fact, whenever we will write a group $G$ as the semidirect product of $N$ and $H$, we will drop the $\varphi$ subscript and just write 
+
+$$ G = N \rtimes H $$
+Note that the symbol $\rtimes$ is a combination of $\triangleleft$ and $\times$ such that it indicates which group is the normal subgroup and which is not.
+
+\newpage
+
+
+{\centering
+\section*{GROUP ACTION}}
+\addcontentsline{toc}{section}{Group Action}
+While groups are defined purely in terms of algebraic structure, a large part of their value comes from when we view the group elements as acting on some space. For this reason, we formalize how a group acts on a set with the notion of \emph{group action}:
+
+\begin{tcolorbox}
+	For a group $G$ and a set $X$, the \textbf{\emph{left group action}} of $G$ on $X$ is a map
+	$$ G\times X \to X $$
+	That is to say we have a mapping like $(g, x)\mapsto x'$ which is typically written as simply $ g\cdot x = x' $ or even just $gx=x'$. A group action must also satisfy the following:
+	\begin{itemize}
+		\item $\forall x\in X \:\: e \cdot x = x$
+		\item $\forall g,h\in G , \:\:\forall x\in X \:\: gh \cdot x= g \cdot (h\cdot x)$
+	\end{itemize}
+	
+\end{tcolorbox}
+A right group action can be similarly defined but for the purposes of these notes is unnecessary. In the special case when $X$ is a vector space, the group action is called a \emph{representation}. The study of such group actions is called representation theory, the basics of which are covered in these notes. However, in general a group can act on sets with less structure than a vector space. We can even have groups acting on other groups. 
+
+\begin{tcolorbox}
+	Given an action of a group $G$ on a set $X$, for a point $x\in X$, its \textbf{\emph{stabilizer}}, $G_x$, is defined by
+	$$ G_x = \left\{ g\in G \:\: | \:\: g\cdot x = x \right\}   $$
+	It is the subgroup of $G$ containing all the elements of $G$ which map $x$ to itself.
+\end{tcolorbox}
+Proving that a stabilizer is indeed a subgroup is simple. Associativity is naturally inherited from $G$. By definition of group action, $e\in G_x$. To see that inverses are included just observe: $ g\cdot x = x \implies x = g^{-1} \cdot x$ so $g^{-1} \in G_x$. Lastly to prove it is closed we take two elements $g, h\in G_x$ and observe that $gh\cdot x = g\cdot(h\cdot x) = g\cdot x = x$. And so we have proven the stabilizer is a subgroup. However, note that while stabilizers are subgroups, they are in general \emph{not} normal subgroups. 
+
+Now in contrast to the stabilizer, we might consider where $x$ goes when it is not necessarily mapped onto itself.
+
+\begin{tcolorbox}
+	For a group $G$ acting on a set $X$, the \textbf{\emph{orbit}} of $x\in X$, denoted $G\cdot x$ is
+	$$ G\cdot x = \left\{ g\cdot x\:\: |\:\: g\in G  \right\} $$
+	So the orbit of $x$ is the subset of $X$ which contains all the points which $x$ maps to under the action of $G$. 
+\end{tcolorbox} 
+Note that $x$ is always in its own orbit $G\cdot x$ by the action of the identity element. Now we can state and prove a useful result about orbits:
+\\
+\\
+\begin{tcolorbox}
+	Given the action of a group $G$ on a set $X$, being in the same orbit is an equivalence relation in $X$.
+\end{tcolorbox}
+
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+Let $x\sim y$ indicate that $x\in G\cdot y$. The want want to show $\sim$ is an equivalence relation. Of course $x\sim x$ so $\sim$ is reflexive. So we only need to show it is symmetric and transitive. 
+\\
+\\
+Since $x\sim y \implies x = g\cdot y$ for some $g\in G$, we also have $y=g^{-1}x$ so $y\sim x$. So it is symmetric. 
+\\
+\\
+For transitive, suppose $x\sim y$ and $y\sim z$. This means there are $g,h\in G$ such that $x = g\cdot y$ and $y= h\cdot z$. This allows us to write $ x = g\cdot h\cdot z = gh\cdot z$. Therefore $x\sim z$ and we have proven $\sim $ is an equivalence relation.
+\\
+\\
+\textbf{q.e.d.}
+
+
+\newpage
+
+Now by the symmetry property, equivalence classes are disjoint and therefore we have as a corollary:
+\\
+\\
+\emph{Corollary: The distinct orbits in $X$ partition $X$}
+\\
+\\
+So we might ask: how can we tell how many elements are in a particular orbit $G\cdot x$? The answer to this question comes from the \emph{orbit-stabilizer theorem}.
+
+{\centering
+\subsection*{THE ORBIT-STABILIZER THEOREM}}
+
+\begin{tcolorbox}
+	Consider an action of a group $G$ on a set $X$. For a point $x\in X$ with stabilizer $G_x \subseteq G $ and orbit $G\cdot x$, we can decompose $G$ in cosets of $G_x$ as
+	
+	$$ G = \bigcup_{i=1}^n \: g_i G_x $$
+	where $n=|G|/|G_x|$. The \textbf{\emph{orbit-stabilizer theorem}} states
+	\\
+	\\
+	\emph{There is a bijection between the set of cosets of $G_x$ (or equivalently the coset representatives) and the orbit $G\cdot x$ which is given by}
+	
+	$$ g_iG_x\mapsto g_i\cdot x $$
+\end{tcolorbox}
+
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+The proof goes by explicit construction of the bijection. Let us define a map $f_x: G\to X$ such that $f_x(g) = g\cdot x$. Clearly the image of $f_x$ is the orbit $G\cdot x$. Suppose two elements $g,h\in G$ map to the same element of the orbit:
+$$ f_x(g) = f_x(h) $$
+$$ g\cdot x = h\cdot x $$
+From here, we find the following chain of statements
+$$ g\cdot x = h\cdot x \iff g^{-1}h\cdot x = x \iff g^{-1}h\in G_x \iff h \in gG_x $$
+So $h$ and $g$ mapping to the same element in the orbit is equivalent to them being in the same coset of $G_x$. Succinctly:
+$$ f_x(g)=f_x(h)\iff h \in gG_x $$
+All the elements of $G$ which belong to the coset $gG_x$ will map to the same element of the orbit, namely $g\cdot x$. If we consider the coset decomposition
+$$ G = \bigcup_{i=1}^n\:g_i G_x $$
+then each coset maps as $g_i G_x \mapsto g_i\cdot x$ which clearly has the inverse $g_i\cdot x \mapsto g_iG_x$. So we find $f_x$ is a bijection from the cosets of $G_x$ to the elements of the orbit.
+\\
+\\
+\textbf{q.e.d.}
+\\
+\\
+Recall that Lagrange's theorem tells us that $|G|$ is related to $|G_x|$ by $ |G| = n|G_x| $ where $n$ is the number of cosets of $G_x$ in $G$. Since we now know that the cosets are in bijection with the elements of the orbit of $x$, we can say that $n=|G\cdot x|$. Thus we have the result
+$$ |G| = |G\cdot x||G_x| $$
+Or equivalently, we may write $ |G\cdot x| = |G|/|G_x| $. So the number of elements in the orbit of $x$ must divide $|G|$ and can be found by finding the stabilizer of $x$. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter*{Notes on Representation Theory}
+\addcontentsline{toc}{chapter}{Notes on Representation Theory}
+{\centering
+\section*{REPRESENTATIONS}}
+\addcontentsline{toc}{section}{Representations}
+Groups are by their nature abstract things and can be thought of as blueprints for how a set of objects can relate to eachother. But a blueprint can be used to build a house. We can represent the group elements by linear maps on a vector space and then reduce the abstraction of group theory to a more familiar linear setting. This is the idea behind representation theory. We can reduce a problem in abstract algebra to one in linear algebra or we can lift a problem in linear algebra into the broader context of symmetry and group theory. A representation is defined as follows:
+
+\begin{tcolorbox}
+A \textbf{\emph{representation}} $\rho$ of a group $G$ on a vector space $V$ is a map $\rho: G\rightarrow GL(V)$\footnote{$GL(V)$ is the group of invertable linear maps on a vector space $V$.} which is homomorphic with respect to the group:
+$$ \rho(g_1g_2) = \rho(g_1)\rho(g_2) $$
+\end{tcolorbox}
+For much of what we will consider, we will only be concerned with isomorphism classes of representations. So we define equivalent representations by:
+\begin{tcolorbox}
+Two representations are \textbf{\textit{equivalent}} if they are related by an isomorphism. For finite-dimensional representations, this amounts to a a similarity transformation
+$$\rho_1(g)=M^{-1}\rho_2(g)M$$
+\end{tcolorbox}
+
+
+{\centering
+\subsection*{TWO SPECIAL REPRESENTATIONS}}
+\noindent\textbf{THE TRIVIAL REPRESENTATION}
+\\
+\\
+The simplest representation we can construct takes $\rho:G\to \{1\}$. Every group element is mapped to the identity $1$. This obviously will satisfy the group multiplication table and is therefore a representation of the group. This is called the \textbf{\emph{trivial representation}} and it is one-dimensional.
+\\
+\\
+\textbf{THE REGULAR REPRESENTATION}
+\\
+\\
+Another simple representation is the \textbf{\emph{regular representation}} $\rho^{(reg)}$. The regular representation of a group $G$ is constructed by taking a $|G|$-dimensional vector space $V_G$ and assigning to each group element, $g$ a basis vector $e_g\in V_G$. Then the group is represented by matrices which permute these basis vectors as
+$$ \rho^{(reg)}(g) e_h = e_{gh} $$
+\\
+The dimension of $\rho^{(reg)}$ is just $|G|$. This is a useful representation for reasons that will be shown later.
+
+
+
+
+
+{\centering
+\section*{REDUCIBLE AND IRREDUCIBLE REPRESENTATIONS}}
+\addcontentsline{toc}{section}{Reducible and Irreducible Representations}
+\begin{tcolorbox}
+Consider a representation $\rho\big{|}_V : G\rightarrow GL(V)$. If there is a subspace $U \subset V$ that is closed under the group action, then we say the representation is \textbf{\textit{reducible}}. More formally, this means
+\\
+ $$\forall u\in U \:\forall g\in G \:\:\:\:\rho\big{|}_V(g)u \in U$$
+\\
+We call the representation $\rho\big{|}_U : G\rightarrow GL(U)$ a \textbf{\textit{subrepresentation}} of $\rho\big{|}_V$ and we call $U$ an \textbf{\emph{invariant subspace}}.
+\\
+If $\rho$ has no nontrivial subrepresentations then it is \textbf{\textit{irreducible}}.
+\end{tcolorbox}
+Note that irreducible representations are often just called \textbf{\emph{irreps}}. Now to fully explore the relationship between reducible and irreducible representations, we will state the following theorem without proof:
+\\
+\\
+\textbf{THEOREM:} \emph{Any finite group can be represented by unitary matrices. Such a representation is called a unitary representation.}
+\\
+\\
+And with that, we state and prove \textbf{\emph{Maschke's theorem:}}
+
+\begin{tcolorbox}
+	A unitary representation $\pi: G \to GL(W)$ of a finite group $G$ can be uniquely decomposed into the direct sum of irreducible representations as
+	$$ \pi = \bigoplus_{n}\rho_n^{\oplus a_n} $$
+	where the $\rho_n$ are distinct irreducible representations of $G$ appearing in the direct sum $a_n$ times. $a_n$ is called the multiplicity of irrep $\rho_n$
+\end{tcolorbox}
+This is often also expressed by writing the space $W$ as a direct sum:
+$$ W = \bigoplus_n V_n^{\oplus a_n} $$
+
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+The proof of this statement relies on the following lemma:
+\\
+\\
+\textit{\textbf{LEMMA}: For a unitary representation $\pi:G\to GL(W)$, if $V\subset W$ is an invariant subspace, then so is its orthogonal complement $V_\perp$.}
+\\
+\\
+$V$ being an invariant subspace means that $v\in V \implies \pi(g)v\in V \:\:\forall g\in G$. The orthogonal complement $V_\perp$ is defined by all the $u \in W$ such that $\langle u,v \rangle=0 \:\: \forall v\in V$. Since $\pi$ is unitary, $\langle u, v\rangle = \langle\pi(g)u , \pi(g)v\rangle = 0$. But we can arbitrarily take $v=\pi(g^{-1})v'$ so that $\langle \pi(g)u, v'\rangle=0$. Therefore $\pi(g)u \in V_\perp$ and the lemma is proven.
+\\
+\\
+The rest of the proof follows naturally. We may take the sub-representation on $V$ to be irreducible. The orthogonal decomposition of $W$ is
+$$ W = V \oplus V_\perp $$
+But since there is another sub-representation on $V_\perp$, we simply check: if it is irreducible, we are done. If it is not, then there necessarily exists an invariant subspace $V'\subset V_\perp$ which harbors a sub-representation. We simply continue decomposing in this way until we have all irreducible spaces.
+\\
+\\
+\textbf{q.e.d.}
+
+
+
+\pagebreak
+
+
+ {\centering
+\section*{SCHUR'S LEMMA}}
+\addcontentsline{toc}{section}{Schur's Lemma}
+Since Maschke's theorem tells us that irreps are the building blocks of representations in general, we can focus our attention on just irreps. So now we prove the foundational result known as Schur's lemma: 
+
+\begin{tcolorbox}
+Let $\rho_1$ and $\rho_2$ be irreducible representations of a group $G$ on vector spaces $V_1$ and $V_2$ respectively:
+$$ \rho_1 : G\rightarrow GL(V_1) $$
+$$ \rho_2 : G \rightarrow GL(V_2) $$
+\\
+Now consider a linear map $h: V_1\rightarrow V_2$ which commutes with the group action such that for $v_1\in V_1$\footnote{Such a map is called intertwining, commuting, or $G$-linear.}
+$$ h(\rho_1(g)v_1) = \rho_2(g)h(v_1) $$
+Schur's lemma states:
+\\
+\textit{
+If $\rho_1 $ and $\rho_2$ are inequivalent, then $h$ is identically 0.
+\\
+If $\rho_1$ and $\rho_2$ are equivalent, then $h=\lambda I$ for $\lambda \in \mathbb{C}$
+}
+\end{tcolorbox}
+
+\begin{center}
+    \textbf{PROOF}
+\end{center}
+\underline{\textbf{Part 1}}
+\\
+\\
+For $v_1 \in \ker h$, we have $\rho_2(g)h(v_1) = h(\rho_1(g)v_1)=0$. So $\rho_1(g)v_1 \in \ker h$. This means that there is a sub-representation of $\rho_1$ on $\ker h$. But by assumption, $\rho_1$ is irreducible so either $\ker h = \{0\}$ or $\ker h= V_1$.
+\\
+\\
+For $v_2 \in \text{im } h$, $\exists v_1 s.t. v_2=h(v_1)$. We then have $\rho_2(g) v_2 = \rho_2(g)h(v_1) = h(\rho_1(g)v_1)$ which tells us that $\rho_2(g)v_2 \in \text{im }h$. This means there is a sub-representation of $\rho_2$ on $\text{im }h$. But by assumption $\rho_2$ is irreducible so either $\text{im }h = \{0\}$ or $\text{im }h = V_2$. 
+\\
+\\
+By the rank-nullity theorem, we know $\dim \text{im }h + \dim \ker h = \dim V_1$. This then leaves only two possibilites:
+
+ 1)  $\ker h = \{0\}$ and $\text{im }h = V_2\simeq V_1$
+ 
+ 2) $\ker h = V_1$ and $\text{im }h = \{0\}$ (This means $h=0$)
+ \\
+ \\
+Option 1 implies that $h$ is invertible which would allow us to write $h^{-1}\rho_2(g)h = \rho_1(g)$. So if we know $\rho_1$ and $\rho_2$ are not equivalent, then this is a contradiction and we must choose option 2 and conclude that $h=0$.
+\\
+\\
+\underline{\textbf{Part 2}}
+\\
+\\
+First we make note of 2 facts:
+\\
+- If $\rho_1$ and $\rho_2$ are equivalent, then writing $\rho_1=\rho_2=\rho$ and $V_1=V_2=V$, we have $h(\rho(g)v) = \rho(g)h(v)$. So $h$ commutes with every $g\in G$.
+\\
+\\
+- By the fundamental theorem of algebra, there exist complex solutions to the polynomial equation defined by $\det (h-\lambda I)=0$.
+\\
+\\
+With that, we consider $v_1\in \ker (h-\lambda I)$ and write $\rho(g)(h-\lambda I)v_1 = (h-\lambda I)\rho(g)v_1 = 0$. So $\rho(g)v_1 \in \ker (h - \lambda I)$. So $\ker (h-\lambda I)$ harbors a sub-representation to $\rho$. But since $\rho$ is irreducible, either $\ker (h-\lambda I)=\{0\}$ or $\ker (h-\lambda I) = V$.
+\\
+Since we know $\det(h-\lambda I)=0$, $h-\lambda I$ must be singular which rules out the possibility of $\ker (h-\lambda I)=\{0\}$. So it must be the case that $\ker(h-\lambda I) = V$. But this means that $h-\lambda I = 0$ leaving us with our final result: $h=\lambda I$.
+\\
+\\
+\textbf{q.e.d.}
+
+\newpage
+
+{\centering
+\subsection*{APPLICATION TO EIGENVALUE PROBLEMS}}
+	There is an immediate application of Schur's lemma to eigenvalue problems which is fairly obvious and very useful. Suppose we have a linear map $h:V\to V$. The \textbf{\emph{symmetry group}} of $h$ is defined by the set of transformations $g$ which leave $h$ invariant. More precisely, the symmetry group $G_h$ is
+	
+	$$ G_h = \{ g:V\to V \:|\: ghg^{-1} = h \} $$
+	This means that every $g\in G_h$ commutes with $h$. So any representation $\rho:G_h\to GL(V)$ must then satisfy $\rho(g)h = h\rho(g)$. By Schur's lemma, if $\rho$ is irreducible on the subspace $U\subset V$, $h$ must act as just a constant $\lambda$ on $U$. So for a vector $u\in U$ we can write
+	
+	$$ h u =  \lambda u $$
+	But this means $u$ is an eigenvector of $h$ with eigenvalue $\lambda$! And this is true for \emph{any} $u\in U$. In other words, the subspace where an irrep acts is precisely an eigenspace of $h$! In general, since $\rho(g)u$ is still in $U$ we can write
+	$$ h \rho(g)u = \lambda \rho(g)u $$
+	\begin{tcolorbox}
+	\emph{Each eigenspace of a linear map $h$ transforms as an irreducible representation of the symmetry group of $h$}
+	\end{tcolorbox}
+	And further, each eigenspace has the dimension of its corresponding irrep. This has vast applications in quantum mechanics. A Hamiltonian will have a symmetry group and by determining the dimension of its irreps, we have information about the degeneracies of the system. Such degeneracies are called \emph{symmetry enforced}.
+\\
+\\
+
+{\centering
+\subsection*{COROLLARY FOR ABELIAN GROUPS}}
+
+If $\rho: G\rightarrow GL(V)$ is an irreducible representation of an Abelian group $G$, then 
+$$ \rho(g_1)\rho(g_2)=\rho(g_2)\rho(g_1) $$
+for all $g_1, g_2 \in G$. Notice that in the above relation, any $\rho(g)$ can be viewed as an intertwining map $h:V\rightarrow V$. So by Schur's lemma, since $\rho$ is obviously equivalent to itself, we have $\rho(g)=\lambda\in \mathbb{C} $. Therefore all representations of Abelian groups act as just multiplication by a complex number which means that every subspace of $V$ will be invariant under the action of $G$ (scalar multiplication). Therefore:
+
+\begin{tcolorbox} 
+	\begin{center}
+	\emph{Irreducible representations of abelian groups must be 1-dimensional}
+	\end{center}
+\end{tcolorbox}
+
+\hspace{0.5cm}
+
+{\centering
+\subsection*{APPLICATION TO TRANSLATION INVARIANT SYSTEMS}}
+
+As an example consider the group of translations in Euclidean space, $\mathbb{T} = (\mathbb{R}^d, +)$. We will represent this group as acting on the space of $L^2(\mathbb{R}^d)$ functions as 
+$$\rho : \mathbb{T}\rightarrow GL(L^2(\mathbb{R}^d))$$
+\\
+Moreover, we will take all $\rho(\*x)$ unitary for $\*x\in\mathbb{T}$. The translation group is clearly abelian since it just amounts to vector addition, so by the above corollary to Schur's lemma, we can then say that all irreducible representations of $\mathbb{T}$ are 1-dimensional. Since they are unitary, they must be norm-conserving which then requires that $|\det \rho(\*x)|=1$. We can now generically write the irreps as $\rho(\*x)=e^{-i\*k\cdot \*x}$ where $\*k$ is some vector parameter which labels the irreps. 
+
+A system with an equation of motion that is symmetric under the action of $\mathbb{T}$ is then said to be translation invariant. For a quantum system, it is then the case that the spectrum of the Hamiltonian will be classified by these irreducible representations $e^{-i\*k\cdot\*x}$. If $\mathbb{T}$ is the full symmetry group of the system, then each $\*k$ would correspond to a different energy state. But if there are other symmetries such as rotational or time-reversal, then more degeneracy can be present. Note that the action of this representation is 
+$$ \rho(\*\delta)f(\*x) = f(\*x-\*\delta) = e^{-i\*k\cdot\*\delta}f(\*x) $$
+\\
+The obvious form for $f$ which satisfies the above relation is another exponential $f(\*x)=e^{i\*k\cdot\*x}$. This is precisely why the free solutions to the Schrodinger equation are of this form.
+
+\pagebreak
+
+{\centering
+\section*{THE GRAND ORTHOGONALITY THEOREM}}
+\addcontentsline{toc}{section}{The Grand Orthogonality Theorem}
+The grand orthogonality theorem is a result which is essentially three orthogonality relations wrapped into one. It is stated as follows:
+
+\begin{tcolorbox}
+	For irreducible representations, $\rho^{(i)}$ and $\rho^{(j)}$, of a finite group $G$, 
+	$$ \frac{1}{|G|}\sum_{g\in G} \rho^{(i)}_{\mu\nu}(g)\rho^{*(j)}_{\alpha\beta} (g) = \frac{\delta_{\mu\alpha}\delta_{\nu\beta}\delta_{ij}}{\text{dim}(\rho^{(i)})} $$
+	where $|G|$ is the group order, $\mu$ and $\alpha$ index the rows of the irreps, and $\nu$ and $\beta$ index the columns.
+\end{tcolorbox}
+
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+Consider two irreducible representations of a finite group $G$, $\rho^{(1)}:G\rightarrow GL(V_1)$ and $\rho^{(2)}: G\rightarrow GL(V_2)$ and consider an arbitrary map $B:V_1\rightarrow V_2$. Now let us construct the following map
+$$ A = \sum_{g\in G} \rho^{(2)}(g)B\rho^{(1)}(g^{-1}) $$
+\\
+First we show that $A$ is intertwining: 
+$$ \rho^{(2)}(g')A = \sum_{g\in G} \rho^{(2)}(g')\rho^{(2)}(g)B\rho^{(1)}(g^{-1}) = \sum_{g\in G} \rho^{(2)}(g'g)B\rho^{(1)}(g^{-1}) $$
+\\
+By the rearrangement theorem, we can define $g''=g'g$ to write
+$$ \rho^{(2)}(g')A = \sum_{g''\in G} \rho^{(2)}(g'')B\rho^{(1)}(g''^{-1}g') = \sum_{g\in G} \rho^{(2)}(g)B\rho^{(1)}(g^{-1})\rho^{(1)}(g') = A\rho^{(1)}(g') $$
+\\
+So we find $A$ is intertwining and Schur's lemma applies! For the elements of $A$, we have:
+
+$$ A_{\mu\beta} = \sum_{g\in G}\sum_{\nu,\alpha}\rho^{(2)}_{\mu\nu}(g)B_{\nu\alpha}\rho^{(1)}_{\alpha\beta}(g^{-1}) $$
+\\
+$B$ is any arbitrary map between $V_1$ and $V_2$ so we can choose $B_{\nu\alpha}=\delta_{\nu \nu_0}\delta_{\alpha\alpha_0}$.  That is, $B$ is the $\text{dim}(\rho_2)\times\text{dim}(\rho_1)$ matrix with zeros everywhere except at element $B_{\nu_0\alpha_0}$ where we have chosen some arbitrary $\nu_0$ and $\alpha_0$. $A$ then becomes
+
+$$ A_{\mu\beta} = \sum_{g\in G} \rho^{(2)}_{\mu\nu_0}(g)\rho^{(1)}_{\alpha_0\beta} (g^{-1})$$
+\\
+So by Schur's lemma, when $\rho^{(1)}\neq\rho^{(2)}$, we can say $A=0$.
+
+On the other hand, if $\rho^{(1)}\simeq \rho^{(2)}=\rho$ then $A=\lambda I$. To determine what $\lambda$ is in this case, observe that for any $B$, the trace of $A$ is $ \text{tr} A = \sum_{g\in G}\text{tr}(\rho(g)B\rho(g^{-1})) = |G|\text{tr}B $. But also $\text{tr}A=\text{tr}(\lambda I) = \text{dim}(\rho) \lambda$. Equating these, we see that $\lambda = \frac{|G|\text{tr}B }{\text{dim}(\rho)}$. For our choice of $B$, the trace is 0 unless our single entry is on the diagonal in which case, the trace is 1. So $\text{tr}B=\delta_{\nu_0\alpha_0}$, and we have
+$$ A_{\mu\beta} = \sum_{g\in G}\rho_{\mu\nu_0}(g)\rho_{\alpha_0\beta}(g^{-1}) = \frac{|G|\delta_{\mu\beta}\delta_{\nu_0\alpha_0} }{\text{dim}(\rho)} $$
+\\
+Taking our representations to be unitary (which we can always do), we can write the representation of $g^{-1}$ as the conjugate transpose of the representation of $g$. So putting it all together:
+
+$$	\frac{1}{|G|}\sum_{g\in G} \rho^{(i)}_{\mu\nu}(g)\rho^{*(j)}_{\alpha\beta} (g) = \frac{\delta_{\mu\alpha}\delta_{\nu\beta}\delta_{ij}}{\text{dim}(\rho^{(i)})} $$
+\\
+\\
+\textbf{q.e.d.}
+    
+{\centering
+\section*{CHARACTERS AND THEIR ORTHOGONALITY}}
+\addcontentsline{toc}{section}{Characters and Their Orthogonality}
+In the discussion of irreducible representations so far, we have only really been talking about irreps up to equivalence. That is, we are working with their isomorphism classes. So it seems natural to define a quantity which is the same for all equivalent irreps. This is one way to motivate the $\textit{character}$:
+
+\begin{tcolorbox}
+	The \textbf{\textit{character}} $\chi^{(i)}:G\to \mathbb{C}$ of a group element $g\in G$ in  representation $\rho^{(i)}:G\to GL(V)$ is defined as
+	$$ \chi^{(i)}(g)=\text{tr} (\rho^{(i)}(g)) $$
+\end{tcolorbox}
+
+As promised, a key property of a character is that it takes the same value for all equivalent representations since the trace is cyclic. That is, for two representations related by a similarity transformation $\rho^{(j)}(g) = M^{-1}\rho^{(i)}(g)M$, we have $ \text{tr}(\rho^{(j)}(g)) =\text{tr}(\rho^{(i)}(g))$. 
+
+Similarly, all group elements $g_1$ and $g_2$ related by conjugation ($g_1 = h^{-1}g_2 h$ for $h \in G$) will have the same character in a given representation. For this reason, characters are a type of \textit{class function} from $G$ to $\mathbb{C}$.
+
+Some jargon: Characters in an irreducible representation are called \textit{irreducible characters}. There are two important orthogonality properties related to irreducible characters. Now we state and prove both.
+\\
+
+{\centering
+\subsection*{THE FIRST CHARACTER ORTHOGONALITY RELATION}}
+
+\begin{tcolorbox}
+\textit{Two irreducible characters on inequivalent irreps are orthonormal with respect to the inner product given by}
+$$ \langle \chi^{(i)}, \chi^{(j)} \rangle = \frac{1}{|G|}\sum_{g\in G}\chi^{(i)}(g)\chi^{*(j)}(g) $$
+\end{tcolorbox}
+
+\begin{center}
+\textbf{PROOF}
+\end{center}
+By definition of characters, we have
+\begin{align}
+\langle \chi^{(i)}, \chi^{(j)} \rangle &= \frac{1}{|G|}\sum_{g\in G}\text{tr}(\rho^{(i)}(g))\text{tr}(\rho^{*(j)}(g)) 
+\nonumber\\
+&= \frac{1}{|G|}\sum_{g\in G}\sum_{\mu\nu}\rho^{(i)}_{\mu\mu}(g)\rho^{*(j)}_{\nu\nu}(g)
+\nonumber\\
+&= \sum_{\mu\nu}\bigg(\frac{1}{|G|}\sum_{g\in G}\rho^{(i)}_{\mu\mu}(g)\rho^{*(j)}_{\nu\nu}(g)\bigg)
+\nonumber
+\end{align}
+\\
+By the grand orthogonality theorem, we can then write
+\begin{align}
+\langle \chi^{(i)}, \chi^{(j)} \rangle  &= \sum_{\mu\nu} \frac{\delta_{\mu\nu}\delta_{ij}}{\text{dim}(\rho^{(i)})} 
+\nonumber \\
+\langle \chi^{(i)}, \chi^{(j)} \rangle  &= \frac{\delta_{ij}}{\text{dim}(\rho^{(i)})}\sum_{\mu}1 
+\nonumber \\
+\langle \chi^{(i)}, \chi^{(j)} \rangle  &= \delta_{ij}
+\nonumber
+\end{align}
+\textbf{q.e.d.}
+\\
+\\
+Taking this further, the characters of a representation satisfy $\langle\chi,\chi\rangle=1$ if \emph{and only if} the representation is irreducible. This then provides an easy way to check if a representation is irreducible.
+
+\break
+
+{\centering
+\subsection*{THE SECOND CHARACTER ORTHOGONALITY RELATION}}
+This one is not a statement about orthogonality of different characters, but rather this is an analogous statement where we sum over irreps instead of group elements. 
+
+\begin{tcolorbox}
+	If $c_{m}$ denotes the $m^{th}$ conjugacy class which has $n_{c_m}$ elements, then
+	$$ \frac{1}{|G|}\sum_{j}n_{c_m}\chi^{(j)}(c_m)\chi^{*(j)}(c_n) = \delta_{mn} $$
+\end{tcolorbox}
+
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+
+In what follows, we will take for granted the following (true) statement:
+\textit{The number of irreps of a finite group $G$ equals the number of conjugacy classes in $G$.} With that, now consider the matrix defined by elements
+
+$$ Q_{ij} = \chi^{(i)}(c_j) $$
+Similarly, consider the matrix
+
+$$ Q_{ij}' = n_{c_i}\chi^{*(j)}(c_i) $$
+Now from the first orthogonality relation, we have for their product
+
+$$ \sum_j Q_{ij}Q'_{jk} = \sum_j n_{c_j}\chi^{(i)}(c_j)\chi^{*(k)}(c_j) = |G|\delta_{ik} $$
+Thus if we divide out $|G|$, then we have $\frac{1}{|G|}QQ' = 1$ and so these matrices are effectively inverses. We can then also write $\frac{1}{|G|}Q' Q = 1$. More explicitly, this is
+
+$$ \frac{1}{|G|}\sum_{j}n_{c_m}\chi^{(j)}(c_m)\chi^{*(j)}(c_n) = \delta_{mn} $$
+\textbf{q.e.d.}
+\\
+\\
+Here the sum is over irreducible representations so this is a notion of orthogonality for conjugacy classes. From this relation, we can also extract a powerful result that constrains the way we might think about possible irreps. If $c_m=c_n$ is the identity class, then each character is simply the dimension of its irrep. And so we can write
+\begin{tcolorbox}
+	$$ \sum_j (\dim \rho^{(j)})^2 = |G| $$
+\end{tcolorbox}
+The sum of the squares of the irrep dimensions must sum to the group order. To see how powerful this really is, consider the triangle group $C_{3v}$ which has $|C_{3v}|=6$ elements. Writing $6$ as a sum of perfect squares only leaves two possibilities:
+$$ 6 = 1^2 + 1^2 + 1^2 + 1^2 + 1^2 +1^2 $$
+$$ 6 = 1^2 + 1^2 + 2^2 $$
+There are 3 conjugacy classes in $C_{3v}$ so the first possibility is ruled out. Thus we immediately obtain the dimensions of the irreps! There are two 1D irreps and one 2D irrep. In fact, since every group has a 1D trivial representation, there will always be one $1^2$ in the sum limiting the possibilities even further. 
+
+{\centering
+\subsection*{CHARACTER TABLES}}
+At this point, character tables need to be mentioned. A character table for a group is simply a table where the rows are indexed by the irreps and the columns are indexed by the group classes. Each entry in the table then corresponds to the character of that class in that irrep. 
+
+The just proven orthogonality relations tell us that in this table, the rows must all be orthogonal and the columns must all be orthogonal. 
+
+\pagebreak
+
+{\centering
+\subsection*{CHARACTERS AS A BASIS IN THE SPACE OF CLASS FUNCTIONS}}
+
+We will denote the space of complex-valued class functions on $G$ by $\mathbb{C}_{class}(G)$. Now we state and prove the important theorem:
+
+\begin{tcolorbox}
+	For a group $G$, the set of irreducible characters $\{\chi^{(i)}\}$ forms an orthonormal basis of $\mathbb{C}_{class}(G)$.
+\end{tcolorbox}
+
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+
+Consider an arbitrary $f \in \mathbb{C}_{class}(G)$ which is orthogonal to every irreducible character $\chi^{(i)}$ under the inner product in the first character orthogonality relation. If we can show that $f$ must vanish, then this proves that the characters span the space. To do so, consider an irrep $\rho^{(j)}$ and define the matrix $M^{(j)}$ by
+
+$$ M^{(j)} = \sum_{g\in G}f(g)\rho^{(j)}(g) $$
+\\
+First we show this is a G-linear map:
+$$ M^{(j)}\rho^{(j)}(h) = \sum_{g\in G}f(g)\rho^{(j)}(g)\rho^{(j)}(h) = \sum_{g\in G}f(g)\rho^{(j)}(gh) $$
+Rendindexing $r=gh$
+$$ M^{(j)}\rho^{(j)}(h) = \sum_{r\in G}f(rh^{-1})\rho^{(j)}(r) $$
+As a class function, it is true that $f(rh^{-1}) = f(h^{-1}r)$. So we can again reindex with $s=h^{-1}r$ to get
+\begin{align}
+	M^{(j)}\rho^{(j)}(h) &= \sum_{s\in G}f(s)\rho^{(j)}(hs)\nonumber \\
+  M^{(j)}\rho^{(j)}(h) &= \rho^{(j)}(h)M^{(j)}
+  \nonumber 
+\end{align}
+So it is G-linear and Schur's lemma can be applied to write
+$$ \sum_{g\in G} f(g)\rho^{(j)}(g) = \lambda \;I $$
+Taking the trace of both sides gives
+$$ \lambda = \frac{1}{\dim(\rho^{(j)})}\sum_{g\in G}f(g)\chi^{(j)}(g)  $$
+But the sum is now precisely $\langle f, \chi^{*(j)} \rangle |G|$ which by assumption is zero. Therefore $\lambda=0$ and so does $M^{(j)}$. Now since any representation can be decomposed as a direct sum of irreps, even if $\rho$ is reducible it still must be zero (direct sum of zero maps is a zero map). So we may take $\rho=\rho^{(reg)}$ to be the regular representation. Recall that if $\rho^{(reg)}$ acts on the vector space $V$, $V$ has a basis $\{e_g | g\in G\}$ and the action of the regular representation just permutes these: $\rho^{(reg)}(g)e_h = e_{gh}$. Thus we may write for the action of $M^{(reg)}$ on the vector $e_1$:
+
+$$ M^{(reg)}e_h = \sum_{g\in G}f(g)\rho^{(reg)}(g) e_1 $$
+$$  = \sum_{g\in G}f(g)e_{g} $$
+But $M^{(reg)}=0$ and since the $e_{g}$ are linearly independent, it must then be true that $f(g)=0 \:\forall g\in G$. So the theorem is proven.
+\\
+\\
+\textbf{q.e.d.}
+
+
+\pagebreak
+
+
+{\centering
+\section*{HARMONIC ANALYSIS ON ABELIAN GROUPS}}
+\addcontentsline{toc}{section}{Harmonic Analysis on Abelian Groups}
+Since the irreducible characters form an orthonormal basis in the space of class functions on $G$, any such function $f:G\to\mathbb{C}$, can be expanded as
+
+$$ f(g) = \sum_n \hat{f}_n \chi^{(n)}(g) $$
+\\
+where the sum is over all irreducible representations. Thanks to the orthonormality of characters, the coefficients are given by
+
+$$ \hat{f}_m = \langle f, \chi^{(m)} \rangle $$
+$$ \hat{f}_m = \frac{1}{|G|}\sum_{g\in G} f(g)\chi^{*(m)}(g) $$
+\\
+This all behaves particularly simply when $G$ is abelian since each element is in its own conjugacy class and therefore every function on $G$ is a class function. And to make things even simpler, $G$ being abelian also means that every irreducible representation is 1D and therefore the characters are just complex exponentials.\footnote{TECHNICAL NOTE: There are actually 2 different definitions of \emph{character}. 1) A homomorphic map $G\to U(1)$ and 2) the trace of irreducible representations. These two definitions coincide when we talk about unitary representations of abelian groups.} 
+
+An important part of the analysis of irreps of abelian groups is that their characters form a homomorphic map $\chi:G\to U(1)$. The characters themselves form a group called the \textit{character group} and as it turns out, the representation theory of the character group reveals a duality. The character group of the character group gives back the original group! So in this sense, a group is dual to its character group and for this reason, the character group is also called the \textit{dual group}. This duality is known as \textbf{\emph{Pontryagin duality}} and it is the theory underlying the various Fourier transforms. For finite groups, the Pontryagin dual is the group itself, but for infinite groups this need not be the case. 
+\\
+\\
+\textbf{Example 1: $\mathbb{Z}/N\mathbb{Z}$}
+\\
+\\
+The integers modulo $N$ under addition form a finite abelian group. Therefore the irreducible representations will be one dimensional and can be taken to be unitary. So irreps are maps $\rho:\mathbb{Z}/N\mathbb{Z}\to U(1)$. We can find that for any $r \in \mathbb{Z} $ the map  $\rho_r(x) = e^{i2\pi r x / N}$ is a group homomorphism
+
+$$ \rho_r(x+y)=e^{i2\pi r(x+y)/N} = e^{i2\pi rx/N}e^{i2\pi ry/N} = \rho_r(x)\rho_r(y) $$
+\\
+and it is clear that $\rho_{r+N}\simeq \rho_r$. So the irreducible representations of $\mathbb{Z}/N\mathbb{Z}$ are in fact indexed by $\mathbb{Z}/N\mathbb{Z}$ itself. Again, since the irreps are 1D, they are the characters: $\chi^{(r)}(n)=e^{i2\pi rn/N}$. Thus for any function $f:\mathbb{Z}/N\mathbb{Z} \to \mathbb{C}$, we can expand it as
+
+$$ f_n = \sum_{r\in \mathbb{Z}/N\mathbb{Z}} \hat{f}_r e^{i2\pi r n/N} $$
+\\
+where the coefficients are 
+$$ \hat{f}_r =\frac{1}{N} \sum_{n\in \mathbb{Z}/N\mathbb{Z}} f_n e^{-i2\pi r n/N} $$
+\\
+This is precisely the discrete Fourier transform! And since the character group is clearly isomorphic to $ \mathbb{Z}/N\mathbb{Z}$, we see that we just as well could have started with the second expression and obtained the first as the coefficients. So we conclude that $\mathbb{Z}/N\mathbb{Z}$ is self-dual and the discrete Fourier transform can be thought of as an expansion in the irreducible characters of $\mathbb{Z}/N\mathbb{Z}$.
+\\
+\\
+
+\textbf{Example 2: $\mathbb{R}/2\pi\mathbb{Z}$}
+\\
+\\
+Consider the circle group $\mathbb{R}/2\pi\mathbb{Z}$. This group is abelian and there are irreducible characters indexed by integers $n$: $\chi_n(x)=(e^{ix})^n=e^{i n x}$. This then means that any function on the interval $[0, 2\pi]$ can be written
+
+$$ f(x) = \sum_{n\in \mathbb{Z}} \hat{f}_n e^{in x} $$
+\\
+There is one caveat here that has been ignored which is of course that this group is not finite. However it turns out not to be too much of a problem since it is compact. The coefficients in this case are a natural generalization of the finite case
+
+$$ \hat{f}_m  = \frac{1}{2\pi}\int_{\mathbb{R}/2\pi\mathbb{Z}} dx f(x)e^{-i m x}$$
+\\
+So this is precisely the Fourier transform of a periodic function with period $2\pi$! If we consider the group $\mathbb{Z}$ instead, note that it has 1D irreducible characters which look like $\chi_x(n)=(e^{-i x})^n=e^{-in x}$ for any $x\in\mathbb{R}/2\pi\mathbb{Z}$. So if expand a function on $\mathbb{Z}$ in these characters, we would get exactly what we just wrote above! So what does this mean? The groups $\mathbb{R}/2\pi\mathbb{Z}$ and $\mathbb{Z}$ are dual in this sense. 
+\\
+\\
+\textbf{Example 3: $\mathbb{R}$}
+\\
+\\
+Now consider the real numbers under addition. This group is clearly not finite as it is continuous. The rigorous treatment of continuous groups like this involves a unique group-action-invariant measure called the \textit{Haar measure}, but most of the generalizations are natural to what has already been discussed. We only need to restrict the class functions to be in $L^2(\mathbb{R})$. It is not too hard to see that the irreducible characters of this group must simply be $\chi_k(x)=e^{ikx}$ for $k\in \mathbb{R}$. So for any $L^2$ function $f:\mathbb{R}\to \mathbb{R}$, we can expand in irreducible characters as
+
+$$ f(x) = \int_{\mathbb{R}} dk\hat{f}(k)e^{ikx} $$
+where the "coefficients" are 
+
+$$ \hat{f}(k) = \int_\mathbb{R} \frac{dx}{2\pi}f(x)e^{-ikx} $$
+This is of course the usual Fourier transform which can now be viewed as an expansion in irreducible characters of $\mathbb{R}$ under addition. 
+\\
+\\
+
+{\centering
+\subsection*{SUMMARY OF PONTRYAGIN DUALITY}}
+So what we have seen here is that the various Fourier transforms can be viewed as expansions in irreducible characters of certain abelian groups. Then the inverse transforms can be viewed in precisely the same way in the context of Pontryagin duality. The results are summarized in the table below:
+\\
+\\
+\begin{center}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\textbf{Transform} & \textbf{Group} & \textbf{Dual Group} \\
+		\hline
+		DFT & $\mathbb{Z}/N\mathbb{Z}$ & $\mathbb{Z}/N\mathbb{Z}$ \\
+		\hline
+		Fourier Series & $\mathbb{R}/2\pi\mathbb{Z}$ & $\mathbb{Z}$ \\
+		\hline
+		Fourier Transform & $\mathbb{R}$ & $\mathbb{R}$ \\
+		\hline
+	\end{tabular}
+\end{center}
+
+
+
+\pagebreak
+
+{\centering
+\section*{TENSOR PRODUCT REPRESENTATIONS}}
+\addcontentsline{toc}{section}{Tensor Product Representations}
+\begin{tcolorbox}
+	Consider two distinct representations of different groups $G$ and $H$: $\rho:G\to GL(V)$ and $\pi:H\to GL(W)$.
+	\\
+	The \textbf{\emph{tensor product representation}} $\rho\otimes\pi$ furnishes a representation of the direct product group $G\otimes H$ on the product space $V\otimes W$
+\end{tcolorbox}
+The proof that $\rho\otimes \pi$ is a representation of $G\otimes H$ is easy. Simply note that for $(g, h)\in G\otimes H$ this representation will act on a vector $v\otimes w$ as
+
+$$ (\rho\otimes\pi)(g, h)(v\otimes w) = \rho(g)v \otimes \pi(h)w  $$
+\\
+This representation has the following properties:
+\\
+\begin{itemize}
+	\item \emph{The character of the product is the product of the characters: $\chi^{\rho\otimes\pi} = \chi^{\rho}\chi^{\pi}$}
+	\item \emph{If $\rho$ and $\pi$ are both irreducible, then $\rho\otimes\pi$ is an irreducible representation of $G\otimes H$}
+	
+	\item \emph{If $\rho$ and $\pi$ represent the same group $G$, then $\rho\otimes \pi$ is a representation of $G$ also}
+	
+\end{itemize}
+It should be emphasized that when $\rho$ and $\pi$ are irreps of $G$, their product is an irrep of $G\otimes G$, but it is generally \emph{not} an irrep of $G$. As a representation of $G$, $\rho\otimes\pi $ is generally reducible! This is an important point. 
+\\
+\subsubsection*{THE CLEBSCH-GORDON SERIES}
+
+Let $\rho^{(1)}$ and $\rho^{(2)}$ be irreducible representations of $G$. Since their product $\rho^{(1)}\otimes\rho^{(2)}$ is generally reducible as a representation of $G$, we now ask: what does its decomposition as a direct sum of irreps look like? That is, we want to know the multiplicities $a_n$ in the decomposition:
+
+$$ \rho^{(1)}\otimes \rho^{(2)} = \bigoplus_n a_n\rho^{(n)} $$
+where we have adopted the shorthand $a_n\rho^{(n)} = \rho^{(n)}\oplus \rho^{(n)}\oplus \dots \oplus \rho^{(n)}$ where the $\rho^{(n)}$ is added $a_n$ times. Along with this, we have the expansion of the characters:
+
+$$ \chi^{(1)\otimes(2)} = \sum_n a_n\chi^{(n)} $$
+Since we know that the character of the product representation is $\chi^{(1)}\chi^{(2)}$, we can calculate the multiplicity in the usual way as
+
+$$ a_n = \langle \chi^{(1)}\chi^{(2)} , \chi^{(n)} \rangle $$
+\\
+This decomposition with these coefficients is known as the \textbf{\emph{Clebsch-Gordon series}}. This is not to be confused with the\emph{ Clebsch-Gordon coefficients} which are related, but rather have to do with expanding basis functions of the product representation in basis functions of the irreps.
+\\
+\\
+
+\begin{center}
+	\subsection*{APPLICATION: SELECTION RULES IN QUANTUM MECHANICS}
+\end{center}
+Suppose we have a Hamiltonian $H = H_0 + V$ where $H_0$ is a solvable Hamiltonian with symmetry group $G_0$ and $V$ is some perturbation which has a symmetry group $G_V$ and transforms as the irrep $\rho_V$. Also consider two eigenstates of $H_0$ which transform as irreps $\rho_0^{(i)}$ and $\rho^{(j)}_0$ of $G_0$. We will call them $\psi^{(i)}$ and $\psi^{(j)}$ respectively. Frequently we want to calculate matrix elements of the form 
+
+$$ \langle\psi^{(j)} , V \psi^{(i)}\rangle $$
+\\
+The vector $V\psi^{(i)}$ has the symmetry of $G_V\otimes G_0$ and transforms as $\rho_V\otimes\rho_0^{(i)}$. Now we know that vectors which transform as different irreps must be in orthogonal subspaces. So for this matrix element to be non-zero, the vectors $\psi^{(j)}$ and $V\psi^{(i)}$ \emph{must} belong to the same irrep. More accurately, it could be that the $\rho_V\otimes\rho_0^{(i)}$ is reducible. If this is the case, then it simply needs to have some overlap with $\rho_0^{(j)}$. In other words, the multiplicity of $\rho^{(j)}_0$ in $\rho_V\otimes \rho_0^{(i)}$ \emph{must} be non-zero! So if we calculate
+
+$$ \langle \chi^{V}\chi^{(i)}, \chi^{(j)}\rangle $$
+and find that it is zero, then the matrix element is necessarily zero!
+
+
+
+\newpage
+
+
+{\centering
+\section*{INDUCED AND SUBDUCED REPRESENTATIONS}}
+\addcontentsline{toc}{section}{Induced and Subduced Representations}
+Consider a group $G$ with representation $\rho_{G}: G\to GL(W)$ and suppose there is a subgroup $H$ which we want the representations for. How do we go from $\rho_{G}$ to a representation of $H$? There is nothing tricky here. Since $\rho_G$ satisfies the group multiplication rules, it must also satisfy them for any subgroup. So all we need to do is \emph{restrict} our set of matrices to those which represent elements $h\in H$. The resulting representation is denoted $\rho_G \downarrow H$ or $\Res_H^G\rho_G$. Importantly note that even if $\rho_G$ is an irrep of $G$, the restriction to $\rho_G\downarrow H$ may not be an irrep of $H$. 
+
+Now we might wonder if there is a way to go the other way. Can we take a representation $\rho_H$ of $H\subset G$ and construct from it a representation of the larger group $G$? The answer turns out to be yes. The essential idea is to use the fact that $G$ can be decomposed as a disjoint union of left cosets of $H$:
+
+$$ G = \bigcup_i \gamma_iH $$
+\\
+where we have chosen a set of coset representatives $\{\gamma_1, \gamma_2, \dots , \gamma_n\}$ where $n=[G:H]$. If $\rho_H$ acts on a vector space $V$, then we can use the coset representatives to extend this space as
+
+$$ W = \bigoplus_i \gamma_iV $$
+\\
+It is on this space that we will represent $G$. The construction goes as follows:
+
+\begin{tcolorbox}
+	For a subgroup $H\subset G$ and a representation $\rho:H\to GL(V)$, we can use the coset representatives of the decomposition $G=\bigcup_i^n \gamma_iH$ to construct the \textbf{\emph{induced representation}} of $G$ by $\rho$. 
+	\\
+	First extend the domain of $\rho$ to $G$ by simply taking
+	$$ \rho(g\notin H) = 0 $$
+	Then the induced representation denoted $\rho\uparrow G$ or $\text{Ind}_H^G \rho$ is built up of the blocks $(\rho\uparrow G)_{ij}$ defined by
+	
+	$$ (\rho\uparrow G)_{ij}(g) = 
+			\rho(\gamma_i^{-1}g \gamma_j)
+	 $$
+	 So the matrix representation of $G$ looks like
+	 
+	 $$ (\rho\uparrow G)(g) = 
+	 \begin{pmatrix}
+	 	\rho(\gamma_1^{-1} g \gamma_1) & \rho(\gamma_1^{-1} g \gamma_2) & \dots & \rho(\gamma_1^{-1} g \gamma_n) \\
+	 	\rho(\gamma_2^{-1} g \gamma_1) & \rho(\gamma_2^{-1} g \gamma_2) & \dots & \rho(\gamma_2^{-1} g \gamma_n)\\
+	 	\vdots & \vdots & \ddots & \vdots \\
+	 	\rho(\gamma_n^{-1} g \gamma_1) & \rho(\gamma_n^{-1} g \gamma_2) & \dots & \rho(\gamma_n^{-1} g \gamma_n)
+	 \end{pmatrix} $$
+	 \\
+	 where $n = [G:H]$ is the index of $H$ in $G$. The dimension of $\rho\uparrow G$ is $[G:H]\dim\rho $.
+\end{tcolorbox}
+Note the following important properties:
+\\
+\\
+\textbf{1. \emph{In every row $i$ of $(\rho\uparrow G)(g)$, all blocks are zero except for the column $j$ where $\gamma_i^{-1}g\gamma_j\in H$}}
+\\
+\\
+\textbf{2. \emph{In every column $j$ of $(\rho\uparrow G)(g)$, all blocks are zero except for the row $i$ where $\gamma_i^{-1}g\gamma_j\in H$}}
+\\
+\\
+To see this, consider the $j^{th}$ column where we have blocks $\rho(\gamma_i^{-1}g\gamma_j)$. The element $g\gamma_j$ must be in one and only one coset. Suppose $g\gamma_j \in \gamma_\ell H$. This would imply $\gamma_\ell^{-1}g\gamma_j \in H$ and for any $i\neq\ell$ we have $\gamma^{-1}_ig\gamma_j\notin H$. Since $\rho(g\notin H)=0$, this then tells us that every block $i$ in column $j$ is zero except for where $i=\ell$ or rather where  $\gamma_i^{-1}g\gamma_j\in H$.
+\\
+The proof for the rows is similar. 
+\\
+\\
+To prove that $\rho\uparrow G$ is indeed a representation of $G$, we must show it is homomorphic. In the abbreviated notation $\Delta=\rho\uparrow G$, we must show $\Delta(g)\Delta(h) = \Delta(gh)$:
+
+$$ \left(\Delta(g)\Delta(h)\right)_{ij} = \sum_k \Delta_{ik}(g)\Delta_{kj}(h) = \sum_{k} \rho(\gamma_i^{-1}g \gamma_k)\rho(\gamma_k^{-1}h\gamma_j)$$
+Now the only term in the sum which can survive is the one which satisfies $\gamma_i^{-1}g \gamma_k\in H$ and $\gamma_k^{-1}h\gamma_j\in H$ at the same time. The first condition implies $\gamma_k \in g^{-1}\gamma_iH$ but since $\gamma_k$ is itself a coset representative and is in $\gamma_kH$ we must have $\gamma_k = g^{-1}\gamma_i$. So this is the only $k$ term which might not vanish. Plugging this in leaves
+$$  \left(\Delta(g)\Delta(h)\right)_{ij} = \rho(\gamma_i^{-1}gh\gamma_j) = \Delta_{ij}(gh)$$
+\\
+\\
+This paints the picture that the matrices in the representation $\rho\uparrow G$ have a structure very similar to permutation matrices. Recall that for the cosets $\{\gamma_1H, \gamma_2H, ... ,\gamma_nH\}$, if we act on them with $g\in G$, it simply permutes them. That is to say there is a representation of $G$ which acts on the cosets by permutation. This representation is core to the structure of $\rho\uparrow G$. In fact, if we consider the trivial representation $\rho^{(triv)}_H$ of $H$ and induce from it the representation $\rho^{(triv)}_H\uparrow G$, then each matrix in this representation will be a $[G:H]\times[G:H]$ permutation matrix. But this is exactly the representation of $G$ as it acts on the cosets of $H$!
+
+\newpage
+
+
+
+{\centering
+\section*{SYMMETRY PROJECTION OPERATORS}}
+\addcontentsline{toc}{section}{Symmetry Projection Operators}
+Suppose we have all the irreducible representations of a group $G$. If we are given a reducible representation $\pi$ which acts on a vector space $V$ for which we have an orthonormal basis defined, we want to find a decomposition of $V$ in terms of invariant subspaces. Particularly, we want orthonormal bases for each such subspace. To do this, we use a tool called \emph{Wigner projection operators}. 
+
+To motivate their definition, first consider some orthonormal basis $\{v^{(j)}_k\}$ for the invariant subspace harboring the subrepresentation $\rho^{(j)}$. Since the space is invariant, the action of $\pi$ amounts to the action of $\rho^{(j)}$ producing linear combinations of the $v^{(j)}_k$. In particular, the action on a basis vector is\footnote{A simple example: Let $v_1 = (1, 0)^T$ and $v_2 = (0, 1)^T$. Then
+$$ \begin{pmatrix} 
+a_{11} & a_{12} \\
+ a_{21} & a_{22}
+  \end{pmatrix}
+  \begin{pmatrix}
+  1\\
+  0 
+  \end{pmatrix}
+  =
+   \begin{pmatrix}
+  a_{11}\\
+  a_{21} 
+  \end{pmatrix}=
+  a_{11}v_1 + a_{21}v_2$$}
+
+$$ \pi(g) v^{(j)}_k = \sum_{\ell}\rho^{(j)}_{\ell k}(g) v^{(j)}_\ell $$
+\\
+Then if we multiply on the left by $\frac{\dim(\rho^{(i)})}{|G|}\rho^{*(j)}_{\mu\nu}(g)$ and sum over $g$, we have
+
+$$ \frac{\dim(\rho^{(i)})}{|G|}\sum_{g\in G}\rho^{*(i)}_{\mu\nu}(g)\pi(g) v^{(j)}_k = \frac{\dim(\rho^{(i)})}{|G|}\sum_\ell \sum_{g\in G}\rho^{*(i)}_{\mu\nu}(g)\rho^{(j)}_{\ell k}(g)v^{(j)}_\ell $$
+\\
+The grand orthogonality theorem then allows the sum over $g$ to be evaluated which gives us several Kronecker deltas. The result is
+$$ \frac{\dim(\rho^{(i)})}{|G|}\sum_{g\in G}\rho^{*(i)}_{\mu\nu}(g)\pi(g)v^{(j)}_k = v^{(j)}_\mu \delta_{ij}\delta_{\nu k} $$
+\\
+So it appears that by operating on $v_\ell^{(j)}$ with the sum on the left, we get zero unless $i=j$ and $\nu=k$ and when it is non-zero we get another basis vector. This then motivates the definition
+
+\begin{tcolorbox}
+	The \textbf{\emph{symmetry transfer operator}} defined by 
+	$$P^{(i)}_{\mu\nu} = \frac{\dim(\rho^{(i)})}{|G|}\sum_{g\in G}\rho^{*(i)}_{\mu\nu}(g)\pi(g) $$
+	transforms a basis vector in the invariant subspace for $\rho^{(i)}$ which transforms as the $\nu^{th}$ row to another basis vector which transforms as the $\mu^{th}$ row of the same irrep.
+\end{tcolorbox}
+
+If we have one basis vector in an invariant subspace, then we can obtain a whole basis using these operators. As a special case, we may take $\mu=\nu$ so that we project out only the $v_\mu^{(i)}$ basis vector.
+
+\begin{tcolorbox}
+The\textbf{\emph{Wigner projection operator}} for the $\mu^{th}$ row of the irrep $\rho^{(i)}$ is given by
+$$ P^{(i)}_{\mu\mu} = \frac{\dim(\rho^{(i)})}{|G|}\:\sum_{g\in G} \rho^{*(i)}_{\mu\mu}(g)\pi(g)  $$
+\\
+It projects onto a basis vector of the invariant subspace of $V$ which transforms as the $\mu^{th}$ row of $\rho^{(i)}$.
+\end{tcolorbox}
+
+From this matrix, we can then construct a slightly more coarse-grained operator which is simpler and often more accessible. Whereas the Wigner projection operators will project onto particular basis vectors in an invariant subspace, we might by alright with projecting onto anywhere in the subspace. That is, we can add up the $P^{(i)}_{\mu\mu}$ for all $\mu$ so that we have a projection onto \emph{any} part of the invariant subspace. Doing this defines the \emph{irrep projection operator} $P^{(i)}$. We write it as
+
+$$ P^{(i)} = \frac{\dim(\rho^{(i)})}{|G|}\:\sum_\mu\sum_{g\in G}\rho^{*(i)}_{\mu\mu}(g)\pi(g) $$
+\\
+The sum over $\mu$ can be recognized as giving the trace of $\rho^{*(i)}$. In other words, it is the character! So we have
+
+\begin{tcolorbox}
+	The \textbf{\emph{irrep projection operator}} is defined as
+	$$ P^{(i)} = \frac{\dim(\rho^{(i)})}{|G|}\:\sum_{g\in G}\chi^{*(i)}(g)\pi(g) $$
+\end{tcolorbox}
+This is extremely useful. If we have just the character table of $G$, then we can project onto the invariant subspace for irrep $\rho^{(i)}$. In particular, since $P^{(i)}$ is idempotent its eigenvalues must be either 0 or 1 and since it is Hermitian, its eigenvectors must form an orthonormal basis. Consider what the 0 or 1 eigenvalue means in terms of the projection. If $P^{(i)}$ operates on a vector causing it to vanish, then the vector must be orthogonal to the projection space. On the other hand, if the eigenvalue is 1, that means that vector was in the projection space to begin with. Therefore, by finding the eigenvectors of $P^{(i)}$ with eigenvalue 1, we have found an orthonormal basis for the invariant subspace!
+
+Suppose for example, we have a Hamiltonian $H$ with symmetry group $G$. The eigenspaces of $H$ must each transform as an irrep of $G$ so by finding orthonormal bases of the invariant subspaces, we can project $H$ onto them for each irrep which block-diagonalizes $H$.
+\\
+\\
+
+
+\newpage
+
+
+
+\chapter*{Lie Groups and Their Representations}
+\addcontentsline{toc}{chapter}{Lie Groups and Their Representations}
+So far everything covered in these notes, aside from some honorable mentions, has only concerned \emph{discrete} groups. But there are many well known continuous groups which have deep importance in physics. These continuous groups are called \emph{Lie groups}. There is a particularly common and useful class of these known as the \emph{matrix Lie groups} which are especially important in physics. They are defined as the structure in certain types of matrices. For example, all the orthogonal matrices of dimension $n$ form a Lie group called $O(n)$. This section will primarily focus on matrix Lie groups.
+
+{\centering
+\section*{LIE GROUPS}}
+\addcontentsline{toc}{section}{Lie Groups}
+
+\begin{tcolorbox}
+	A \textbf{\emph{Lie group}} is a differentiable manifold $G$ which is also a group such that the group product  $ G\times G \to G $ and the inverse are smooth.
+\end{tcolorbox}
+By making Lie groups differentiable manifolds, we have expanded the language we can use to talk about these groups. Now methods from calculus and analysis can be applied to say meaningful things. As will be shown, the tangent space of a Lie group will play a particularly prominent role. 
+
+As mentioned, all the focus of these notes will be on matrix Lie groups. So now we define them properly. 
+
+\begin{tcolorbox}
+	A \textbf{\emph{matrix Lie group}} is a closed subgroup $H\subseteq GL(n, \mathbb{C})$
+\end{tcolorbox}
+On the next page there is a list of a few common matrix Lie groups. It is worth noting that while strictly speaking affine transformations in $\mathbb{C}^n$ do not belong to $GL(n,\mathbb{C})$, they are isomorphic to transformations in $GL(n+1,\mathbb{C})$. Because of this, important groups such as the Euclidean group and the Poincare group can be lumped into the category of matrix Lie groups. 
+\\
+\\
+
+{\centering
+\subsection*{LIE GROUP REPRESENTATIONS}}
+
+\noindent Representations of Lie groups are defined in essentially the same way as the finite group case. The only difference is that we must also preserve the differentiable structure.
+
+\begin{tcolorbox}
+	A representation of a Lie group $G$ on a vector space $V$ is a homomorphic map $\Pi:G\to GL(V)$ which is also continuous.
+\end{tcolorbox}
+
+
+
+
+
+
+\newpage
+
+
+
+
+{\centering
+\section*{EXAMPLES OF MATRIX LIE GROUPS}}
+\addcontentsline{toc}{section}{Examples of Matrix Lie Groups}
+\begin{tcolorbox}
+\noindent\underline{\textbf{$\*{O(n)}$ : The Orthogonal Group}}
+\\
+\\
+$O(n)$ is the group of all $n$-dimensional orthogonal matrices. Consider arbitrary vectors $\*x ,\*y \in\mathbb{R}^n$ and their inner product $\langle\*x, \*y\rangle = \sum_i x_iy_i$. The matrices in $O(n)$ are all the matrices $O$ which preserve the inner product: $\langle O\*x, O\*y\rangle = \langle \*x,\*y\rangle$. Equivalently, they are all the matrices which satisfy
+$$ O O^T = \mathbbm{1} $$
+\end{tcolorbox}
+
+\begin{tcolorbox}
+\underline{\textbf{$ \*{SO(n)} $ : The Special Orthogonal Group}}
+\\
+\\
+Note that any matrix $A\in O(n)$ must have determinant $\det A = \pm1$. $SO(n)$ is the subset which has determinant 1. The term \emph{special} means that all matrices have determinant 1. $SO(n)$ should be thought of as the group of rotations in $n$-dimensions.
+\end{tcolorbox}
+
+\begin{tcolorbox}
+\underline{\textbf{$\*{U(n)}$ : The Unitary Group}}
+\\
+\\
+$U(n)$ is the complex version of $O(n)$. Consider arbitrary vectors $\*z,\*w \in \mathbb{C}^n$ and the inner product $\langle\*z, \*w\rangle = \sum_i z^*_iw_i$. A matrix $U\in U(n)$ preserves the inner product $\langle U\*z, U\*w \rangle = \langle\*z, \*w\rangle$. Equivalently, a matrix in $U(n)$ must satisfy
+$$ U^\dagger U = \mathbbm{1} $$
+\end{tcolorbox}
+\begin{tcolorbox}
+\underline{\textbf{$\*{SU(n)}$ : The Special Unitary Group}}
+\\
+\\
+$SU(n)$ is the subgroup of $U(n)$ containing unitary matrices with determinant 1.
+\end{tcolorbox}
+\begin{tcolorbox}
+\underline{\textbf{$\*{O(n,k)}$ : The Generalized Orthogonal Group and The Lorentz Group}}
+\\
+\\
+While $O(n)$ preserves the inner product $\sum_i x_iy_i$, the generalized orthogonal group preserves
+$$[\*x, \*y] = x_1y_1 + \dots + x_ny_n - x_{n+1}y_{n+1} - \dots - x_{n+k}y_{n+k}$$
+Of particular importance is the \textbf{\emph{Lorentz group}} $O(3,1)$. Similar to the others, we can take the subgroup $SO(n,k)\subset O(n,k)$ consisting of the matrices with determinant 1.
+\end{tcolorbox}
+\begin{tcolorbox}
+\underline{\textbf{$\*{Sp(n)}$ : The Symplectic Group}}
+\\
+\\
+In classical physics, the Poisson bracket structure motivates interest in transformations which preserves the skew-symmetric bilinear form $b$ defined by
+$$ b(\*x,\*y) = \sum_{i=1}^n x_iy_{n+i} - x_{n+i}y_i $$
+for $\*x,\*y \in \mathbb{R}^{2n}$. A matrix $A$ which preserves this $b(A\*x,A\*y) = b(\*x,\*y)$ is an element of $Sp(n)$. To give a clear way to check this, consider the matrix 
+$$ J = \begin{pmatrix} 
+		0 &\mathbbm{1}_n\\
+		-\mathbbm{1}_n & 0\\
+		\end{pmatrix} $$
+This allows us to write $b(\*x,\*y)$ in terms of the common inner product as $b(\*x,\*y) = \langle\*x, J\*y\rangle$. From here we can check the elements of the symplectic group must satisfy
+$$ A^TJA = J $$
+\end{tcolorbox}
+
+
+
+{\centering
+\section*{LIE ALGEBRAS}}
+\addcontentsline{toc}{section}{Lie Algebras}
+\begin{tcolorbox}
+	A \textbf{\emph{Lie algebra}} is a vector space $\mathfrak{g}$ with the additional structure of a bilinear operation $[\cdot,\cdot]: \mathfrak{g}\times\mathfrak{g}\to\mathfrak{g}$ which satisfies the following.
+	\\
+	For any $\*u,\*v,\*w \in \mathfrak{g}$,
+	
+	\begin{itemize}
+		\item Alternating: $[\*v, \*v]=0$
+		\item Jacobi Identity: $[\*u, [\*v, \*w]] + [\*w, [\*u, \*v]] + [\*v, [\*w,\*u]]=0$
+	\end{itemize}
+	The operation $[\cdot,\cdot]$ is called the \textbf{\emph{Lie bracket}}.
+\end{tcolorbox}
+\noindent Bilinearity and the alternating property imply that the Lie bracket is anticommutative:
+$$ [\*u+\*v, \*u+\*v] = [\*u, \*u + \*v] + [\*v, \*u+\*v] =  [\*u, \*v] + [\*v, \*u] = 0 $$
+$$\implies [\*u,\*v] = - [\*v, \*u]$$
+Since a Lie algebra is a vector space, if we want to talk about homomorphisms between Lie algebras, they will certainly be linear maps. However, a Lie algebra has more structure than an ordinary vector space due to the Lie bracket. As a consequence if we want to begin to talk meaningfully about homomorphisms of Lie algebras, we better extend our notion of homomorphic to one which accounts for this additional structure also.
+
+
+
+\begin{tcolorbox}
+	A \textbf{\emph{Lie algebra homomorphism}} is a linear map between Lie algebras which preserves the Lie bracket structure. That is, given two Lie algebras $\mathfrak{g}_1$ and $\mathfrak{g}_2$ with respective Lie brackets $[\cdot,\cdot]_1$ and $[\cdot,\cdot]_2$, a map 
+	$$\varphi:\mathfrak{g}_1\to\mathfrak{g}_2$$
+	is a Lie algebra homomorphism if it is linear and satisfies
+	$$ \varphi\left([\:\*u,\*v\:]_1\right) = [\:\varphi(\*u), \varphi(\*v)\:]_2 $$
+\end{tcolorbox}
+
+
+{\centering
+\subsection*{LIE ALGEBRA REPRESENTATIONS}}
+\addcontentsline{toc}{section}{Lie Algebra Representations}
+\begin{tcolorbox}
+	A \textbf{\emph{representation}} of a Lie algebra $\mathfrak{g}$ on a vector space $V$ is a Lie algebra homomorphism 
+	$$\pi: \mathfrak{g} \to \mathfrak{gl}(V)$$
+	where $\mathfrak{gl}(V)$ is the Lie algebra consisting of all linear endomorphisms on $V$ with Lie bracket given by the commutator.
+\end{tcolorbox}
+
+
+{\centering
+\section*{LIE GROUP / LIE ALGEBRA CORRESPONDENCE}}
+\addcontentsline{toc}{section}{Lie Group / Lie Algebra Correspondence}
+\noindent At first glance, there is nothing about the definitions of Lie groups and Lie algebras that suggests they are related. However, they are closely tied. In a loose sense, a Lie algebra is the linearization of a Lie group. This will now be made more precise, but to do that we first need a tool: the matrix exponential
+
+\begin{tcolorbox}
+	For a matrix $X$, its exponential $e^X$ is given by
+	$$ e^{X} = \sum_{n=0}^\infty\: \frac{X^n}{n!} $$
+\end{tcolorbox}
+
+\noindent This
+
+
+\newpage
+
+{\centering
+\section*{REPRESENTATIONS OF THE LIE ALGEBRA $\mathfrak{so}(3) \simeq \mathfrak{su}(2)$} }
+\addcontentsline{toc}{section}{Representations of the Lie Algebra $\mathfrak{so}(3) \simeq \mathfrak{su}(2)$}
+
+
+
+
+
+
+
+
+
+
+
+\pagebreak
+
+
+
+
+
+
+
+\chapter*{Crystal Symmetry}
+\addcontentsline{toc}{chapter}{Crystal Symmetry}
+{\centering
+\subsection*{LATTICES AND TRANSLATION SYMMETRY}}
+\addcontentsline{toc}{section}{Lattices and Translation Symmetry}
+\begin{tcolorbox}
+	A \textbf{\emph{lattice}} $\Lambda \subset \mathbb{R}^n$  is defined as
+	
+	$$ \Lambda = \left\{ \sum_{i=1}^n a_i\*v_i \:\:\big|\:\: a_i \in \mathbb{Z}  \right\} $$
+	\\
+	where the $\*v_i$ form a basis of $\mathbb{R}^n$. An element $\*R \in \Lambda$ is called a \emph{lattice vector}.
+	\\
+	The parallelepiped spanned by the primitive lattice vectors $\*v_i$ is called the \emph{unit cell} of $\Lambda$.
+\end{tcolorbox}
+The particular choice of $\*v_i$ are called the \emph{primitive lattice vectors}. So a lattice is an infinite set of points in $\mathbb{R}^n$ which, as is easy to see, is closed under any translation by a lattice vector in the lattice. This then establishes a translation symmetry group $\mathbb{T}$ which contains a translation operation for every $\*R \in \Lambda$. Since the operations in $\mathbb{T}$ amount to vector addition, it is clearly an abelian group. Moreover, since any choice of $n$ integers uniquely determines a lattice vector, we have
+$$ \mathbb{T} \simeq \mathbb{Z}^n  $$
+\\
+\\
+{\centering
+\subsection*{POINT GROUP SYMMETRY: CLASSIFYING LATTICES}}
+\addcontentsline{toc}{section}{Point Group Symmetry: Classifying Lattices}
+The particular choice of primitive lattice vectors $\*v_i$ will determine not only the translation symmetry of the lattice, but also the rotational or reflection symmetry. These non-translation operations define a group $\mathbb{P}\subset O(n)$ which leave the lattice invariant. We call $\mathbb{P}$ the point group or the \textbf{\emph{geometric holohedry}} of the lattice and it is defined by the $p\in O(n)$ such that
+$$ p\Lambda = \Lambda $$
+However, if we consider the same lattice which we then slightly rotate by an $r\in O(n)\setminus \mathbb{P}$ then we will get a lattice spanned by the slightly different primitive lattice vectors $r\*v_i$. In any meaningful sense, the new lattice $\Lambda'=r\Lambda$ is the same as $\Lambda$. It also not too hard to see that as a set of orthogonal matrices, the point group of the rotated lattice is $r\mathbb{P}r^{-1}$. In this light, we can generally say that two lattices which have point groups which are conjugate in $O(n)$ are equivalent. These conjugacy classes are called \emph{lattice systems}:
+\\
+\\
+\begin{tcolorbox}
+	A \textbf{\emph{lattice system}} is a conjugacy class in $O(n)$. That is,
+	if two lattices have matrix point groups $\mathbb{P}$ and $\mathbb{P}$' such that
+	$$ \mathbb{P}'=r\mathbb{P}r^{-1} $$
+	for some $r\in O(n)$, then the lattices belong to the same lattice system.
+	\\
+	Two lattices in the same lattice system are also said to be \textbf{\emph{geometrically equivalent}}.
+\end{tcolorbox}
+Bieberbach proved that there are a finite number of lattice systems in every dimension.
+
+
+\newpage
+
+Now for some $p\in\mathbb{P}$ to be a symmetry of the lattice, it must be the case that it takes any lattice vector to another lattice vector. In particular, the action of $p$ on a primitive lattice vector must give some \emph{integer} linear combination:
+$$ p\*v_i = \sum_{j}m_{ij}(p)\*v_j \:\:\:\:\:\: m_{ij}\in\mathbb{Z} $$
+\\
+The $m_{ij}(p)$ can be assembled into a matrix $m(p)\in GL(n, \mathbb{Z})$. If we also construct the matrix $V$ such that its rows are the primitive vectors: $V_{ij} = \*v_{i,j}$, then the above equation can be written for all $\*v_i$ as
+
+$$ pV = m(p)V $$
+The full set of integer entry matrices $\{ m(p)\:\forall p\in\mathbb{P}\}$ form the Bravais group or \textbf{\emph{arithmetic holohedry}} of the lattice which we will denote by $\mathbb{A}$. By definition $\mathbb{A}\subset GL(n, \mathbb{Z})$ and just as before, we want to enforce equivalance of lattice which are related by conjugation. In this case however we restrict to conjugation within $GL(n,\mathbb{Z})$ instead of $O(n)$. This is a more restrictive criterion and it leads us to Bravais classes:
+
+\begin{tcolorbox}
+	A \textbf{\emph{Bravais class}} is a conjugacy class in $GL(n, \mathbb{Z})$. If two lattices have arithmetic holohedries $\mathbb{A}$ and $\mathbb{A}'$ such that
+	$$ \mathbb{A}' = \mathfrak{n}\mathbb{A}\mathfrak{n}^{-1} $$
+	for some $\mathfrak{n}\in GL(n, \mathbb{Z})$, then the lattices belong to the same Bravais class.
+	\\
+	Two lattices in the same Bravais class are said to be \textbf{\emph{arithmetically equivalent}}.
+\end{tcolorbox}
+Now we state and prove a useful relationship between the geometric and arithmetic holohedries:
+\begin{tcolorbox}
+	Consider a lattice $\Lambda$ with primitive vectors $\{\*v_i\}$ and which has geometric holohedry $\mathbb{P}$ and arithmetic holohedry $\mathbb{A}$. With an orthonormal basis of $\mathbb{R}^n$, $\{\*e_i\}$, we may construct the matrix $C$ such that
+	$$ \*v_i = \sum_j C_{ij}\*e_j $$
+	With this, $\mathbb{P}$ and $\mathbb{A}$ are related by conjugation:
+	
+	$$ \mathbb{A} = C\mathbb{P}C^{-1} $$
+	
+\end{tcolorbox}
+
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+Similar to how we defined the matrix $V$ before, we now define the matrix $E$ such that $E_{ij} = e_{i,j}$. With this, the matrix $C$ is defined so that $V = CE $. Now consider the action of the orthogonal matrix $p$ on the orthonormal basis $\{\*e_i\}$:
+
+$$ (p\*e_i)_j = \sum_{k}p_{j k}e_{i,k} $$ 
+In terms of $E$, the transformed $E'_{ij} = (p\*e_i)_j$ is written
+$$ E'_{ij} = \sum_k p_{jk}E_{ik} = \sum_k E_{ik}p^T_{kj} $$
+and thus we have $E' = Ep^T$. As we saw before, the elements of the arithmetic holohedry $m(p) \in \mathbb{A}$ are related to the transformed primitive lattice vectors $V'=pV$ by $V' = m(p)V $. With these equations, we have $ V' = m(p)V = m(p)CE $ and $V' =CE' = CEp^T$. From these, we obtain
+$$ C^{-1}m(p)CE = Ep^T $$
+We can choose the $\*e_i$ such that they are the standard basis and $\*e_{i,j}=\delta_{ij}$. In this basis, $E=\mathbbm{1}$ and we obtain the conjugacy relation we are looking for.
+\\
+\\
+\textbf{q.e.d.}
+\\
+\\
+The Bravais classes in 2D and 3D are listed below. The Bravais classes are defined by their lattice type along with their centering. The centering types are named by
+\\
+\begin{itemize}
+	\item P - primitive
+	\item C - base-centered
+	\item I - body-centered
+	\item F - face-centered
+\end{itemize}
+
+\begin{center}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		3D Lattice System & Point Group & Bravais Classes \\
+		\hline\hline
+		Triclinic & $C_i$ & P \\
+		\hline 
+		Monoclinic & $C_{2h}$ & P, C\\
+		\hline 
+		Orthorhombic & $D_{2h}$ & P, C, I, F\\
+		\hline
+		Tetragonal & $D_{4h}$ & P, I\\
+		\hline
+		Rhombohedral & $D_{3d}$ & P\\
+		\hline
+		Hexagonal &  $D_{6h}$ & P\\
+		\hline
+		Cubic & $O_h$ & P, I, F\\
+		\hline
+	\end{tabular}
+	\quad
+	\begin{tabular}{|c|c|c|}
+		\hline
+		2D Lattice System & Point Group & Bravais Classes\\
+		\hline\hline
+		Oblique & $C_2$ & P\\
+		\hline
+		Rectangular & $D_2$ & P, C\\
+		\hline
+		Hexagonal & $D_6$ & P\\
+		\hline
+		Square & $D_4$ & P\\
+		\hline
+	\end{tabular}
+\end{center}
+
+
+{\centering
+\subsection*{CRYSTALLOGRAPHIC RESTRICTION ON ROTATIONS}}
+As a consequence of the translation symmetry of a lattice, not all rotational symmetries can be respected. In fact for symmetry operations $m\in \mathbb{A}$ and $r\in \mathbb{P}$, since we know they are conjugate, we know that the trace of the matrix in either basis must be an integer. For a general rotation matrix by an angle $\theta$, the trace will be $2\cos\theta + 1$ which gives us the condition
+
+$$ 2\cos\theta = n \in \mathbb{Z} $$
+Or $\cos\theta = \frac{n}{2}$. This clearly has no solution for $\abs{n}>2$. However, for $n=-2$, it is satisfied by $\theta=\frac{2\pi}{2}$, for $n=-1$ by $\theta=\frac{2\pi}{3}$, for $n=0$ by $\theta=\frac{2\pi}{4}$ and for $n=1$ by $\theta=\frac{2\pi}{6}$. Thus the allowed crystallographic rotations are 2-fold, 3-fold, 4-fold, and 6-fold. \emph{No others.}
+\\
+\\
+\newpage
+
+{\centering
+\section*{SPACE GROUPS}}
+\addcontentsline{toc}{section}{Space Groups}
+A space group is the group of all affine transformations which leave a crystal invariant. That is, every element $g$ of the space group can be associated with a point group operation $R$ and a translation $t$ such that its action on $\*x\in\mathbb{R}^n$ is
+
+$$ g\cdot\*x = R\*x + t $$
+Pairing $R$ and $t$ into the condensed \emph{Seitz} notation, we write this group element as 
+
+$$ g = (R | t) $$
+It is then easy to check the multiplication rule: 
+$$ (R_1|t_1)(R_2|t_2) = (R_1R_2 | R_1t_2 + t_1) $$
+
+\begin{tcolorbox}
+A symmorphic space group $\mathbb{S}$ can generically be written as the (inner) semidirect product 
+$$\mathbb{S} = \mathbb{T}\rtimes\mathbb{P}$$
+where $\mathbb{T}$ is the translation subgroup and $\mathbb{P}$ contains all point group and non-primitive translation symmetries of the crystal. 
+\end{tcolorbox}
+
+\begin{center}
+	\textbf{PROOF}
+\end{center}
+Recall that the semidirect product is defined on the Cartesian product $\mathbb{T}\times\mathbb{P}$ with a homomorphism $\varphi:\mathbb{P}\to \text{Aut}(\mathbb{T})$ such that the group operation is
+
+$$ \bigg( (e|t_1), (R_1|0) \bigg) \bigg( (e|t_2) , (R_2| 0)  \bigg) = \bigg( (e|t_1)\varphi_{R_1}\big( (e|t_2)\big) , (R_1R_2|0) \bigg)$$
+For ease of notation, we used $\varphi_{R_1}=\varphi(R_1)$. In this case $\varphi$ is just conjugation:
+
+$$\varphi_{R_1}\big((e|t_2)\big) = (R_1|0)(e|t_2)(R_1^{-1}|0) = (e|R_1t_2)$$
+Thus the group multiplication gives
+
+$$\bigg( (e|t_1), (R_1|0) \bigg) \bigg( (e|t_2) , (R_2| 0)  \bigg) = \bigg( (e|R_1t_2+t_1) , (R_1R_2|0) \bigg)$$ 
+From here we may see the natural isomorphism mapping which takes the elements of the Cartesian product into elements of $\mathbb{S}$. We take 
+$$ \bigg((e|t), (R|0)\bigg) \mapsto (R|t) $$
+and we naturally obtain the multiplication law
+$$ (R_1|t_1)(R_2|t_2) = (R_1R_2 | R_1t_2 + t_1)  $$
+Thus $\mathbb{S}$ is isomorphic to the semidirect product.
+\\
+\\
+\textbf{q.e.d.}
+
+
+
+\newpage
+
+
+
+{\centering
+\section*{REPRESENTATIONS OF SPACE GROUPS}}
+\addcontentsline{toc}{section}{Representations of Space Groups}
+Since space groups are infinite, it might not be clear at first how we might construct their irreducible representations. However, the procedure has long been known and uses all of the concepts introduced in these notes. In what follows, the space group we are representing is $\mathbb{S}=\mathbb{T}\rtimes\mathbb{P}$.
+\\
+\begin{center}
+	\textbf{IRREPS OF $\mathbb{T}$ AND THE BRILLOUIN ZONE}
+\end{center}
+We begin by considering irreps of just the translation subgroup $\mathbb{T}$. Of course $\mathbb{T}$ is also infinite, but since it is abelian, its representation theory is simple enough to handle. As we have seen, $\mathbb{T}$ is isomorphic to $\mathbb{Z}^n$ so we only really need to study $\mathbb{Z}^n$.
+
+Perhaps the first thing to note is that 
+$$ \mathbb{Z}^n \equiv \bigotimes_{i=1}^n \:\mathbb{Z}$$
+and as a consequence, its irreps are just tensor products of the irreps of $\mathbb{Z}$. Focusing on $\mathbb{Z}$, we know it is abelian so its irreps are 1D and we might write $\rho^{(k)}:\mathbb{Z}\to U(1)$ with
+
+$$ \rho^{(k)}(n) = e^{ikn} $$
+Indeed this is a homomorphism since $\rho^{(k)}(n_1+n_2) = \rho^{(k)}(n_1)\rho^{(k)}(n_2)$. This map is clearly homomorphic for any $k\in\mathbb{R}$, but notice that $\rho^{(k+m2\pi)}=\rho^{(k)}$ for any $m\in \mathbb{Z}$. So really the irreps live in $\mathbb{R}/2\pi\mathbb{Z}$.
+
+With that, we have the irreps of $\mathbb{Z}$ and we may now construct the irreps of $\mathbb{Z}^n$ by simply taking products. Since each $\mathbb{Z}$ irrep is indexed by $k\in\mathbb{R}/2\pi\mathbb{Z}$, when we take products they will be indexed by $\*k\in\mathbb{R}^n/(2\pi\mathbb{Z})^n$. So we may define an irrep of $\mathbb{Z}^n$ by 
+
+$$ \rho^{(\*k)}: \mathbb{Z}^n \to U(1) $$
+where the explicit representation of $\*R=(n_1,\dots, n_n)\in\mathbb{Z}^n$ will be 
+
+$$ \rho^{(\*k)}(\*R) = \prod_{j=1}^n\:\rho^{(k_j)}(n_j) = \prod_{j=1}^n\:e^{ik_j n_j} = e^{i \sum_{j} k_j n_j} $$
+
+$$ \rho^{(\*k)}(\*R) = e^{i\*k\cdot\*R} $$
+These then are the irreps of $\mathbb{Z}^n$. To now make the isomorphic map to the irreps of $\mathbb{T}$, observe that the only difference will be $\*R$ is no longer just a tuple of integers but is a generic lattice vector of the form $\*R = \sum_j n_j\*a_j$ where $\*a_j$ are the primitive lattice vectors. The equivalence of irreps then becomes $\rho^{(\*k+\*G)}=\rho^{(\*k)}$ where $\*G \cdot\*R = m2\pi$ for all $\*R$ where $m\in\mathbb{Z}$. The set of $\*G$ which satisfy this condition in fact form a lattice $\Lambda^\star$ which is called the \textbf{\emph{reciprocal lattice}}:
+
+$$ \Lambda^\star  = \left\{\: \*G \in\mathbb{R}^n\:\:|\:\:\*G\cdot\*R = m2\pi \:\:\forall\*R\in\Lambda\:,\:m\in\mathbb{Z} \: \right\}$$
+\\
+So instead of $\*k$ living in $\mathbb{R}^n/(2\pi\mathbb{Z})^n$, we have now generalized to arbitrary lattices where $\*k$ lives in $\mathbb{R}^n/\Lambda^\star$. So we have just proven the following: 
+
+\begin{tcolorbox}
+	A $n$-dimensional lattice translation group $\mathbb{T}\simeq \mathbb{Z}^n$ has irreducible representations $\rho^{(\*k)}:\mathbb{T}\to U(1)$ where 
+	$$ \rho^{(\*k)}(\*R) = e^{i\*k\cdot\*R} $$
+	for $\*R\in\mathbb{T}$. The irrep index $\*k$ belongs to $\mathbb{R}^n/\Lambda^\star$ where $\Lambda^\star$ is the reciprocal lattice. 
+	\\
+	The space $\mathbb{R}^n/\Lambda^\star$ is called the \textbf{\emph{Brillouin zone}}.
+\end{tcolorbox}
+
+
+\newpage
+
+\begin{center}
+	\textbf{MOTIVATION FOR THE METHOD: A NAIVE ATTEMPT}
+\end{center}
+To motivate the procedure for constructing space group irreps, first consider how it fits into the general representation theory. We know that if the space group $\mathbb{S}$ were the \emph{direct} product of $\mathbb{T}$ and $\mathbb{P}$ rather than the \emph{semidirect} product, then the irreps of $\mathbb{S}$ would simply be tensor products of the irreps of $\mathbb{T}$ and $\mathbb{P}$. We might hope that there is such a general rule for semidirect products but the unfortunate reality is that there is not. Despite this, we can see what happens if we try to represent $\mathbb{S}$ with such a product representation. 
+
+So consider an irrep $\Lambda^{(\mu)}: \mathbb{P}\to GL(V)$ and an irrep $\rho^{(\*k)}$ of $\mathbb{T}$. Forming the product $\pi^{(\*k,\mu)} = \rho^{(\*k)}\otimes \Lambda^{(\mu)}$, we have 
+$$\pi^{(\*k,\mu)}(R|\tau+t) = e^{i\*k\cdot\*t}\Lambda^{(\mu)}(R|\tau)$$ 
+Now we want to show this respects the multiplication rule of the space group so we check
+
+\begin{align}
+ \pi^{(\*k,\mu)}(R_1|\tau_1 + t_1)\pi^{(\*k,\mu)}(R_2|\tau_2 + t_2)   &= e^{i\*k\cdot t_1}\:\Lambda^{(\mu)}(R_1|\tau_1)\: e^{i\*k\cdot t_2}\:\Lambda^{(\mu)}(R_2|\tau_2)
+\nonumber	\\
+ & = e^{i\*k \cdot(t_1 + t_2)}\:\Lambda^{(\mu)}(R_1R_2|R_1\tau_2 + \tau_1) 
+ \nonumber
+\end{align}
+The answer we want should be $\pi^{(\*k,\mu)}(R_1R_2|R_1\tau_2 + \tau_1 + R_1 t_2 + t_1)$ which in our construction is
+
+$$ \pi^{(\*k,\mu)}(R_1R_2|R_1\tau_2 + \tau_1 + R_1 t_2 + t_1) = e^{i\*k\cdot(R_1t_2 + t_1)}\Lambda^{(\mu)}(R_1R_2|R_1\tau_2 + \tau_1) $$
+Looking at the exponent, we find that $\pi^{(\*k,\mu)}$ fails to represent $\mathbb{S}$. So the product representation fails but there is something we can learn here. If it were true that $\*k\cdot R_1 t_2 = \*k\cdot t_2$ then this would respect the multiplication rule. Since $R_1$ is an orthogonal point group operation, we can write $\*k\cdot R_1t_2 = R_1^{-1}\*k\cdot t_2$. Now if $R_1^{-1}\*k = \*k$, then we would have the homomorphism we want. So perhaps we should not be looking at irreps of $\mathbb{P}$ to form products, but instead we want irreps of a group which leaves $\*k$ invariant! This is precisely the method we want and is the road we now go down.
+\\
+\\
+
+
+\begin{center}
+	\textbf{SPACE GROUP ACTION ON THE BRILLOUIN ZONE}
+\end{center}
+
+
+
+From the previous motivation, we seek subgroups of $\mathbb{S}$ which leave some $\*k\in\mathbb{R}^n/\Lambda^\star$ invariant. To formalize this, we must consider a group action $\mathbb{S}\times \mathbb{R}^n/\Lambda^\star \to \mathbb{R}^n/\Lambda^\star$. In particular we want a group action defined by the mapping
+
+$$ (R|t)\cdot \*k = R\*k $$
+\\
+So only the point group operation $R$ acts on $\*k$ under this action. Now we can define stabilizers and orbits for any $\*k \in \mathbb{R}^n/\Lambda^\star$. In this context these have special names:
+
+\begin{tcolorbox}
+	
+	The \textbf{\emph{little group}} of $\*k$ is defined as the stabilizer $\mathbb{S}_k$:
+	
+	$$ \mathbb{S}_k = \left\{ \:(R|t)\in \mathbb{S} \:\:|\:\: R\*k = \*k \:  \right\} $$ 
+	
+\end{tcolorbox}
+Importantly note that since $\*k$ lives in the Brillouin zone, it is equivalent to $\*k+\*G$ for any $\*G\in \Lambda^\star$. So even if $R$ moves $\*k$, it can still be in the little group if the resulting $R \*k$ differs by a reciprocal lattice vector. Also note that the little group is infinite since the translations are all still included. Moving forward, we may consider the orbit:
+
+\begin{tcolorbox}
+	The \textbf{\emph{star}} of $\*k$, often denoted $^\star\*k$, is the orbit of $\*k$ under the action of $\mathbb{S}$
+	
+	$$ ^\star\*k = \left\{ \: R\*k \:\:\forall \:(R|t)\in\mathbb{S} \: \right\} $$
+\end{tcolorbox}
+With the little group (stabilizer) and star (orbit) of $\*k$ defined, by the orbit-stabilizer theorem we can decompose $\mathbb{S}$ in cosets of $\mathbb{S}_k$ as
+
+$$ \mathbb{S} = \bigcup_{i=1}^{|^\star\*k|} \:(R_i|t_i)\mathbb{S}_k $$
+where the $(R_i|t_i)$ are those space group elements which generate the star of $\*k$. To obtain the irreps of $\mathbb{S}$, we will use this coset decomposition and the method of induction presented previously. But to do that, we first need to have the irreps of the little group $\mathbb{S}_k$. To obtain these irreps, we note that $\mathbb{T}\triangleleft\mathbb{S}_k$ so we can define the quotient group:
+
+\begin{tcolorbox}
+	The \textbf{{group of the wavevector}} $\mathbb{G}_k$, also called the \textbf{\emph{little cogroup}}, is the quotient group
+	$$ \mathbb{G}_k = \mathbb{S}_k / \mathbb{T} $$
+\end{tcolorbox}
+	So any two elements in $\mathbb{S}$ which differ by a lattice translation are equivalent in $\mathbb{G}_k$. Therefore it consists of only elements $(R|\tau)$ where $\tau$ can be a non-primitive translation (part of a screw or glide). It is always isomorphic to a point group and when $\mathbb{S}$ is symmorphic, it precisely is a point group.
+	
+\begin{center}
+	\textbf{IRREPS OF THE LITTLE GROUP $\mathbb{S}_k$}
+\end{center}
+	
+\begin{tcolorbox}
+	For a given $\*k$, consider an irreducible representation of the group of the wavevector $\Lambda^{(\mu)}:\mathbb{G}_k \to GL(V)$. There is a corresponding irreducible representation of the little group $\Omega^{(\*k,\mu)}:\mathbb{S}_k\to GL(V)$ given by the product
+	
+	$$ \Omega^{(\*k,\mu)} = \rho^{(\*k)} \Lambda^{(\mu)} $$
+	such that
+	$$ \Omega^{(\*k,\mu)}(R|\tau + t) = e^{i\*k\cdot\*t}\:\Lambda^{(\mu)}(R|\tau) $$
+\end{tcolorbox}
+The proof that this is indeed a representation of $\mathbb{S}_k$ was essentially worked out in the motivation. Since the only point group operations $R$ in $\mathbb{G}_k$ are those which leave $\*k$ unchanged, $\mathbb{G}_k$ is precisely the group which fixes the problem we ran into there. Thus the product $\Omega^{(\*k,\mu)}=\rho^{(\*k)}\Lambda^{(\mu)}$ respects the space group multiplication rule and is a representation of $\mathbb{S}_k \subseteq \mathbb{S}$.
+
+However we still need to determine the irreps of $\mathbb{G}_k$. When $\mathbb{S}$ is symmorphic, this is not a problem since $\mathbb{G}_k$ will be just an ordinary point group which is easy to find the irreps of. On the other hand, when $\mathbb{S}$ is non-symmorphic, we have to do a little more work to find the irreps of $\mathbb{G}_k$. We will revisit this.
+
+
+\begin{center}
+	\textbf{INDUCING THE REPRESENTATIONS OF SPACE GROUPS}
+\end{center}
+
+
+Now that we know how to construct the irreps $\Omega^{(\*k,\mu)}$ of the little group $\mathbb{S}_k$, we can combine this with the coset decomposition
+
+$$ \mathbb{S} = \bigcup_{i=1}^{|^\star\*k|}\:(R_i|\tau_i)\mathbb{S}_k $$
+and induce a representation of $\mathbb{S}$ which we call $\Omega^{(\*k,\mu)}\uparrow\mathbb{S}$. Recall its blocks are defined by
+
+$$ (\Omega^{(\*k,\mu)}\uparrow\mathbb{S})_{ij}(R|\tau+t) = 
+	\begin{cases}
+		\Omega^{(\*k,\mu)}(\: (R_i|\tau_i)^{-1}(R|\tau+t)(R_j|\tau_j) \:) & \text{if } (R_i|\tau_i)^{-1}(R|\tau+t)(R_j|\tau_j) \in \mathbb{S}_k \\
+		0 & \text{else}\\ 
+	\end{cases} $$
+Looking closer at the condition for getting a non-zero block, we can evaluate
+
+$$ (R_i|\tau_i)^{-1}(R|\tau+t)(R_j|\tau_j) = (R_i^{-1}RR_j| R_i^{-1}R\tau_j + R_i^{-1}\tau - R^{-1}_i\tau_i + R^{-1}_i t) $$
+For determining whether the block is zero or not, the translation part of the result does not really matter since for this operation to be in $\mathbb{S}_k$, we only need $\*k$ to be invariant under the point group operation (up to a reciprocal lattice vector). So we need $R_i^{-1}RR_j\*k = \*k$. For symmorphic space groups, we have $\tau=\tau_i=\tau_j=0$ and explicitly using the product representation, we can write
+
+$$ (\Omega^{(\*k,\mu)}\uparrow\mathbb{S})_{ij}(R|t) = 
+\begin{cases}
+e^{iR_i\*k\cdot\*t}\Lambda^{(\mu)}(\:R_i^{-1}RR_j\:) & \text{if }  R_i^{-1}RR_j\*k \equiv \*k \\
+0 & \text{else}\\ 
+\end{cases} $$
+where we have used $e^{i\*k\cdot R_i^{-1}\*t} = e^{iR_i\*k\cdot\*t}$. With that we can write down the general procedure for obtaining irreps of symmorphic space groups:
+
+\begin{tcolorbox}
+	Consider a \emph{symmorphic} space group $\mathbb{S} = \mathbb{T}\rtimes\mathbb{P}$. Given the irreducible representations
+	$$\rho^{(\*k)}:\mathbb{T}\to U(1)$$
+	$$ \Lambda^{(\mu)}:\mathbb{G}_k \to GL(V) $$
+	where $\mathbb{G}_k$ is the group of the wavevector $\*k$, an irreducible representation of the little group $\mathbb{S}_k$ is formed by their product. Then with the coset decomposition
+	
+	$$ \mathbb{S} = \bigcup_{i=1}^{|^\star\*k|}\:(R_i|0)\mathbb{S}_k $$
+	
+	an irreducible representation of $\mathbb{S}$ can be induced. The induced representation $\Gamma^{(\*k,\mu)}:\mathbb{S}\to GL(W)$ is defined by the blocks
+	
+	$$ \Gamma^{(\*k,\mu)}_{ij}(R|t) = 
+	\begin{cases}
+		e^{i R_i \*k\cdot\*t}\:\Lambda^{(\mu)}(R_i^{-1}R R_j) & \text{if } R_i^{-1}R R_j  \*k \equiv \*k \\
+		0 & \text{else}
+	\end{cases} $$
+	These matrices consist of $|^\star\*k|$ blocks of size $\dim\Lambda^{(\mu)}$ so the dimension of the representation is
+	$$ \dim \Gamma^{(\*k,\mu)} = |^\star\*k| \times\dim\Lambda^{(\mu)} $$
+\end{tcolorbox}
+
+Notice that if $\*k'$ is in the star of $\*k$, then $\Gamma^{(\*k',\mu)}$ will look very similar to $\Gamma^{(\*k,\mu)}$. In fact, they are equivalent representations. So for space group irreducible representations, we only have one irrep per distinct $^\star\*k$ so we are better served labeling them as $\Gamma^{(^\star\*k,\mu)}$.
+\\
+\\
+For completeness, we can now check that this does indeed respect the space group structure. We check for the multiplication law:
+
+\begin{align}
+ \left( \Gamma^{(\*k,\mu)}(R_1|t_1) \Gamma^{(\*k,\mu)}(R_2|t_2) \right)_{ij} &= \sum_{n}\:\Gamma^{(\*k,\mu)}_{in}(R_1|t_1)\Gamma^{(\*k,\mu)}_{nj}(R_2|t_2) \nonumber\\
+ &= \sum_n\:e^{i\left(R_i\*k\cdot\*t_1 + R_n\*k\cdot\*t_2\right)}\Lambda^{(\mu)}(R_i^{-1}R_1R_n)\:\Lambda^{(\mu)}(R_n^{-1}R_2R_j) \nonumber
+\end{align}
+The only blocks in the sum which will be non-zero are those for which $R_i^{-1}R_1R_n\*k\equiv\*k$ and $R_n^{-1}R_2R_j\*k \equiv \*k$ are simultaneously satisfied. The first condition implies that $R_n$ must be $R_n=R_1^{-1}R_i$. There is one $n$ which satisfies this so the only surviving term in the sum is
+
+\begin{align} 
+\left( \Gamma^{(\*k,\mu)}(R_1|t_1) \Gamma^{(\*k,\mu)}(R_2|t_2) \right)_{ij} &= \:e^{i\left(R_i\*k\cdot\*t_1 + R_1^{-1}R_i\*k\cdot\*t_2  \right)} \Lambda^{(\mu)}(R_i^{-1}R_1R_2R_j) \nonumber\\
+ &= \:e^{iR_i\*k\cdot\left(\*t_1 + R_1\*t_2  \right)} \Lambda^{(\mu)}(R_i^{-1}R_1R_2R_j) \nonumber
+ \end{align}
+ And so we have the space group homomorphism 
+ 
+ $$ \left( \Gamma^{(\*k,\mu)}(R_1|t_1) \Gamma^{(\*k,\mu)}(R_2|t_2) \right)_{ij} = \Gamma^{(\*k,\mu)}_{ij}\left(R_1R_2|t_1 + R_1t_2\right) $$
+
+
+\newpage
+
+
+
+{\centering
+\section*{BAND REPRESENTATIONS}}
+\addcontentsline{toc}{section}{Band Representations}
+The irreducible representations of space groups are obtained by the little group induction method outlined in the previous section. While the irreps are naturally of great use in describing the physics of systems with crystalline symmetry, they are not the only useful representations. The irreps we get by inducing from little groups over the Brillouin zone are local in $\*k$-space and as a consequence, any coordinate-space information is delocalized. There is an alternative type of representation which was first put forward by Zak which uses the real space symmetries of the crystal to describe bands.
+
+Instead of starting with the symmetry of $\*k$ points, we can start directly with the symmetry of the lattice. In particular we want to take a point $\*q$ in the crystal and determine its stabilizer group. To do so, let's first be explicit about what space $\*q$ lives in and what the group action is here. A crystal has its lattice $\Lambda$ along with the \emph{motif} at each lattice site. We want to imbed $\Lambda \hookrightarrow \mathbb{R}^d$ and then be able to consider any point in the space. So $\*q\in \mathbb{R}^d$.
+
+The group action is defined as usual: for $(R|t)\in\mathbb{S}$, we have $(R|\*t)\*q = R\*q + \*t$. The starting place for building band representations if the \emph{site-symmetry} group defined by
+\\
+\begin{tcolorbox}
+	For a point $\*q$ in a crystal, the \emph{\textbf{site-symmetry group}} of $\*q$, is the stabilizer group 
+	$$ G_q = \{ (R|\*t)\in \mathbb{S} \:\:\:|\:\:\: (R|\*t)\*q = \*q  \} $$
+\end{tcolorbox}
+
+\noindent Not all sites in a unit cell are entirely different. If there is a $g_\alpha\in\mathbb{S}$ such that we can get to a site $\*q_\alpha$ from $\*q$ as $\*q_\alpha=g_\alpha \*q$ (where $\*q_\alpha$ and $\*q$ are in the same unit cell), then it is easy to find that the site-symmetry group of $\*q_\alpha$ is $g_\alpha G_q g_\alpha^{-1}$. Thus the site-symmetry groups of sites related by symmetry are conjugate to each other. Now some terminology:
+\\
+\begin{tcolorbox}
+	Any two sites whose site-symmetry groups are conjugate are said to lie in the same \textbf{\emph{Wyckoff position}}. 
+	\\
+	For one site in a Wyckoff position, the number of sites which lie in its orbit and are within one unit cell is called the \textbf{\emph{multiplicity}} of the position.
+\end{tcolorbox}
+So with the site-symmetry group $G_q$ and the orbit of $q$ within a unit cell (i.e. its Wyckoff position), we can form the coset decomposition using the set of points $\{\*q_\alpha \}$ in the Wyckoff position:
+$$ \mathbb{S} = \bigcup_{\alpha=1}^n\:g_\alpha\left( G_q \ltimes \Lambda \right) $$
+where each $g_\alpha$ is defined by $\*q_\alpha=g_\alpha\*q$. Note that $G_q\ltimes \Lambda$ can be understood as the stabilizer group of the point $\*q$ up to translations by a lattice vector. It is exactly the space group for the sublattice of atoms at unit cell site $\*q$. Through this coset decomposition, we will construct representations of $G_q\rtimes \Lambda$ and induce a \emph{band representation} of $\mathbb{S}$ via the coset representatives $\{g_\alpha\}$. 
+\\ 
+
+\begin{center}
+\textbf{INDUCING SPACE GROUP REPRESENTATIONS FROM LOCAL BASIS FUNCTIONS}
+\end{center}
+
+\noindent We begin by considering a atomic site $\*q_1$ in the unit cell which has site-symmetry group $G_{q_1}$. On this site, we consider a set of localized functions $\{w_{i1}\}_{i=1}^{n_\mu}$ which transform as an irreducible representation $\sigma^{(\mu)}$ of $G_{q_1}$:
+$$ g_1\cdot w_{j1}(\*r) = \sum_{i=1}^{n_\mu} \sigma^{(\mu)}_{ij}(g_1)w_{i1}(\*r) $$
+From the irrep of the site-symmetry group, we want to induce a representation of the full space group $\sigma^{(\mu)}\uparrow\mathbb{S}$. We can do this by considering a coset decomposition which looks like
+$$ \mathbb{S} = \bigcup_{\alpha,\ell}\gamma_{\alpha\ell} G_{q_1} $$
+for an infinite set of coset representatives $\gamma_{\alpha\ell}$ which are of the form $(E|\*t_\ell)g_\alpha$ for all lattice translations $\*t_\ell\in\Lambda$ and all $g_\alpha$ which take $\*q_1$ to other points in its Wyckoff position. That is, if $\*q_1$ is in the Wyckoff position consisting of points $\{ \*q_\alpha \}_{\alpha=1}^m$ in the unit cell, we have a set of space group operations $g_\alpha$ defined by $\*q_\alpha = g_\alpha \*q_{1}$. In light of this coset decomposition, we can use the the usual induction procedure and write the blocks of the induced representation as
+$$ (\sigma^{(\mu)}\uparrow\mathbb{S})_{\alpha\ell,\beta\ell'}(g) = \begin{cases} \sigma^{(\mu)}(\gamma_{\alpha\ell}^{-1}g\gamma_{\beta\ell'}) & \text{if } \gamma_{\alpha\ell}^{-1}g\gamma_{\beta\ell'} \in G_{q_1} \\
+0 & \text{else}\end{cases} $$
+Since these blocks are indexed by the lattice vectors $\*t_\ell\in\Lambda$ we clearly have an infinite dimensional representation. To make this more concrete, we extend our set of basis functions to include every unit cell $\ell$ and every site $\alpha$ in the Wyckoff position. We extend to the entire lattice $\Lambda$ by defining the translation $(E|\*t_\ell)\cdot w_{i1}(\*r)=w_{i1}(\*r-\*t_\ell)$ and we extend to the other sites in the Wyckoff position by defining $w_{i\alpha}$ by $w_{i\alpha}(\*r) \equiv g_\alpha \cdot w_{i1}(\*r)$.
+
+For convenience, we can rewrite the $\gamma_{\alpha\ell}^{-1}g\gamma_{\beta\ell'}$ in the nicer form $g_\alpha^{-1}(E|-\*t_{\alpha\beta})gg_{\beta}$. Since any non-zero block of our induced representation will be for $g_{\alpha}^{-1}(E|-\*t_{\alpha\beta})gg_\beta$ in $G_{q_1}$, we can set this equal to some $g_1\in G_{q_1}$ thus allowing us to decompose the space group element $g$ as
+$$ g = (E|\*t_{\alpha\beta})g_\alpha g_1 g_\beta^{-1} $$
+The translation $\*t_{\alpha\beta}$ is found for a given space group operation $g$ by acting on $\*q_\beta$. Doing so, we find\footnote{$ g\*q_\beta = (E|\*t_{\alpha\beta})g_\alpha g_1 g_\beta^{-1}\*q_\beta = (E|\*t_{\alpha\beta})g_\alpha g_1 \*q_1 = (E|\*t_{\alpha\beta})g_\alpha \*q_1 = (E|\*t_{\alpha\beta})\*q_\alpha = \*q_\alpha + \*t_{\alpha\beta} $}
+$$ \*t_{\alpha\beta} = g\*q_\beta - \*q_\alpha $$
+With this, we can now determine how our basis set of localized functions transform under a general space group operation $g=(R|t)$. We have:
+\begin{align*}
+g\cdot w_{j\beta}(\*r - \*t_\ell) &= g(E|\*t_\ell)\cdot w_{j\beta}(\*r) \\
+&=(E|R\*t_\ell)g\cdot w_{j\beta}(\*r)\\
+&= (E|R\*t_\ell)(E|\*t_{\alpha\beta})g_\alpha g_1 g_\beta^{-1}\cdot w_{j\beta}(\*r) \\
+&= (E|R\*t_\ell + \*t_{\alpha\beta})g_\alpha g_1 \cdot w_{j1}(\*r)\\
+&= (E|R\*t_\ell + \*t_{\alpha\beta})g_\alpha \sum_i\sigma^{(\mu)}_{ij}(g_1) w_{i1}(\*r)\\
+&= (E|R\*t_\ell + \*t_{\alpha\beta}) \sum_i\sigma^{(\mu)}_{ij}(g_1) w_{i\alpha}(\*r) \\
+g\cdot w_{j\beta}(\*r-\*t_\ell)&= \sum_i\sigma^{(\mu)}_{ij}(g_1) w_{i\alpha}(\*r - R\*t_\ell - \*t_{\alpha\beta})
+\end{align*}
+This transformation defines how our induced representation acts on any basis function $w_{i\alpha}(\*r-\*t_\ell)$.
+\\
+
+\begin{center}
+	\textbf{GLOBAL BAND REPRESENTATIONS}
+\end{center}
+
+\noindent We can work with a more convenient basis for this representation by defining \emph{Bloch functions}
+$$ \psi_{i\alpha,k}(\*r) = \sum_\ell e^{i\*k\cdot \*t_\ell}w_{i\alpha}(\*r - \*t_\ell) $$
+Indeed, knowing how the local functions $w_{j\beta}$ transform, we find:
+\begin{align*}
+g\cdot\psi_{j\beta,k}(\*r) &= \sum_\ell e^{i\*k\cdot \*t_\ell} \sum_i \sigma^{(\mu)}_{ij}(g_1) w_{i\alpha}(\*r - R\*t_\ell - \*t_{\alpha\beta}) \\
+&= e^{-iR\*k\cdot \*t_{\alpha\beta}}\sum_i \sigma^{(\mu)}_{ij}(g_1) \sum_{\ell'} e^{iR\*k\cdot \*t_{\ell'}}  w_{i\alpha}(\*r - \*t_{\ell'})\\
+g\cdot \psi_{j\beta,k}(\*r)& =  e^{-iR\*k\cdot \*t_{\alpha\beta}}\sum_i \sigma^{(\mu)}_{ij}(g_1) \psi_{i\alpha,Rk}(\*r)
+\end{align*}
+From this transformation, we can determine a nice block structure in the induced representation matrices. The set of basis functions is $\{ \psi_{i\alpha,k} \}$ for all $ i,\alpha$ and $\*k$ and from above, we see that a group element $(R|t)$ takes $\psi_{j\beta,k}$ to only basis functions with wavevector $R\*k$. Thus we can view the matrix representation of $(R|t)$ as containing blocks labeled by (row, column)=($\*k,\*k'$) where in a given row $\*k$, the only non-zero block is for $\*k'=R\*k$. Calling such a block $\rho^k(g)$, it contains $n_\mu\times n_\mu$ sub-blocks $\rho_{\alpha\beta}^k(g)$ given by
+$$ \rho^k_{\alpha\beta}(g) = \begin{cases}
+e^{-iR\*k\cdot \*t_{\alpha\beta}} \sigma^{(\mu)}\left(g_1\right) & \text{ if } g_1=g_\alpha^{-1}(E|-\*t_{\alpha\beta})gg_\beta\in G_{q_1} \\
+0 & \text{ else}
+\end{cases}$$
+
+\begin{center}
+	\textbf{GLOBAL TO LOCAL $\*k$-SPACE REPRESENTATIONS}
+\end{center}
+
+\noindent Since the band representation contains blocks for every $\*k$, it is clearly global in reciprocal space and must contain the space group irreps which we found before. The idea is we subduce our band representation $\rho$ of $\mathbb{S}$ to a representation of the little group $\mathbb{S}_k$ of some wavevector $\*k$. The result $\rho\downarrow \mathbb{S}_k$ of course contains only those space group elements which leave $\*k$ invariant. As such, since $\rho$ contains blocks indexed by $(\*k, R\*k)$ and we want only those elements where $R\*k\equiv\*k$, we want exactly the on-diagonal block $\rho^k$ which satisfies this. That is, we can write
+$$ (\rho\downarrow \mathbb{S}_k)(g) = \rho^k(g) $$
+with the understanding that $R\*k\equiv \*k$. This is a reducible representation of the little group which can be decomposed as a direct sum of the irreps we found before: 
+$$ \rho\downarrow \mathbb{S}_k = \bigoplus_\mu a_\mu \Omega^{(\*k,\mu)} \ $$
+The multiplicities $a_\mu$ are found by taking the character of the above decomposition:
+$$ \chi^{(\rho\downarrow\mathbb{S}_k)} = \sum_{\mu}a_\mu \chi^{(\mu)} $$
+and then taking the inner product and using the orthogonality of characters to write $ a_\mu = \langle \chi^{(\mu)}, \chi^{(\rho\downarrow\mathbb{S}_k)}\rangle $. 
+\\
+\\
+
+\begin{center}
+	\textbf{ELEMENTARY BAND REPRESENTATIONS}
+\end{center}
+
+\noindent Since band representations are induced from a representation $\sigma^{(\mu)}$ of the site symmetry group $G_{q_1}$, we can write them as $\rho = \sigma^{(\mu)}\uparrow \mathbb{S}$. While the resulting band representation is always reducible, we can define basic building blocks which we will call \emph{elementary band representations}.
+
+\begin{tcolorbox}
+	An \textbf{\emph{composite band representation}} is one which can be written as the direct sum of two band representations: 
+	$$ \rho_{com} = \rho_1 \oplus \rho_2 $$
+	A band representation is called \textbf{\emph{elementary}} if it is not composite.
+\end{tcolorbox}
+
+\noindent To determine whether a band representation is elementary or not, we can use two facts about induction. First: induction commutes with direct sums:
+$$ (\sigma^{(\mu)} \oplus \sigma^{(\nu)})\uparrow \mathbb{S} = (\sigma^{(\mu)} \uparrow\mathbb{S})\oplus (\sigma^{(\nu)} \uparrow \mathbb{S}) $$
+From this we see that if we induce a band representation from a reducible representation of the site-symmetry group, we will get a composite band representation. And conversely, if we induce from an irrep of a site-symmetry group, we will have an elementary band representation. 
+
+Second, induction is transitive: given groups $G_{q_1}\subset G_{q_2} \subset \mathbb{S}$ and a representation $\sigma$ of $G_{q_1}$, it follows that
+$$ (\sigma \uparrow G_{q_2})\uparrow \mathbb{S} = \sigma \uparrow \mathbb{S}$$
+This tells us that to enumerate all the elementary band representations within a certain space group, we only need to consider so-called \emph{maximal site-symmetry groups}.
+
+
+\chapter*{Space Group Symmetry in Physics}
+\addcontentsline{toc}{chapter}{Space Group Symmetry in Physics}
+
+{\centering
+\section*{Space Group Symmetric Operators}}
+
+\noindent In physics, the study of crystals and their symmetry is bedrock to our understanding of phenomena in the solid state. Given a Hilbert space $\mathcal{H}$, a central problem is to find the spectrum of a self-adjoint operator $H:\mathcal{H}\to\mathcal{H}$ which has the full symmetry of a space group. Here we will use only those symmetries and gain as much information about the system as we possibly can.
+
+Suppose the space group is $\mathbb{S}=\mathbb{T}_\Lambda\rtimes\mathbb{P}$ where $\mathbb{T}_\Lambda$ is the translation group for the Bravais lattice $\Lambda$ and $\mathbb{P}$ is the crystal point group. We know that since $H$ has $\mathbb{S}$ as its symmetry group, we can block diagonalize $H$ so that each block transforms as some irreducible representation\footnote{$U(\mathcal{H})$ is the group of unitary transformations on $\mathcal{H}$.} 
+$$\Gamma^{(^\star\*k,\mu)}:\mathbb{S}\to U(\mathcal{H})$$
+So $H$ decomposes into the block diagonal form:
+$$ H = \bigoplus_{\Gamma}H_\Gamma $$
+From the previous section on space group representations, we recall that each $\Gamma^{(^\star\*k,\mu)}$ is induced from an irrep of the little group of $\*k$ (or any $\*k'\in\, ^\star\*k$ for that matter). That little group irrep looks like $\rho^{(\*k)}\Lambda^{(\mu)}$ where $\rho^{(\*k)}$ is the $\*k$-irrep of the translation group $\mathbb{T}_\Lambda$ and $\Lambda^{(\mu)}$ is an irrep of the little cogroup of $\*k$. From the induction, we can write
+$$\dim\Gamma^{(^\star\*k,\mu)}=|^\star\*k|\times\dim\Lambda^{(\mu)}$$
+As the dimensions of the irreps, this also gives the dimensions of the blocks/eigenspaces of  $H$. So we can immediately draw some conclusions about the degeneracies in the spectrum. 
+
+The standard approach to studying the spectrum here is to treat it as a set of functions (bands)
+$$ \varepsilon_n: \mathbb{R}^d/\Lambda^\star \to \mathbb{R} $$
+where $n$ labels the various irreps $\Lambda^{(\mu)}$ that might occur. In this light, the factor of $|^\star\*k|$ in the degeneracies can be viewed as equivalent to the fact that $\varepsilon_n(R\*k)=\varepsilon_n(\*k)$ for any point group operation $R$. It is typical to then reduce our scope to only those $\*k$ which are \emph{not} related by symmetry. Such a set defines an \textbf{\emph{irreducible zone}} of the Brillouin zone. Once we know the spectrum over an irreducible zone, we immediately know the spectrum over the rest of the Brillouin zone just by symmetry. 
+
+With an irreducible zone defined, we have entirely accounted for the $|^\star\*k|$ degeneracy so all that remains is the contribution from the little cogroup irreps $\Lambda^{(\mu)}$.
+
+
+
+
+\end{document}

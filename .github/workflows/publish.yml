@@ -1,0 +1,55 @@
+# Compiles every note to PDF and publishes them with GitHub Pages at
+# https://<user>.github.io/<repo>/<note>.pdf
+# PDFs are build output only: they are never committed to the repo.
+name: Publish notes
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only the newest push deploys; older in-flight builds are cancelled.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history, for each note's "last updated" date
+
+      - name: Compile notes
+        # Full TeX Live in Docker. Runs as the runner's user so later steps can write to _site.
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -e BUILD_COMMIT="${GITHUB_SHA::7}" \
+            -v "$PWD":/work -w /work \
+            texlive/texlive:latest \
+            bash scripts/build.sh _site
+
+      - name: Write manifest and index
+        run: python3 scripts/manifest.py _site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

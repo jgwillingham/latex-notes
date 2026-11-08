@@ -1,0 +1,606 @@
+\documentclass[twocolumn]{gwclass}
+\usepackage[utf8]{inputenc}
+\usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage{tikz-cd}
+
+
+\newcommand{\man}{\mathcal{M}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\W}{\mathcal{W}}
+
+%\newcommand{\intbw}[1]{\int_{\t{-}\frac{#1}{2}}^{\frac{#1}{2}}\hspace{-0.2em}}
+%\newcommand{\intbw}[1]{\int_{\scriptscriptstyle -#1\hspace{-0.1em}/\hspace{-0.1em}2}^{\scriptscriptstyle #1\hspace{-0.1em}/\hspace{-0.1em}2}\hspace{-0.5em}}
+
+\newcommand{\intbw}[1]{\int_{\hspace{-0.1em}\scriptscriptstyle\mathscr{B}}\hspace{-0.25em}}
+
+\title{\vspace{-0.5in}\Huge\bfseries \color{\stylecolor}Spectrum Estimation \& Time-Frequency Methods}
+\author{--- George Willingham ---}
+\date{}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+\subsection{The Power Spectral Density (PSD)}
+This note is intended to be a brief, but thorough, overview on the subject of spectrum estimation. Countless modern technologies and scientific practices rely on spectrum estimation or related time-frequency analyses for their operation. Such technologies include medical image processing, cellular, WiFi, Bluetooth, radar, seismic monitoring, musical instrument tuners, and an endless list of experimental techniques in physics and chemistry. All of these have in common that they are best understood in the frequency domain --- the signal of interest can be decomposed into a combination of sinusoids.  The foundational operation in frequency domain analysis is the \textbf{Fourier transform}. A function $x:\R\to\C$ has Fourier transform defined by\footnote{and inverse $x(t)=\int_\R df\;e^{-j2\pi ft}X(f)$}
+$$ \tiny X(f)\equiv \int_\R dt\;e^{-j2\pi f t}x(t) $$ 
+The quantity $\abs{X(f)}^2$ is understood as the energy per unit frequency --- the \emph{energy spectral density}. When we work with steady state signals which are modeled as extending infinitely in time (e.g. sine functions), the energy spectral density diverges and the integral Fourier transform does not exist in the basic sense. Therefore, a new quantity is needed to capture the frequency domain characteristics of such signals. The new quantity, called the \textbf{power spectral density} (PSD), is defined by
+$$ S_{xx}(f) \equiv \lim_{\t{T}\to\infty} \frac{\abs{X_\t{T}(f)}^2}{2\t{T}} $$
+where $X_\t{T}(f) = \int_{-\t{T}}^\t{T} dt\;e^{-j2\pi f t}x(t)$ is the Fourier transform of the signal $x$ if it is \emph{windowed} to be zero outside of the time interval $[-\t{T},\t{T}]$.
+
+\subsection{Stochastic Processes \& Power Spectra}
+A stochastic process is a sequence of random variables  $\{x(t)\:|\:t\in\mathcal{I}\}$ where $\mathcal{I}$ is some index set which could be continuous (e.g. $\R$) or discrete (e.g. $\mathbb{Z}$). The mean function of a stochastic process is the mean value of each random value as a function of time:
+$$ \mu(t) \equiv \mathbb{E}[x(t)] $$
+Throughout these notes, it will be assumed that the mean has been subtracted off so that $\mu(t)=0$. The autocorrelation function of a zero-mean stochastic process is defined just like the typical covariance:
+$$ r_{xx}(t,s)\equiv\mathbb{E}[x(t)x^*(s)] $$
+A \textbf{wide-sense stationary} stochastic process is one for which the autocorrelation function is \emph{time-translation invariant}. This means that for any shift $\tau$, we have $ r_{xx}(t-\tau,s-\tau) = r_{xx}(t,s) $. As a consequence, we can always make the special choice of $\tau=s$ to find the form $r_{xx}(t-s,0)$ making it clear that the autocorrelation function is really only a function of the time difference $t-s$. 
+
+
+Now we face the question of how to describe the spectrum of a wide-sense stationary stochastic process. We will define the PSD by
+$$ S_{xx}(f) \equiv \lim_{\t{T}\to\infty}\frac{1}{2\t{T}}\mathbb{E}\left[\abs{\int_{-\t{T}}^{\t{T}} dt\;e^{-j2\pi f t}x(t)}^2\right] $$
+Expanding out the square, it is straight forward to find that the wide-sense stationarity of $x$ relates the autocorrelation function to the PSD through a Fourier transform. This is known as the \textbf{Wiener-Khinchin Theorem}:
+$$ S_{xx}(f) = \int_\R d\tau\;e^{-j2\pi f\tau}r_{xx}(\tau)$$
+
+\subsection{Sampling and the DTFT}
+Consider a continuous stochastic process $\{x(t)\:|\:t\in\R\}$ which we measure by taking samples every $T$ seconds. We define the \textbf{sample rate} as $f_s=1/T$. The effect of sampling on the analysis can be neatly captured by the \emph{Dirac comb} function defined by
+$$ \Psi(t) \equiv T\sum_{n\in\mathbb{Z}} \delta(t - nT) $$
+The sampling procedure can be thought of as the mapping $x(t)\mapsto x(t)\Psi(t)$. Since the Dirac comb is zero everywhere except at the times $nT$, this is effectively writing $x$ in the form
+$$ x(t)= T\sum_{n\in\Z}x(n)\delta(t- nT) $$
+where we have introduced the convenient, albeit sloppy notation $x(n)=x(nT)$. The Fourier transform of the sampled function now reduces from an integral to a sum due to the delta functions. Specifically,
+$$ X(f) = \frac{1}{f_s}\sum_{n\in\mathbb{Z}}e^{-j2\pi f n/f_s} x(n) $$
+This is known as the \textbf{discrete-time Fourier transform}, or the DTFT but it is nothing other than a familiar Fourier series, only now the series is in the time domain and the periodic function is in frequency. Indeed, the above form for $X$ is manifestly $f_s$-periodic: $X(f+f_s)=X(f)$. The series is inverted with
+$$ x(n) = \frac{1}{f_s}\intbw{f_s}df\;e^{j2\pi fn/f_s}X(f) $$
+where for brevity's sake, the notation $\intbw{1}$ is used to indicate integration over any interval of length $f_s$. Since the integrand is $f_s$-periodic, the integral is the same no matter what $f_s$ length interval is integrated over. The standard choices however are either $[-f_s/2, f_s/2)$ or $[0,f_s)$.
+
+The PSD of a sampled signal can be derived from the continuous case by replacing the limit $\t{T}\to\infty$ with a limit over the number of samples in the window $N\to\infty$ such that $\t{T}=NT$:
+$$ S_{xx}(f) = \lim_{N\to\infty} \frac{1}{2Nf_s}\mathbb{E}\left[\abs{\sum_{n=-N}^{N-1}e^{-j2\pi fn/f_s}x(n)  }^2\right] $$
+Expanding this out and evaluating the $N\to\infty$ limit, we recover the discrete version of the Wiener-Khinchin theorem:
+$$ S_{xx}(f) = \frac{1}{f_s} \sum_{n\in\Z} e^{-j2\pi fn/f_s}r_{xx}(n)  $$
+
+\subsection{The Cross-Spectral Density (CSD)}
+Before moving on, it is worth pointing on that there is a more general form of the PSD which relates two distinct signals $x$ and $y$. Their cross-spectral density (CSD) is defined by
+$$ S_{xy}(f) \equiv \lim_{\t{T}\to\infty}\frac{\mathbb{E}\left[X_\t{T}(f)Y_\t{T}^*(f)\right]}{2\t{T}} $$
+
+\section{Periodograms and the DFT}
+\subsection{Periodograms and Finite Data Records}
+With a real dataset consisting of a finite number of samples, we are faced with the problem of estimating the PSD with incomplete information. This is the fundamental problem of spectrum estimation and is the general problem addressed throughout these notes. Perhaps the simplest approach to the problem is to treat the data as belonging to an infinite sequence which is zero-valued everywhere outside of the data record. This is modeled as an infinite sequence $w(n)x(n)$ where $w:\Z\to\C$ is a dimensionless \textbf{window function} which is only non-zero over the measured samples $n=0,\dots,N-1$. With this, we obtain the important \textbf{periodogram}\footnote{Sometimes non-rectangular windows are associated with so-called \emph{modified} periodograms}:
+$$\hat{S}_{xx}(f) = \frac{1}{f_s}\abs{\sum_{n=0}^{N-1} e^{-j2\pi f n/f_s} w(n)x(n) }^2 $$
+To emphasize, periodograms always involve a choice of window. Even ``no window" is really just choosing a basic rectangular window that is constant over the full data record. But generally, we make any choice that might benefit the estimation. This method of estimating the PSD is in fact equivalent to replacing the continuous time integral with a Riemann sum. The integral is replaced with a sum and $dt\mapsto 1/f_s$.
+
+Expanding out the square, one can show that the periodogram is a biased estimate of the PSD since it has expected value:
+$$ \mathbb{E}[\hat{S}_{xx}(f)] = \frac{1}{f_s}\intbw{f_s} d\gamma\;S_{xx}(f-\gamma)\abs{W(\gamma)}^2 $$
+where $W(\gamma)$ is the DTFT of the window function. This tells us that on average, the periodogram estimate is the true PSD convolved with the \emph{spectral window} $\abs{W(f)}^2$. So then as long as the spectral window is a nascent delta function, converging in the $N\to\infty$ limit, then the periodogram is asymptotically unbiased. That is,
+$$ \lim_{N\to\infty}\abs{W(f)}^2= f_s\delta(f) \:\:\implies\:\: \lim_{N\to\infty}\mathbb{E}[\hat{S}_{xx}] = S_{xx} $$
+However, it can also be shown that even in this limit, the periodogram is \emph{not} a consistent estimator since the variance remains nonzero.
+
+The total power within any bandwidth $f_s$ can be computed by integrating the PSD over that band. With $P_{xx}\equiv \intbw{f_s}df\;S_{xx}(f)$, we can use the above form for the expected value to find the total power in our estimate:
+$$ \mathbb{E}[\hat{P}_{xx}] =  \|\*w\|_2^2P_{xx}$$
+where $\*w\in \R^N$ is the window viewed as a vector and $\|\cdot\|_2$ denotes the $\ell^2$ norm. This makes it clear that to have an unbiased estimate for the total power, we must normalize the window function $\|\*w\|_2^2 = 1$. Equivalently:
+$$ \sum_{n=0}^{N-1} \abs{w(n)}^2 = 1 $$
+
+\subsection{Frequency Resolution}
+An important question to ask about periodograms is how well they can resolve separate peaks in a PSD. That is, if there are two perfect sinusoids composing the data, then what is the closest they can be in frequency before the periodogram only resolves a single peak? For a single sinusoid $x(n)=e^{j2\pi f_0 n/f_s}$, the periodogram (with rectangular window) can be computed analytically. Plugging into the equation for the periodogram, the sum is nothing other than a standard geometric series. Using a well known formula\footnote{$\sum_{n=0}^{N-1}r^n = (1-r^N)/(1-r)$} and a trig identity, we have the PSD:
+$$ \hat{S}_{xx}(f) = \frac{1}{f_sN}\abs{\frac{\sin(\pi(f-f_0)N/f_s)}{\sin(\pi(f-f_0)/f_s)}}^2 $$
+This has a strong peak at $f=f_0$ as expected, but it is generally quite broad. The frequency resolution might be defined as the distance $\delta f= f-f_0$ at which the periodogram falls to zero from its peak. This occurs when the sine in the numerator find its first nontrivial zero. The resolution is then found through $\pi\delta f N/f_s = \pi$ which is solved to give
+$$ \delta f = f_s/N $$
+So then, two sinusoids in a PSD can only be separately resolved in a periodogram if $f_s/N$ is sufficiently small. So for a fixed sample rate, the frequency resolution increases as we collect more data. In fact, if $\t{T}$ is the collection duration, then $N=f_s\t{T}$ and so the frequency resolution becomes simply $\delta f = 1/\t{T}$. This has a clean interpretation as the lowest possible frequency which completes a full cycle during the collection --- a natural bound on the resolution.
+
+\subsection{The DFT}
+The PSD is properly a continuous function of frequency --- defined over $[0,f_s]$ for sampled signals. On a CPU however, we must restrict to only a subset of discrete frequencies. Typically, we calculate at evenly spaced frequencies $f=f_s k/N$ for $k=0,\dots,N-1$. Doing so, the simple DTFT of $x$ becomes the \textbf{discrete Fourier transform (DFT)}:	
+$$ X(k) \equiv \sum_{n=0}^{N-1}e^{-j2\pi kn/N}x(n) $$
+Through the sum rule $\sum_n e^{-j2\pi (k-k')n/N}=N\delta_{kk'}$, the inverse transformation is given by
+$$ x(n) = \frac{1}{N}\sum_{k=0}^{N-1}e^{j2\pi kn/N}X(k) $$
+There are several important observations about the DFT that should be made. First, notice that the frequency spacing is $f_s/N$, matching the intrinsic resolution of a periodogram. It is common practice however (for reasons which will become clear in the discussion of FFTs) to compute the PSD at a greater number $N_\t{DFT}$ of frequencies than we have data samples $N$. For frequencies $f=f_s k/N_\t{DFT}$ where $k=0,\dots, N_\t{DFT}-1$, the resulting DFT is trivially obtained by replacing $e^{-j2\pi k n/N}\mapsto e^{-j2\pi kn/N_\t{DFT}}$, but the sum is still over $N$. The crucial observation here is that, this is exactly the ordinary DFT if the data $x$ is \textbf{zero-padded} at its end so that it has artificial length $N_\t{DFT}$. Indeed, all we have done is chosen a greater number of frequencies to compute the continuous PSD at, but it turns out that this can be equivalently understood as zero-padding the data. In this way, zero-padding data before a DFT should be understood as a means of \emph{spectrum interpolation}.
+
+Second, notice that not only is the spectrum periodic $X(k+N)=X(k)$, but the inverse DFT reveals that $x(n+N)=x(n)$. Evidently then, we have implicitly assumed that our data record repeats periodically in time. This has important consequences for the measured spectrum. If $x(0)$ is not close to $x(N-1)$, then the assumed periodicity of the signal produces a discontinuity. This discontinuity introduces spectral artifacts to the PSD known as \textbf{spectral leakage}. The situation can be remedied with an appropriate choice of window function.
+
+\subsection{Choosing a Window}
+The simplest choice of window function is of course just the rectangular window that is constant across the entire data record $w(n)=1/\sqrt{N}$. However, the discontinuities which appear at the boundary lead to spectral leakage in our PSD estimate. Often in the literature, any other choice of window produces a so-called \emph{modified periodogram}. There are many possible choices of window and they have various trade-offs that must be weighed when deciding on a window for practical application. One simple window is the \textbf{Hann\footnote{Sometime erroneously called the \emph{Hanning} window in confusion with the distinct Hamming window.} window}, or \emph{raised cosine}, defined by
+$$ w^\t{hann}(n) = \frac{1}{2}\big[1 - \cos(2\pi n/(N-1))\big] $$
+Observe that the Hann window is zero at its edges $w^\t{hann}(0)=w^\t{hann}(N-1)=0$ which removes any discontinuity that otherwise would affect our PSD. Of course, by fixing the discontinuity, we have tampered with the data. There is no perfect solution to the problem.
+
+\section{The FFT Algorithm}
+\subsection{Radix-2 Algorithm}
+In practice, DFTs are calculated using a famous algorithm called the Fast Fourier Transform (FFT). As compared to the naive implementation of a DFT which runs in $O(n^2)$ time, the FFT runs in $O(n\log n)$ time. It works on a divide and conquer principle --- splitting the DFT sum into smaller parts that are themselves small DFTs. The most familiar version of FFT is the \textbf{radix-2} algorithm which splits the data into its even and odd components. Assuming $N$ is even, we can reindex with $n=2m+\ell$ and derive the following recursion:
+$$ X_N(k) = X_{N/2}^{0}(k) \:+\: e^{-j2\pi k/N} X_{N/2}^1(k)$$
+Here $X_N^\ell$ denotes the $N$-point DFT consisting of samples $x(2m+\ell)$ for fixed $\ell$ and $m=0,\dots,N/2-1$. In other words, these are the DFT of the even and odd index samples. 
+
+In the special case when $N$ is a power of 2, then the same even-odd split can be made for each of the smaller DFTs and this can be performed recursively until the base case of a trivial 1-point DFT. Since we know zero-padding the data is harmless to the spectral estimate, it is conventional to zero-pad the data to the next power of 2 before computing the FFT.
+
+The only problem with the algorithm as described so far is that the $N/2$-point DFTs only cover half the frequencies of the full $N$-point DFT that we want. The solution comes from the periodicity in frequency. Since $X^\ell_{N/2}(k+N/2)=X^\ell_{N/2}(k)$, we have:
+$$ X_N(k+N/2) = X^0_{N/2}(k) - e^{-j2\pi k/N}X^1_{N/2}(k) $$
+where the minus sign is picked up from a factor of $e^{-j\pi}$ in the exponential. With this, we have the full $N$-point DFT computed in a recursive manner. Pseudocode for the algorithm is shown below.
+
+\begin{algorithm}
+	\caption{Radix-2 FFT}
+	\SetKwInOut{Input}{Input}
+	\SetKwInOut{Output}{Output}
+	
+	\underline{function FFT}$(x)$\\
+	\Input{Data $x\in \C^N$ for $N$ a power of $2$}
+	\Output{DFT $X\in\C^N$}
+	
+	\eIf{$\t{length}(x) = 1$}{
+		return $x$}{
+		$x_\t{e} \leftarrow [x(2n)$\quad\:\:\: \t{for } $n=0,\dots,N/2-1]$ \\
+		$x_\t{o} \leftarrow [x(2n+1)$ \t{for } $n=0,\dots,N/2-1]$ \\
+		$X_\t{e} \leftarrow \t{FFT}(x_\t{e})$\\
+		$X_\t{o} \leftarrow \t{FFT}(x_\t{o})$\\
+		\For{$k=0 \t{ to } N/2-1$}{
+			$X(k) \quad\quad\quad\leftarrow X_\t{e}(k) + e^{-j2\pi k/N}X_\t{o}(k)$\\
+			$X(k+N/2) \,\leftarrow X_\t{e}(k) - e^{-j2\pi k/N}X_\t{o}(k)$
+		}		
+	return $X$
+	}
+\end{algorithm}
+
+
+
+\section{Welch's Method}
+\subsection{Averaged Periodograms}
+The essential problem with the periodogram is that it is \emph{not} a consistent estimator: even as $N\to \infty$, the variance does not vanish. As a consequence, the estimate is typically quite noisy. To fix this problem, Welch proposed to split the data record into overlapping segments, compute the periodogram of each one, and then take their average. Assuming the noise in distant segments is uncorrelated, this will reduce the variance of the estimate by a factor of $1/K$ where $K$ is the number of segments. 
+
+The Welch estimate can be written
+$$ \hat{S}_{xx}^\t{welch}(f) \equiv \frac{1}{K}\sum_{k=0}^{K-1}\frac{1}{f_s}\abs{\sum_{n\in\mathbb{Z}}e^{-j2\pi f n/f_s} w(n)x_k(n) }^2 $$
+where $x_k(n)=x(k\Delta + n)$ is the data in segment $k$, $\Delta$ is the \emph{stride} or spacing between adjacent segments, and the window is nonzero over $L$ values $w(0),w(1),\dots w(L-1)$. In practical implementations of Welch's method, we usually specify the window length $L$ and the overlap between adjacent segments $L_\t{overlap}$. From these values, the number of segments $K$ and the stride $\Delta$ are fully determined. In particular, consider that we cannot take data outside of our record, so this places a constraint on the index in the final segment: $(K-1)\Delta + L \leq N$. Rearranged, this gives us a way to compute the number of windows
+$$ K \leq \frac{N - (L - \Delta)}{\Delta} $$
+Since $K$ must be an integer, we take the floor of the right hand side to get the number of windows in the estimate. The stride is simply related to the overlap by $\Delta + L_\t{overlap} =L$ so we can write the useful equation
+$$ K = \left\lfloor \frac{N - L_\t{overlap}}{L - L_\t{overlap}} \right\rfloor $$
+Welch's method finds its real utility in providing a knob to turn to adjust the bias and variance of the estimate. With a short window, the bias is higher, but we get more segments in the average and the variance is lower. With a long window, the bias is lower but the variance is higher. 
+
+\section{Multitaper Method}
+The multitaper method\sidenote{Note: moving forward, all frequencies will be normalized so that $f_s=1$} is similar to Welch's method in that it consists of averaging over periodograms. However, while in Welch's method, we are averaging over different overlapping segments of the data record, the multitaper method averages periodograms taken over the full data record but each with a different window. The key property of multitaper is that the windows are orthogonal, making the periodograms all uncorrelated. 
+
+As discussed previously, the expected value of a periodogram estimate is given by the convolution of the true PSD with the spectral window $\abs{W(f)}^2$. This is of course optimized by a delta function which is non-realizable with a finite number of samples. The multitaper method is motivated by finding the optimal realizable window and asking the question: \emph{what length $N$ window maximally concentrates power within some bandwidth $B$?} The power in bandwidth $B$ is computed as
+$$ \int_{-B/2}^{B/2}df\;\abs{W(f)}^2 = 
+\*w^\dagger D\*w$$
+where the right hand side is arrived at by replacing $W(f)$ with its DTFT form and evaluating the integral. The $N\times N$ matrix $D$ is symmetric and Toeplitz with elements\footnote{$\t{sinc}(x)=\frac{\sin(\pi x)}{\pi x}$}
+$$ D_{mn} = B\t{sinc}(B|m-n|) $$
+The goal now is to maximize this power while constraining the window norm $\|\*w\|_2=1$. This is the so-called \emph{spectral concentration problem} and it can be solved here using Lagrange multipliers. We write the Lagrangian $ \mathcal{L} = \*w^\dagger D\*w - \lambda \|\*w\|_2^2 $. Setting the derivative to zero, we derive the eigenvalue problem
+$$ D\*w = \lambda\*w $$
+Evidently then, the eigenvectors of $D$ are exactly the windows which maximize the spectral concentration. The eigenvalues/multipliers are the fraction of power in the desired bandwidth
+$$ \lambda = \frac{\int_{-B/2}^{B/2}df\;\abs{W(f)}^2}{\intbw{1} df\;\abs{W(f)}^2} $$
+The eigenvectors of $D$ are called \textbf{Slepian sequences}, or discrete prolate spheroidal sequences. 
+
+Since $D$ is Hermitian, its eigenvectors $\{\*w_k\}_{k=0}^{N-1}$ form an orthonormal basis of $\C^N$. Since each is orthogonal the windowed sequences $w_k(n)x(n)$ are all uncorrelated. As a consequence, the averaging will successfully reduce variance by a factor of $1/K$ where $K$ is the number of terms in the average. So finally, the multitaper spectrum estimate is
+$$ \hat{S}_{xx}^\t{mt}(f) \equiv \frac{1}{K}\sum_{k=0}^{K-1}\abs{\sum_{n\in\Z}e^{-j2\pi f n}w_k(n)x(n)}^2 $$
+More generally we can take a weighted sum, giving more weight to the more concentrated tapers. This is usually done by weighting each taper by its corresponding eigenvalue.
+
+The expected value of this estimator is 
+$$ \mathbb{E}[\hat{S}_{xx}^\t{mt}(f)] = \intbw{1} d\gamma\;S_{xx}(f-\gamma)\psi_K(\gamma) $$
+where $\psi_K(f) = \frac{1}{K}\sum_k \abs{W_k(f)}^2$ is the average spectral window of the Slepian sequences. It can be shown that if $K\approx NB$, then this function is well approximated by a box function which is $1/B$ over $[-B/2,B/2]$ and 0 elsewhere. Therefore, the multitaper PSD is in expectation a locally smoothed version of the true PSD.
+
+\subsection{Linear Algebra Perspective}
+The multitaper method has a nice interpretation in terms of projection onto a minimal error subspace. Consider first that the basic periodogram can be understood as the projection of a data vector $\*x\in\C^N$ onto the 1-dimensional subspace spanned by the sinusoidal vector $\*e_f=(1\;e^{j2\pi f}\;\dots \;e^{j2\pi f(N-1)})^\t{T}$. This is done with the projection matrix $P_f=\*e_f \*e_f^\dagger / \|\*e_f\|_2^2$. The squared magnitude of the projection of $\*x$ is
+$$ \|P_f\*x\|_2^2 = \frac{|\*e_f^\dagger\*x|^2}{\|\*e_f\|_2^2}=\frac{1}{N}\abs{\sum_{n=0}^{N-1}e^{-j2\pi f n}x(n)}^2 $$
+which is just a periodogram with rectangular window. 
+
+This can be generalized so that we project onto a $K$-dimensional subspace. In particular, we will seek the subspace which minimizes the error for sinusoids over a particular frequency band $[f-B/2,f+B/2]$. This is an optimization problem
+$$ \mathcal{S}_f = \arg\min_{\mathcal{S}\subset\C^N} \int_{ f-B/2}^{ f+B/2}\hspace{-0.25em}d\gamma\;\|\*e_\gamma - P_{\scriptscriptstyle\mathcal{S}}\*e_\gamma\|_2^2 $$
+subject to the constraint that $\dim(\mathcal{S})=K$. Here $P_{\scriptscriptstyle\mathcal{S}}$ is the projection onto the target subspace. Since the dimension is fixed to $K$, the projection matrix can be written $P_{\scriptscriptstyle\mathcal{S}}=\sum_k \*w_{fk}\*w_{fk}^\dagger$ where $\{\*w_{fk}\}_{k=0}^{K-1}$ form an orthonormal basis of the error-minimizing subspace. The goal is to find these vectors. With this form, the error can be expanded and the integral evaluated so that the quantity to be minimized is $ NB- \sum_k\*w^\dagger_{fk} U_f D U_f^\dagger \*w_{fk} $
+where $U_f=\t{diag}(\*e_f)$ is a unitary matrix and $D$ is the matrix found previously. Since $D$ is a positive definite matrix, the optimization problem is now
+$$ \*w_{fk} = \arg\max_{\*w} \*w^\dagger U_f D U_f^\dagger\*w $$
+subject to the constraint $\|\*w\|_2^2=1$. As before, this leads to an eigenvalue problem for the matrix $U_f D U_f^\dagger$. Since this is simply a unitary transformation of $D$, the eigenvectors are related as $\*w_{fk}=U_f\*w_k$ where $\*w_k$ are the Slepian sequences (i.e. eigenvectors of $D$). So then, the projection of $\*x$ onto this error-minimizing subspace is given by
+\begin{align*} 
+	\|P_{\scriptscriptstyle\mathcal{S}}\*x\|_2^2 &= \sum_{k=0}^{K-1}\|\*w^\dagger_kU_f^\dagger \*x\|^2_2 \\
+	&= \sum_{k=0}^{K-1}\abs{\sum_{n=0}^{N-1}e^{-j2\pi f n}w_k(n)x(n)}^2
+\end{align*}
+Up to an overall factor of $1/K$, this is exactly the multitaper PSD estimate. So this method can be understood as a projection of our data record onto a $K$-dimensional subspace which minimizes the total error over a bandwidth $B$.
+
+\subsection{Choosing the Number of Tapers $K$}
+It remains to determine how many tapers to include in the averaging. To decide on a value for $K$, one can examine the eigenvalues of $D$. Ordering them as $\lambda_0\geq \lambda_1\geq \dots\geq\lambda_{N-1}$, one can show that the first several eigenvalues are close to 1, then there is a narrow transition region as the eigenvalues decrease rapidly toward 0. In other words, the first however many eigenvectors have very nice spectral concentration properties, but beyond the transition region, the eigenvectors lose this quality. 
+
+Simple numerical experiments or more involved analysis will show that the number of eigenvectors with eigenvalue close to 1 is approximately given by the \textbf{time-bandwidth product} $NB$. This is also sometimes called the \emph{Shannon number}. So then, the rule of thumb is to use for our number of tapers
+$$ K = \lfloor NB\rfloor - 1 $$
+
+
+\subsection{Minimum Bias Tapers}
+As an alternative to Slepian sequences, we can optimize a different problem to obtain another set of orthogonal tapers to average over. In particular, assuming the window is normalized to have unit power, one can show that the periodogram bias is approximated to second order by
+$$ \t{bias}[\hat{S}_{xx}(f)] \approx \frac{S_{xx}''(f)}{2} \intbw{1} d\gamma\;\gamma^2\abs{W(\gamma)}^2 $$
+as long as $S_{xx}''(f)$ is nonzero. Since the integral is a positive constant depending on our choice of window, we might try to minimize bias by finding a window which minimizes this value. Expanding out $W(f)$ in terms of its DTFT, we find the matrix form
+$$ \intbw{1} d\gamma\;\gamma^2\abs{W(\gamma)}^2 = \*w^\dagger A \*w $$
+where the $N\times N$ matrix $A$ is symmetric and Toeplitz with elements
+$$ A_{mn} = \begin{cases}
+	1/12 & m=n \\
+	\frac{(-1)^{m-n}}{2\pi^2(m-n)^2} & m\neq n
+\end{cases} $$
+Just as was done in the spectral concentration problem, we now aim to minimize $\*w^\dagger A\*w$ subject to the constraint that the window is normalized $\|\*w\|_2^2=1$. This is done in precisely the same way with Lagrange multipliers. So then, the minimum bias tapers are the eigenvectors of $A$:
+$$ A\*w = \lambda\*w $$
+It can be shown that these eigenvectors are well-approximated by simple \textbf{sine tapers} of the form 
+$$w_k(n)\approx \sqrt{\frac{2}{N+1}} \sin(\frac{\pi k n}{N+1})$$
+These have the benefit of having closed form --- no eigenvalue problem must be solved.
+
+\section{Capon Method}
+The Capon method, also known as the \textbf{minimum variance spectral estimator}, differs from the other methods discussed so far since it is not based on periodograms. Instead, it is based on a more general statistical technique using \emph{linear estimators}. Just like other methods discussed in these notes, this method serves a more general purpose than PSD estimation. Indeed, the Capon method can be applied to the direction of arrival (DOA) estimation problem in phased arrays. In that context, it is known as the minimum variance beamformer.
+
+\subsection{Estimating a Sinusoid's Amplitude}
+To begin, suppose we model our data $\*x\in\C^N$ as a sinusoid with known frequency $f$ in noise. With the sinusoidal vector $\*e_f=(1\;e^{j2\pi f}\;\dots\;e^{j2\pi f(N-1)})^\t{T}$, we write
+$$ \*x = A\*e_f + \*\epsilon $$
+where $A$ is an unknown complex amplitude and $\*\epsilon$ is a zero-mean noise process with known covariance matrix $\Sigma$. To estimate the complex amplitude $A$, we will construct the \emph{best linear unbiased estimator} (BLUE). The estimator is written in the form $\hat{A}=\*w^\dagger\*x$ for some to-be-determined coefficient vector $\*w$. Observe that the expected value of the linear estimator is $\mathbb{E}[\hat{A}]=\mathbb{E}[\*w^\dagger\*x]= A\*w^\dagger\*e_f$. Therefore, we can constrain $\hat{A}$ to be unbiased by enforcing the condition $ \*w^\dagger\*e_f=1 $. Among all the linear unbiased estimators, we want the one which has minimum variance. The variance is easily found to be $\mathbb{E}[|\hat{A}|^2]=\*w^\dagger \Sigma\*w$ so we seek a solution to the following problem
+$$ \*w = \arg\min_{\*v\in\C^N} \*v^\dagger\Sigma\*v$$
+subject to the constraint $\*v^\dagger\*e_f=1$. The solution is easily found through Lagrange multipliers and leads to the full form of the estimator along with its variance:
+$$ \hat{A} = \frac{\*e_f^\dagger\Sigma^{-1} \*x}{\*e_f^\dagger \Sigma^{-1}\*e_f} \qquad\qquad\mathbb{E}[|\hat{A}|^2]=\frac{1}{\*e_f^\dagger\Sigma^{-1}\*e_f}$$
+The variance can clearly be understood as the expected power in the signal.
+
+In the special case where the noise is complex gaussian $\*\epsilon\sim\mathcal{N}(0,\Sigma)$ this estimator coincides with the \emph{maximum likelihood estimator} (MLE) for $A$.
+
+\subsection{Filter View}
+The linear estimator just obtained can be viewed as an FIR filter $\*w^\dagger$ acting on the data. The frequency response of this filter is
+$$ W(\gamma) = \sum_{n=0}^{N-1}e^{-j2\pi \gamma n}w(n) = \*e_\gamma^\dagger\*w  $$
+At the frequency of our model $\gamma=f$, the unbiased constraint manifests in the frequency domain as a filter which has unity gain $W(f)=1$. So the filter leaves the model frequency unaffected. The estimator variance on the other hand can be written in the frequency domain to find
+$$ \mathbb{E}[|\hat{A}|^2]= \intbw{1} d\gamma\; \abs{W(\gamma)}^2S_{xx}(\gamma) $$
+So minimizing the variance subject to the constraint that $W(f)=1$, appears to be minimizing the power at all other frequencies in the spectral window $|W(\gamma)|^2$. The estimator for the PSD based on Capon's method is then precisely the variance:
+$$ \hat{S}_{xx}^\t{capon}(f) \equiv \frac{1}{\*e_f^\dagger \Sigma^{-1}\*e_f} $$
+There is a nice linear algebra perspective for this. Consider the eigendecomposition of the inverse covariance matrix $\Sigma^{-1}=\sum_k \lambda_k^{-1} P_k$ where $\lambda_k$ is the $k^\t{th}$ eigenvalue of $\Sigma$ and $P_k$ the orthogonal projector onto the corresponding eigenspace. The idempotence and Hermiticity of the projectors imply $P_k^\dagger P_{k'}=\delta_{kk'}P_k$ which allows the estimator to be written
+$$ \hat{S}_{xx}^\t{capon}(f) = \frac{1}{ \|\Pi\*e_f\|_2^2} $$
+where $\Pi = \sum_k \lambda_k^{-1/2} P_k$ is the sum of scaled projectors. Note that the small eigenvalue subspaces (i.e. those that are more noise-like than signal-like) are the dominant contributions to $\Pi$.
+	
+
+\subsection{Estimating the Covariance Matrix}
+Capon's method is optimal in a statistical sense, but as formulated so far, it relies on having exact knowledge of the noise covariance matrix. Generally speaking, the noise properties are unknown so we must replace $\Sigma$ with an estimator $\hat{\Sigma}$.
+
+\section{Subspace Methods}
+It often proves useful to assume that a data vector $\*x\in\C^N$ consists of some number of distinct signals $Q < N$. If these signals are linearly independent, this implies that there is a $Q$-dimensional \textbf{signal subspace} $\mathcal{S}\subset \C^N$ which contains all the signal in our data and a complement $\C^N-\mathcal{S}$ which contains only noise. This point of view often relies on having a priori knowledge of the number of signals $Q$, but in the scenario where that information is available, the question is \emph{how do we determine the signal subspace}? 
+
+In special cases, the signal subspace itself might be known a priori through a set of known signals which span the space: $\mathcal{S}=\t{span}\{\*s_0, \*s_1,\dots,\*s_{Q-1}\}$. In this case, a simple projection of $\*x$ onto $\mathcal{S}$ can be performed, effectively denoising the data. Typically the known signals need not be orthogonal so the projection matrix onto $\mathcal{S}$ has the general form\footnote{This is identically the least squares solution to the problem of writing $\*x$ as a combination of the vectors $\{\*s_k\}$. The solution is commonly written $\hat{\*x}=SS^+\*x$ where $S^+=(S^\dagger S)^{-1}S^\dagger$ is the \emph{Moore-Penrose pseudoinverse.}} 
+$$P_{\scriptscriptstyle\mathcal{S}}=S(S^\dagger S)^{-1}S^\dagger$$ 
+where $S=[\*s_0\;\*s_1\;\dots\;\*s_{Q-1}]$ is the $N\times Q$ matrix with the $\*s_k$ for columns. The denoised data is then simply $\hat{\*x}=P_{\scriptscriptstyle\mathcal{S}}\*x$.
+
+\subsection{Eigenspace Methods}
+More often however, we do not know the signals which make up the data and the signal subspace must be estimated. The standard approach to this problem is to assume that $\*x$ is \emph{mostly signal} so that the signal space $\hat{\mathcal{S}}$ is the $Q$-dimensional subspace which best represents the data on average. To find $\hat{\mathcal{S}}$ then, we will find the subspace which minimizes the mean square error (MSE) of the projection. We seek the solution to the problem:
+$$ \hat{\mathcal{S}} = \arg\min_{\mathcal{S}\subset\C^N} \mathbb{E}\left[\|\*x - P_{\scriptscriptstyle\mathcal{S}}\*x\|_2^2\right]$$
+subject to the constraint that $\dim(\mathcal{S})=Q$. By expanding the square and using the idempotence of the projection matrix, one finds that this is equivalent to $ \hat{\mathcal{S}}=\arg\max_\mathcal{S} \mathbb{E}\left[\*x^\dagger P_{\scriptscriptstyle\mathcal{S}}\*x \right] $.
+A solution can be found by writing the subspace as $\hat{\mathcal{S}}=\t{span}\{\*v_0,\dots,\*v_{Q-1}\}$ for some set of $Q$ orthonormal basis vectors $\*v_k$. With this, the projection matrix is $P_{\scriptscriptstyle\hat{\mathcal{S}}}=\sum_k \*v_k\*v_k^\dagger$ from which one can derive $\mathbb{E}[\*x^\dagger P_{\scriptscriptstyle\mathcal{S}}\*x] = \sum_k\*v_k^\dagger \Sigma\*v_k$ where $\Sigma\equiv\mathbb{E}[\*x\*x^\dagger]$ is the covariance matrix for the data generating process. Since the covariance matrix is positive-definite, maximizing the sum of bilinear forms is equivalent to maximizing each one individually. Therefore the optimization problem becomes
+$$ \*v_k = \arg\max_{\*v} \*v^\dagger \Sigma\*v  $$
+subject to the constraint that $\|\*v\|_2^2=1$. This is the same problem which has been solved several times in these notes using Lagrange multipliers. The result is that the basis vectors of $\hat{S}$ are precisely the eigenvectors of the covariance matrix
+$$ \Sigma\*v_k  = \sigma_k^2 \*v_k$$
+where $\sigma_k^2$ is the variance of $\*x$ along the direction $\*v_k$. The signal subspace is then the span of the $Q$ eigenvectors of $\Sigma$ with the highest eigenvalues. With the eigenvalues ordered as $\sigma_0^2 \geq \sigma_1^2 \geq \dots \geq \sigma_{N-1}^2$, the solution is succinctly written
+$$ \hat{\mathcal{S}} = \t{span}\{\*v_0,\dots,\*v_{Q-1}\} \quad\quad\Sigma\*v_k=\sigma_k^2\*v_k $$ 
+This is nothing other than the standard technique in \textbf{principal component analysis}. The eigenvectors are called \emph{principal components} and by keeping only $Q$ of them, this is a method for dimensional reduction.
+
+Note that the covariance matrix is rarely known a priori, so it must itself be estimated before the eigenvectors can be found. 
+
+\subsection{MUSIC}
+Another possible scenario is where we know a functional form for the signal vectors, but it depends on some unknown parameters $\*\eta=(\eta_0\;\dots\;\eta_{D-1})^\t{T}$. Suppose we aim to estimate these parameters. A common algorithm to solve this problem is known as MUSIC (MUltiple SIgnal Classification). The essential idea is to define a function $g(\*\eta)$ which is strongly peaked at the true parameter values. To construct such a function, we begin with the estimated signal subspace $\hat{\mathcal{S}}$ found through eigenspace means as described in the previous section. With the signal subspace in hand, we get for free the \textbf{noise subspace} which is just the orthogonal complement: $\hat{\mathcal{N}}\equiv\C^N - \hat{\mathcal{S}}$. So the projection onto the noise $P_{\scriptscriptstyle\hat{\mathcal{N}}}$ can be applied to our parameterized signal vectors $\*v_{\*\eta}$ to define:
+$$ g(\*\eta) \equiv \frac{1}{\|P_{\scriptscriptstyle\hat{\mathcal{N}}}\*v_{\*\eta}\|_2^2} $$
+When $\*\eta$ is close to the true value, the vector $\*v_{\*\eta}$ should be very much in the signal subspace making the projection onto the noise close to zero. Consequently $g$ should be strongly peaked at values which are more true to the signal in hand.
+
+For\sidenote{Frequency estimation with MUSIC} example, suppose we model our data as a sum of $Q$ sinusoids with unknown frequencies $f_0,\dots,f_{Q-1}$. Each such signal can be written in the functional form:
+$$ \*v_f = A\*e_{f} $$
+where $\*e_f=(1\;e^{j2\pi f}\;\dots\;e^{j2\pi f (N-1)})^\t{T}$ is the usual sinusoidal vector and $A$ is some complex amplitude. In this case, the MUSIC function is 
+$$ \hat{S}_{xx}^\t{music}(f) = \frac{1}{\|P_{\scriptscriptstyle\hat{\mathcal{N}}} \*e_f\|_2^2} $$
+This defines a sort of \textbf{pseudospectrum} --- it is not valued like a true PSD, but it should still have peaks at the same frequencies as the true PSD. The estimates for the unknown frequencies are obtained as the $Q$ peak frequencies appearing in this functions output.
+
+For\sidenote{DOA estimation with MUSIC} another example, consider a linear array of $M$ sensors at positions $m\*d$ for $m=0,\dots, M-1$. When a plane wave of frequency $f$ is incident on this array, the signal measured on sensor $m$ at time $n$ is given by
+$$ x_{mn} = A_fe^{jmkd\cos\theta} e^{j2\pi f n} $$
+where $\theta$ is the angle between the axis of the array and the direction of wave propagation, also called the \textbf{direction of arrival} (DOA). Suppose we want to estimate $\theta$ for the wave at known frequency $f$. To do so, we can take a single snapshot of the array (i.e. fix $n$) so that the parameterized signal vector measured by the array is $ \*v_\theta = (1\;e^{jkd\cos\theta}\;\dots\;e^{j(M-1)kd\cos\theta})^\t{T}$. With the covariance matrix computed over the spatial dimension of the array rather than in time, we can find the signal subspace and estimate the DOA with
+$$ \hat{\theta} = \arg\max_\theta \frac{1}{\|P_{\scriptscriptstyle\hat{\mathcal{N}}}\*v_\theta\|_2^2} $$
+
+
+\section{Autoregressive Models}
+\subsection{Wold's Decomposition}
+In the theory of stochastic processes, Wold's theorem states that any wide-sense stationary process can be decomposed as the sum of a filtered white noise process and a deterministic\footnote{``Deterministic" in this context means simply that the present value can be exactly predicted from past values. It can contain an ordinary deterministic function (e.g. sine) but it can also still be stochastic.} process. We will focus on purely non-deterministic processes for which the PSD exists in the usual sense. Since $S_{xx}(f)$ is positive and periodic, we can take a logarithm and write
+$$ \log S_{xx}(f) = \sum_{n\in\Z} e^{-j2\pi f n} c(n)$$
+for so-called \textbf{cepstral coefficients} $c(n)$. From this form, both sides can be exponentiated to find that the PSD has the general form\footnote{Note that since $S_{xx}$ is real, the cepstral coefficients are symmetric: $c(-n)=c(n)$.}
+$$ S_{xx}(f) = \sigma^2 \abs{A(f)}^2$$
+where $\sigma^2 = e^{c(0)}$ and $A(f) = e^{\sum_{n=1}^\infty e^{-j2\pi f n}c(n)}$. This is exactly the PSD of a white noise process filtered by an FIR filter with frequency response $A(f)$. The coefficients of such a filter can be computed in the usual way. Given a white noise process $\epsilon$ with covariance $\mathbb{E}[\epsilon(m)\epsilon^*(n)]=\sigma^2\delta_{mn}$, we can then write $x$ as the filtered process:
+$$ x(n) = \sum_{m=0}^\infty a(m)\epsilon(n-m) $$
+Conversely, the process $x$ can be filtered with frequency response $1/A(f)$ to generate white noise. 
+
+\subsection{Rational Response Functions}
+Wold's decomposition indicates that a purely non-deterministic wide-sense stationary stochastic process can be viewed as filtered white noise. This motivates a particularly simple generative model we can construct where the data is viewed as filtered white noise and the filter taps are the model parameters. While exact, this is problematic since Wold's decomposition will generally involve infinitely many taps. The model filter must be truncated to have finitely many taps. When this basic model is truncated to have $q$ taps, it is called a \textbf{moving average} model of order $q$, a.k.a. an MA(q) model.
+
+More generally, the data is modeled through an \textbf{autoregressive moving average (ARMA)} process which is an IIR filter of white noise. We write
+$$ x(n) = \sum_{\ell=1}^{q}\theta_\ell \epsilon(n-\ell)  + \sum_{m=1}^p\varphi_m x(n-m) + \epsilon(n)  $$
+This is the ARMA(p,q) model. The frequency response of this filter is a rational function which in the $z$-domain looks like
+$$ \mathbb{E}[\abs{X(z)}^2] = \sigma^2\abs{\frac{1 + \displaystyle\sum_{\ell=1}^q z^{-\ell}\theta_\ell}{1 - \displaystyle\sum_{m=1}^p z^{-m}\varphi_m}}^2 $$
+Recall that the PSD is obtained by evaluating on the unit circle $z=e^{j2\pi f}$. The peaks in frequency for this function are entirely determined by the poles and zeros, i.e. the roots of the numerator and denominator polynomials. 
+\subsection{AR(p) Models}
+It is common to focus only on purely autoregressive processes for spectrum estimation. These consist of all-pole-filtered white noise. We write
+$$ x(n) = \sum_{m=1}^p \varphi_m x(n-m) + \epsilon(n) $$
+The number of coefficients $p$, called the model \emph{order}, is closely related to the autocorrelation properties of the process. This is easily seen by writing the definition $r_{xx}(k)=\mathbb{E}[x(n)x^*(n-k)]$ and plugging in the above AR(p) process for $x(n)$. The noise $\epsilon(n)$ is uncorrelated with any past values of $x$ and therefore for $|k|>1$, we have
+$$ r_{xx}(k) = \sum_{m=1}^p\varphi_m r_{xx}(k-m)$$
+So $r_{xx}$ satisfies a linear difference equation which can in  fact be solved. Taking a standard approach, we assume the exponential ansatz $r_{xx}(k) \stackrel{?}{=} \lambda^k$ and then compute what value(s) of $\lambda$ makes this true. Plugging in and simplifying, we find
+$$ \Phi(\lambda) \equiv 1 -  \sum_{m=1}^p \varphi_m \lambda^{-m} = 0 $$
+Evidently then, any $\lambda$ that is a root of the so-called \emph{characteristic polynomial} $\Phi(\lambda)$ is a solution. Since $\Phi$ is a degree $p$ polynomial, it will generally have $p$ roots $\{\lambda_i\}_{i=1}^p$. By linearity then, the general solution for the autocorrelation function is a linear combination of all the possible solutions
+$$ r_{xx}(k) = \sum_{i=1}^p a_i \lambda_i^{-k} $$
+for some set of coefficients $a_1,\dots,a_p$ which can be determined by initial conditions. 
+
+From this form,\sidenote{Stability of AR(p) processes} important information about the AR(p) process can be learned. Considering that the roots of $\Phi$ are generally complex with magnitude and phase $\lambda_i=|\lambda_i|e^{j\omega_i}$, each term in the autocorrelation function has the form $|\lambda_i|^{-k} e^{-j\omega_i k}$ which is an exponentially decaying (or growing) sinusoid as a function of the lag $k$. An exponentially growing autocorrelation function would indicate an unstable process so we can conclude that the stability of an AR(p) process is indicated by all the roots of the characteristic polynomial being outside the unit circle ($|\lambda_i|>1$).
+
+
+The autocorrelation difference equation can also provide insight into how the model parameters $\varphi_m$ can be obtained. Noting that $r_{xx}(-k)=r_{xx}^*(k)$, the difference equation can be written in a neat matrix form where it is known as the \textbf{Yule-Walker equation}:
+$$\footnotesize \begin{pmatrix}
+	r_{xx}(1) \\
+	\vdots \\
+	r_{xx}(p)
+\end{pmatrix} = 
+\begin{pmatrix}
+r_{xx}(0) & \dots & r_{xx}^*(p-1) \\
+\vdots & \ddots & \vdots \\
+r_{xx}(p-1) & \dots & r_{xx}(0)
+\end{pmatrix}
+\begin{pmatrix}
+\varphi_1 \\
+\vdots \\
+\varphi_p
+\end{pmatrix} $$
+This can be written more succinctly as $\*r_{xx}=R_{xx}\*\varphi$ where the matrix $R_{xx}$ is $p\times p$, Toeplitz, and Hermitian. In fact, it is generally invertible so that this equation can be used to solve for the AR parameters $\*\varphi = R_{xx}^{-1}\*r_{xx}$.
+
+
+Now suppose we have data $\*x\in\C^N$ and we wish to model it as an AR(p) process. The goal is to find an estimator $\hat{\*\varphi}$ for the AR coefficients.\sidenote{Estimating AR(p) parameters} For AR(p), each sample should be equal to a linear combination of the previous $p$ samples up to some additional white noise. So then, the AR(p) model suggests we should be able to write
+$$ \footnotesize\begin{pmatrix}
+	x(p)\\
+	\vdots\\
+	x(N-1)
+\end{pmatrix} \approx
+\begin{pmatrix}
+	x(p-1) & \dots & x(0) \\
+	\vdots & \ddots & \vdots \\
+	x(N-2) & \dots & x(N-1-p)
+\end{pmatrix}
+\begin{pmatrix}
+	\varphi_1 \\
+	\vdots \\
+	\varphi_p
+\end{pmatrix} $$
+up to an additional error term. This is often written in the more succinct vector form by defining the vector $\*x_{p:}$ consisting of all but the first $p$ samples of the data and also the matrix $X$ which is $(N-p)\times p$ with elements given by $X_{mn}=x(p-1+m-n)$. The above equation is then
+$$ \*x_{p:} = X\*\varphi + \*\epsilon $$
+for some model error $\*\epsilon$ which we seek to minimize. The parameter vector $\*\varphi$ can be estimated in a least squares procedure by minimizing $\|\*x_{p:} - X\*\varphi\|_2^2$. The solution is in terms of the usual Moore-Penrose pseudoinverse. We have
+$$ \hat{\*\varphi} = (X^\dagger X)^{-1}X^\dagger \*x_{p:} $$
+This result can be interpreted as an estimation of the Yule-Walker equation. It is easy to see that the $p\times p$ matrix $\hat{R}_{xx}=X^\dagger X$ forms a reasonable estimate for the matrix appearing in the Yule-Walker equation. Also $\hat{\*r}_{xx}=X^\dagger \*x_{p:}$ estimates the autocorrelation vector appearing there. With this, the AR(p) estimation scheme can be neatly written
+$$ \hat{\*\varphi} = \hat{R}_{xx}^{-1}\hat{\*r}_x $$
+
+With the AR coefficients in hand, the PSD estimate is calculated as shown previously for the general ARMA(p,q) model. We have
+$$ \hat{S}_{xx}^{\t{AR}}(f) = \frac{\sigma^2}{\abs{1 - \displaystyle\sum_{m=1}^p e^{-j2\pi f m}\hat{\varphi}_m}^2} $$
+
+
+\subsection{Reduced Rank AR(p) Models}
+There are some scenarios when it is useful to constrain the coefficient vector $\*\varphi$ to a lower-dimensional subspace. With a set of basis vectors $\{\*b_\ell\}_{\ell=0}^{L-1}$ spanning an $L$-dimensional subspace, we can write
+$$ \*\varphi = B\*a $$
+where $B=[\*b_0\;\dots\*b_{L-1}]$ is the $N\times L$ matrix with the subspace basis vectors for columns and $\*a=(a_0,\dots,a_{L-1})^\t{T}$ is the vector of coefficients. Plugging this into the AR model, we have
+$$ \*x_{p:}=XB\*a + \*\epsilon $$
+The same fitting procedure can be applied but now with the reduced rank matrix $\widetilde{X}=XB$. This yields the coefficient vector as $\hat{\*a}=(\widetilde{X}^\dagger\widetilde{X})^{-1}\widetilde{X}^\dagger\*x_{p:}$ and finally, the AR parameters as $\hat{\*\varphi} = B\hat{\*a}$.
+
+
+\subsection{Model Identification}
+In practice the model order $p$ is not known a priori so it too must be estimated.
+ 
+
+
+
+\section{Maximum Entropy Estimation}
+Autoregressive models have another crucial property which further justifies their wide usage in spectrum estimation. They satisfy a \textbf{maximum entropy} principle which makes them the most non-committal approach to extrapolating limited data. \sidenote{Maximum entropy distributions}The maximum entropy principle states that the distribution which best represents our knowledge of a quantity is the one which maximizes the entropy subject to a priori constraints. The entropy of a random variable $x$ is defined by
+$$ H(x) = \mathbb{E}[-\log p(x)] $$
+where $p(x)$ is the pdf. So if $\mathscr{P}$ is the set of all distributions which are consistent with our in-hand knowledge, then the maximum entropy distribution is
+$$ p^\star(x) = \arg \max_{p\in\mathscr{P}} \mathbb{E}[-\log p(x)] $$
+where the expectation is itself taken with respect to the trial density $p$. As an important example, one can show that if the mean $\mu$ and variance $\sigma^2$ are known, then the maximum entropy distribution is Gaussian $\mathcal{N}(\mu,\sigma^2)$.
+\subsection{Entropy Rates and Linear Filters}
+In the context of stochastic processes, it is more natural to work with the \textbf{entropy rate} rather than the bare entropy. For a discrete process $\{x_n\}_{n\in\Z}$, the entropy rate is defined by
+$$ h \equiv \lim_{N\to\infty} \frac{1}{N}H(\*x)\qquad \*x=(x_0,\dots,x_{N-1})^\t{T} $$
+This can be related to the PSD with a few observations. Observe that under a linear transformation $\*x\mapsto A\*x$ for some matrix $A$, the entropy transforms as\footnote{The density transforms with the inverse Jacobian such that $p(\*x)\mapsto \abs{\det A^{-1}}p(\*x)$} $H(A\*x)=H(\*x) + \log \abs{\det A}$. Clearly then, any unitary transformation leaves $H(\*x)$ invariant so the entropy rate can be computed in the frequency domain after applying the unitary DFT matrix $U$.
+
+We now ask the question \emph{how does a linear filter affect the entropy rate of a stochastic process?} Working in the frequency domain, a linear filter is diagonalized to scale each frequency independently. So for frequency response $A(f)$, we have the Jacobian $ |\det A| = \prod_n |A(f_n)| $. Taking the logarithm, it is straight forward to find the $N\to \infty$ asymptotic behavior:
+$$ \log\abs{\det A} \sim  N \intbw{1}  df\;\log|A(f)| $$ 
+Plugging this back into the definition of the entropy rate, the limit can be taken to find that the filter leads to a change in entropy rate given by
+$$ \Delta h = \intbw{1} df\;\log|A(f)| $$
+\subsection{Maximum Entropy Rate Processes}
+Since any non-deterministic wide-sense stationary process can be viewed as filtered white noise via Wold's decomposition, the above result can be used to construct maximum entropy processes. As shown in the earlier section on Wold's decomposition, the PSD can always be written $S_{xx}(f)=\sigma^2 \abs{A(f)}^2$. Therefore, a maximum entropy wide-sense stationary process is one which is a solution to the optimization problem
+$$ S_{xx}^{\star} = \arg\max_{S_{xx}}\intbw{1} df\;\log S_{xx}(f) $$
+subject to the constraint that the total power is fixed. This is a different sort of optimization problem than is found in other places in these notes. The solution is not a vector, but a function. To solve it, we can still use the method of Lagrange multipliers, but now within the context of the calculus of variations\footnote{See appendix for a summary of the calculus of variations}. We write down the functional for this problem:
+$$ J[S_{xx}] = \intbw{1} df\;\left[ \log S_{xx}(f) - \lambda S_{xx}(f)\right] $$
+The functional derivative can be set to zero $\delta J=0$ leading to the result $S^\star_{xx}(f) = 1/\lambda$. So the maximum entropy process has constant PSD and therefore is unsurprisingly white noise.
+
+Now with a data record $\*x\in \C^N$, suppose we can make confident estimates for the autocorrelation function at lags $-p$ to $p$. With infinite data, we could make good estimates for all lags and then take a Fourier transform of $r_{xx}$ to obtain a strong estimate of the PSD. In this light, the fundamental problem of spectrum estimation is determining the best way to use our limited data to accurately express our knowledge of the PSD. The maximum entropy method addresses this by saying we should assume that the underlying process is the maximum entropy stochastic process constrained by our confident estimates of the autocorrelation. These are constraints on the PSD since we can write $ \hat{r}_{xx}(m) = \intbw{1} df e^{j2\pi fm} S_{xx}(f) $ for $m=-p,\dots,p$. Note that this includes the total power constraint for $m=0$. So then, we write a functional with $2p+1$ constraints:
+$$ \footnotesize J[S_{xx}] = \intbw{1} df\bigg[\log S_{xx}(f) -  \sum_{m=-p}^p \lambda_m e^{j2\pi f m}S_{xx}(f) \bigg]  $$
+Setting the functional derivative to zero $\delta J=0$ yields the following maximum entropy result:
+$$ S^\star_{xx}(f) = \frac{1}{\displaystyle\sum_{m=-p}^p \lambda_m e^{j2\pi f m}} $$
+Since the PSD is real and non-negative, the right side can be factored such that it takes the form
+$$ S^\star_{xx}(f) = \frac{1}{\abs{\varphi_0 + \displaystyle\sum_{m=1}^p \varphi_m e^{-j2\pi f m}}^2} $$
+for some set of coefficients $\varphi_0,\dots,\varphi_p$. This can be recognized as precisely the PSD of an AR(p) process making it clear that the maximum entropy process subject to autocorrelation constraints is an autoregressive process. This is a fundamental result which justifies the widespread use of AR models in spectrum estimation and in time-series analysis in general.
+
+\section{Time-Frequency Analysis}
+\subsection{Short-Time Fourier Transform (STFT)}
+At this point, the focus of these notes will turn to the topic of \textbf{time-frequency analysis}. The standard problem of estimating a PSD implicitly assumes that the underlying stochastic process is truly wide-sense stationary so that a ground truth PSD exists. However, with real data this is often not the case. Many applications deal with non-stationary time series for which no PSD exists --- the frequency content is \emph{changing in time}. The standard assumption of time-frequency analysis is that there is some duration over which the signal is approximately wide-sense stationary so that a PSD can be computed.
+
+The problem can basically be motivated by the question \emph{how can we analyze signals whose frequency changes in time?} We want a Fourier transform resolved over time $X(f,t)$ which would give the amplitude of frequency $f$ at time $t$. For a continuous signal $x$, the first approach here is to define the \textbf{short-time Fourier transform (STFT)} given by
+$$ X(f,t) \equiv \int_\R d\tau\;e^{-j2\pi f \tau}w(t-\tau)x(\tau) $$
+for some window function $w$ which is primarily supported over some narrow time window that is approximately wide-sense stationary. 
+
+Importantly, the STFT can be inverted to recover the original time series $x$ through the following:
+$$ x(t) = \frac{1}{A_w}\int_\R d\tau\left[\int_\R df\;X(f,\tau)e^{j2\pi f t}\right] $$
+where $A_w\equiv \int_\R d\tau\;w(t-\tau)$ is a normalizing constant to ensure the window function has unity area under the curve. This can be seen by noting that if $t$ is treated as constant in the STFT $X(f,t)$, then it is nothing other than a standard Fourier integral which can be inverted. So the inverse Fourier transform over frequency gives back $w(t-\tau)x(\tau)$. This is then integrated over $t$ to isolate the full signal $x$.
+
+With real sampled data, the STFT must be evaluated discretely
+$$ X(f,m) = \sum_{n\in\Z} e^{-j2\pi fn}w(m-n)x(n) $$
+The \textbf{spectrogram} is then obtained by taking the squared magnitude:
+$$ S_{xx}(f,m) \equiv \abs{X(f,m)}^2 $$
+Note that for arbitrary sample rates, this must be scaled by a factor of $1/f_s$ just like a periodogram.
+$$ r_{xx}(t,s)=\mathbb{E}[x(t)x^*(s)] $$
+\subsection{The Uncertainty Principle}
+There is a fundamental limitation to time-frequency analysis which says that the time and frequency resolutions cannot be made simultaneously arbitrarily precise. In general, there is a trade-off so that greater resolution in the frequency domain corresponds to worse resolution in the time-domain. In terms of the STFT, this means that narrower the window $w$ is in time, the worse the frequency resolution will be. This trade-off is known as the \textbf{Heisenberg uncertainty principle} and it is a core property of the Fourier transform. 
+
+We will now derive the uncertainty principle on general grounds. Consider two Hermitian operators $A$ and $B$ acting on $L^2(\R)$. The Cauchy-Schwartz inequality can be used to write
+$$ \abs{\langle Ax, B x\rangle}^2 \leq  \| Ax\|_2^2 \|Bx\|_2^2 $$
+The inner product on the left $\langle Ax, Bx\rangle$ is just a complex number which has imaginary part given by
+$$ \t{Im}\{  \langle Ax,Bx\rangle\} = \frac{\langle x, [A,B]x\rangle}{2j} $$
+where $[A,B]\equiv AB - BA$ is the commutator. The magnitude of the imaginary part must be less than or equal to the full magnitude of the complex number. Therefore, we can write the inequality
+$$ \frac{\abs{\langle x, [A,B]x\rangle}^2}{4} \leq \|Ax\|_2^2 \|Bx\|_2^2 $$
+This is a generalized form of the time-frequency uncertainty principle which plays a central role in quantum mechanics. To specialize to the time-frequency case, let $A$ be the time-position operator $A=t$ and let $B$ be the differentiation operator $B=\partial_t$. Observe that with this choice, we have
+$$ \|tx\|_2^2 = \underbrace{\int_\R dt\;t^2\abs{x(t)}^2}_{\sigma_t^2}$$
+This can clearly be interpreted as the ``variance" or width of the function $x\in L^2(\R)$. Similarly, using the fact that the Fourier transform maps derivatives as $\partial_t x(t) \mapsto j2\pi f X(f)$, Parseval's theorem yields
+$$ \|\partial_t x\|_2^2 = \int_\R dt\; \abs{\partial_t x(t)}^2 = (2\pi)^2\underbrace{\int_\R df\;f^2 \abs{X(f)}^2}_{\sigma_f^2} $$
+which is the ``variance" of the frequency domain function $X$ up to a factor of $(2\pi)^2$. The commutator is easily found to be the identity operator $ [\partial_t, t]x=x  $ which is the final ingredient needed to write the time-frequency uncertainty principle:
+$$ \sigma_t^2\sigma_f^2 \geq \frac{1}{16\pi^2} $$
+where the function $x$ is normalized $\|x\|_2^2=1$. 
+
+The uncertainty principle states that the product of the time and frequency domain variances is bound from below by a constant $1/16\pi^2$. So neither variance can be pushed down arbitrarily far without pushing the other higher. It can be shown that the function $x$ which saturates the inequality is the Gaussian. For this reason, a popular form of the STFT is the \textbf{Gabor transform} in which the window function is Gaussian:
+$$ X^\t{gabor}(f,t) \equiv \int_\R d\tau\;e^{-j2\pi f \tau}e^{-\pi(t-\tau)^2}x(\tau) $$
+
+
+\subsection{Wigner Functions}
+
+An alternative way to construct a time-frequency representation is to draw inspiration from the Wiener-Khinchin theorem for wide-sense stationary signals and start with the two-time autocorrelation function $r_{xx}(t_1,t_2)=\mathbb{E}[x(t_1)x^*(t_2)]$. Rewriting this in terms of a lag $\tau=t_1-t_2$ and a central time $t=(t_1+t_2)/2$, we have
+$$ r_{xx}(\tau,t)=\mathbb{E}[x(t + \tau/2)x^*(t-\tau/2)] $$
+When $x$ is wide-sense stationary, all of the dependence is in the lag $\tau$ so $r_{xx}$ is constant with respect to $t$. This suggests that any nonstationarity will be captured by a nontrivial dependence on $t$. Motivated this way, the \textbf{Wigner function} will be defined so that it has expected value which coincides the PSD in the stationary case:
+$$ \mathbb{E}[\mathcal{W}_x(f,t)] = \int_\R d\tau\;e^{-j2\pi f\tau}r_{xx}(\tau,t) $$
+Indeed, the definition of the Wigner function is more explicitly written as
+$$ \mathcal{W}_x(f,t) \equiv \int_\R d\tau\;e^{-j2\pi f\tau}x(t+\tau/2)x^*(t-\tau/2) $$
+While highly precise, this formulation suffers from what is known as the \textbf{cross-term problem}.
+
+\subsection{Reassignment Methods}
+
+In all of the spectrum estimation methods discussed so far, there has been virtually no mention of the signal's phase. But in time-frequency analysis, it seems much more natural to consider the phase which carries some information about how the signal is changing in time. 
+
+Reassignment methods are a way to use phase to improve upon an existing time-frequency representation.
+
+\section{State-Space Methods}
+\subsection{Review of Bayes Filters}
+State space methods in time-frequency analysis are based on the concept of a \textbf{Bayes filter}, also known as \textbf{recursive Bayesian estimation}. The general problem which Bayes filters aim to solve is the estimation of a state vector $\*s_k$ at time $k$ given noisy measurements $\*x_{1:k}$ for all past times. Ideally, we want the conditional distribution $p(\*s_k|\*x_{1:k})$. Bayes' theorem allows us to write
+$$ p(\*s_k|\*x_{1:k}) \propto \underbrace{p(\*x_k|\*s_k,\*x_{1:k-1})}_{\substack{\t{measurement}\\\t{model}}} \underbrace{p(\*s_k|\*x_{1:k-1})}_{\t{prediction}} $$
+where each factor on the right has an intuitive interpretation. The first term $p(\*x_k|\*s_k,\*x_{1:k-1})$ is the probability of getting the latest measurement $\*x_k$ given the current state and past measurements. Typically it is assumed that the $\*x_k$ are all independent, depending only on the contemporaneous state $\*s_k$ --- that is to say, we can write $p(\*x_k|\*s_k,\*x_{1:k-1}) = p(\*x_k|\*s_k)$. The second factor $p(\*s_k|\*x_{1:k-1})$ is the probability of the current state given all past measurements --- naturally understood as a prediction. With the law of total probability, this can be decomposed as an integral over $\*s_{k-1}$.  Finally, by assuming that the underlying state evolves as a \textbf{Markov process}, we end up with the equation:
+$$ \footnotesize \underbrace{p(\*s_{\scriptscriptstyle k}|\*x_{\scriptscriptstyle1:k})}_{\substack{\t{updated}\\\t{belief}}}\propto \underbrace{p(\*x_{\scriptscriptstyle k}|\*s_{\scriptscriptstyle k})}_{\substack{\t{measurement}\\\t{model}}}\overbrace{\int\hspace{-0.4em} d\*s_{\scriptscriptstyle k-1}\underbrace{p(\*s_{\scriptscriptstyle k}|\*s_{\scriptscriptstyle k-1})}_{\substack{\t{dynamical}\\\t{model}}} \underbrace{p(\*s_{\scriptscriptstyle k-1}|\*x_{ \scriptscriptstyle1:k-1})}_{\substack{\t{past}\\\t{belief}}}}^{\t{prediction}} $$
+This is a recursive update equation for our belief about the underlying state vector given the most recent measurement $\*x_k$ and all past measurements. The fundamental components for this to work are a \textbf{measurement model} which captures how the state $\*s_k$ is translated into our noisy measurement $\*x_k$ and a \textbf{dynamical model} which captures how the state $\*s_k$ depends on its previous value $\*s_{k-1}$. With these models specified, the Bayes filter provides an algorithm for recursively updating our beliefs about the state vector.
+
+In the special case where the measurement noise, process (dynamical) noise, and the prior are all Gaussian random variables, the Bayes filter reduces to the well-known \textbf{Kalman filter}.
+
+\subsection{State-Space Time-Frequency Analysis}
+Suppose we have a time series $\*x\in\C^N$ which is approximately stationary over segments of length $J$. Splitting the data into $K=N/J$ nonoverlapping segments $\{\*x_k\in\C^J\}_{k=0}^{K-1}$ of length $J$, these can each be Fourier transformed to obtain $K$ time-resolved spectrum estimates $\{\*X_k\in\C^J\}$. To take the state-space approach, we can think of each $\*X_k$ as a measurement of the true underlying time-dependent spectrum $\*S_k$ which we hope to estimate. With the appropriate assumptions, the Bayes filter can be used to inform our state estimate. We need a measurement model $p(\*X_k|\*S_k)$ as well as a dynamical model $p(\*S_k|\*S_{k-1})$. With these pieces, we can construct a Bayesian MMSE estimator
+$$ \hat{\*S}_k = \mathbb{E}[\*S_k | \*X_{1:k}] $$
+With or without any additional insight into how our measurements $\*X_k$ relate to the ground truth spectrum, a sensible choice is to assume a \emph{maximum entropy} distribution. Suppose our measurements are known to be unbiased with fixed variance $\sigma_\epsilon^2$. In this case, the maximum entropy model is simple Gaussian noise. We write for the measurement model
+$$ \*X_k = \*S_k +\*\epsilon_k $$
+for $\*\epsilon_k\sim \mathcal{N}(0, \sigma_{\epsilon}^2 \mathbbm{1})$. Similarly, we might assume a random walk model for the dynamics:
+$$ \*S_k = \*S_{k-1} + \*\eta_k $$
+The process noise is Gaussian $\*\eta_k\sim\mathcal{N}(0,C)$ with diagonal covariance matrix $C_{ij} = \delta_{ij}\sigma_{\eta,i}^2$. Under these assumptions, the Bayes filter reduces to the standard Kalman filter. After each measurement $\*X_k$, the estimate is computed as
+$$ \hat{\*S}_{k} = \hat{\*S}_{k-1} + g_k(\*X_k - \hat{\*S}_{k-1}) $$
+$$ \hat{\Sigma}_k = (1 - g_k)(\hat{\Sigma}_{k-1} + C) $$
+where $g_k$ is the \emph{Kalman gain} defined by
+$$g_k = \left(\hat{\Sigma}_{k-1} + C + \sigma_\epsilon^2\mathbbm{1}\right)^{-1} \left(\hat{\Sigma}_{k-1} + C\right)$$
+Observe that since the process noise and measurement noise have diagonal covariance, the Kalman gain is also diagonal and this is effectively just $J$ 1-dimensional Kalman filters acting in parallel.
+
+\subsubsection{Parameter Estimation}
+The parameters of this model are the elements of the process covariance matrix $C=\t{diag}(\sigma^2_{\eta,1}\dots \sigma^2_{\eta,J})$, the measurement noise variance $\sigma_\epsilon^2$, and the initial state $\hat{\*S}_0$. These can be estimated using the EM algorithm. Thanks to the Markovian dynamics and independent measurements, we can write the joint likelihood function
+$$ p(\*X_{1:K},\*S_{1:K}) = p(\*S_0)\prod_{k=1}^K p(\*S_k|\*S_{k-1})p(\*X_k|\*S_k) $$
+The EM algorithm approaches a maximum likelihood estimator by iterating the following procedure:
+$$ \hat{\Theta}^{i+1}=\arg\max_\Theta Q(\Theta|\hat\Theta^i) $$
+where $ Q(\Theta|\hat\Theta^i)\equiv \mathbb{E}_{S_{1:K}|\hat\Theta^i}[\log p(\*X_{1:K},\*S_{1:K})] $. Taking the logarithm of the joint likelihood breaks the product into a sum and so the expectation is evaluated term by term as
+$$ \sum_{k=1}^K\mathbb{E}_{S_{k-1:k}}[-\frac{1}{2}(\*S_k-\*S_{k-1})C^{-1}(\*S_k-\*S_{k-1})] $$
+
+\subsection{State-Space Multitaper Method}
+The basic state-space method just outlined can be extended via the multitaper method. In this context, each measurement $\*X_k$ is now replaced with a set of $M$ tapered spectra. With the slepian sequences, sine tapers, or another set of orthogonal tapers $\{\*w^{(m)}\}_{m=0}^{M-1}$, we compute
+$$\*X_k^{(m)}=\t{DFT}\{\*w^{(m)}\odot \*x_k\}$$
+where $\odot$ denotes the Hadamard (element-wise) product. Each of these now defines a state vector which can be independently tracked with a Kalman filter. From this point of view, the state-space multitaper method consists of $MJ$ 1-dimensional filters acting in parallel. Finally, the estimate for the spectrum at time $k$ is 
+$$ \hat{S}_{xx,k}(f) = \frac{1}{M}\sum_{m=0}^{M-1} \abs{\hat{S}_k^{(m)}(f)}^2 $$
+
+
+\section{Wavelet Methods}
+\subsection{Multiresolution Analysis}
+Wavelets are an entirely different approach to time-frequency analysis which replaces frequency with \emph{scale}. Consider that in a standard frequency domain representation, higher frequency components reflect small-scale features in the signal while low frequencies reflect larger scale features. Wavelet analysis decomposes a signal in this same multi-scale sense but without necessarily using ``frequency" to define the scale. 
+
+The general theory of wavelets has at its foundation the concept of a \textbf{multiresolution analysis} (MRA) of $L^2(\R)$ which ultimately aims to decompose functions in terms of different scale features. To begin, consider a nested sequence of subspaces $\{V_j\}_{j\in\Z}$ such that 
+$$  V_j \subset V_{j+1} $$
+The idea here is that functions in $V_j$ should be bounded in how small scale their features are. The \emph{higher resolution} space $V_{j+1}$ will naturally contain the lower resolution space $V_j$. To bring scale into this more explicitly, certain self-similarity conditions must be satisfied. Namely, for each $g_0\in V_j$, the function $g_n$ defined by $g_n(x)\equiv g_0(2^n x)$ is contained in $V_{j+n}$ for any $n\in\Z$. Indeed, the argument rescaling $x\mapsto 2^n x$ squeezes or dilates the features of $g_0$ so that they fit into higher or lower resolution spaces.
+
+To ground the whole construction, we must have a \textbf{scaling function} $\phi:\R\to\C$ whose integer translates span $V_0$. That is:
+$$ V_0 = \t{span}\{\phi(x-k) \:\:|\:\:k\in\Z\} $$
+Combined with the self-similarity condition, one can show that this implies that
+$$ V_j = \t{span}\{ \phi(2^jx - k)\:\:|\:\: k\in \Z \} $$
+The scaling function is typically chosen so that it has compact support and so at higher resolution spaces (higher $j$), $\phi(2^jx)$ is squeezed to have increasingly narrow support.
+
+As it stands, each space $V_j$ contains functions with simply \emph{bounded} scale features --- the goal is to isolate each scale so that we can decompose a function into its components at each scale. Consider that since $V_j\subset V_{j+1}$ for all $j$, the part of $V_{j+1}$ which does not contain the lower resolution space must contain all the ``new" smaller scale features. This can be isolated with an orthogonal decomposition
+$$ V_{j+1} = W_j \oplus V_j $$
+where the space $W_j$ is called a \textbf{detail space}. Iteratively performing this decomposition, we easily find that $V_j=W_j\oplus W_{j-1}\oplus W_{j-2}\oplus\dots$. As $j\to\infty$, this reveals an orthogonal decomposition of the full space:
+$$ L^2(\R) = \bigoplus_{j\in\Z} W_j $$
+The basis functions for the detail spaces are called \textbf{wavelets} and they are exactly the tool required for a multi-scale decomposition.
+
+\subsection{Father Wavelets and Dilation Equations}
+The first step in any wavelet analysis is to construct a suitable scaling function (a.k.a. a father wavelet) which satisfies the self-similarity conditions. To do so, consider that the subspace nesting is such that any function in $V_0$ is also in $V_1$. Since the unscaled $\phi$ lives in $V_0$ and the rescaled scaling function $\{\phi(2x-k)\}_{k\in\Z}$ spans $V_1$, we must be able to decompose $\phi$ in terms of itself:
+$$ \phi(x) = \sum_{k\in\Z} a_k \phi(2x - k) $$
+This is a \textbf{dilation equation} --- similar to a differential equation but generally harder to solve. As a starting point for finding a wavelet basis, one will usually start with some set of coefficients $\{a_k\}$ and then solve the dilation equation to obtain the father wavelet.
+
+As a first observation, notice that by integrating over all $\R$, we find a constraint on the coefficients. Integrating both sides of the dilation equation and changing variables $dx\to d(2x-k)/2$ on the right side, we have
+$$ \int_\R dx\; \phi(x) = \frac{1}{2}\sum_{k\in\Z} a_k\int_\R d(2x-k)\; \phi(2x-k) $$
+Using the fact that $\phi$ has compact support, we will assume it is normalized such that $\int_\R dx\;\phi(x)=1$. Then the integrals on either side here cancel and we find
+$$ \sum_{k\in\Z}a_k = 2 $$
+This is a necessary condition for the existence of a solution to the dilation equation.
+
+Now consider the simple,\sidenote{Haar father wavelet}illustrative example\footnote{Also insightful is the case of a single coefficient $a_0=2$. This gives a dilation equation $\phi(x)=2\phi(2x)$ which might be recognized as a property of the Dirac delta function.} where there are only two coefficients $a_0=a_1=1$. The dilation equation is $ \phi(x) = \phi(2x) + \phi(2x-1) $ which has a simple solution given by the box function:
+$$ \phi_\t{haar}(x)=\t{box}(x) = \begin{cases}
+	1 & \t{if } x\in [0,1] \\
+	0 & \t{otherwise}
+\end{cases} $$
+This is the father wavelet for the well-known \textbf{Haar wavelet}. Intuitively, the box function captures features with resolution equal to the width of the box. Indeed the higher resolution spaces $V_j$ are spanned by boxes of width $1/2^j$.
+
+\subsection{Mother Wavelets --- Orthogonality}
+Now for the primary goal --- to construct a wavelet basis for each of the detail space $W_j$ in the multiresolution analysis. We seek a \textbf{mother wavelet} $\psi\in W_0$ such that its integer translates $\{\psi(x-k)\}_{k\in\Z}$ form an orthonormal basis of $W_0$. Note that with the mother wavelet $\psi$, we get bases for all the other detail spaces $W_j$ for free since the function $\psi_{jk}$ defined by $\psi_{jk}(x)\equiv \psi(2^jx-k)$ lives in $W_j$ and is by construction orthogonal to all other such functions.\footnote{This follows from the self-similarity property in the MRA as well as the orthogonal decomposition defining the detail spaces.}
+
+Since $W_0\subset V_1$, the mother wavelet can be decomposed in terms of the father wavelet as
+$$ \psi(x) = \sum_{k\in\Z} b_k \phi(2x -k) $$
+The coefficients $\{b_k\}$ can be shown to be closely related to the coefficients in the dilation equation $\{a_k\}$ by imposing three orthogonality constraints:
+\begin{align*}
+	\langle\phi(x), \phi(x-k)\rangle &=\delta_{k0} \\
+	\langle\psi(x), \psi(x-k)\rangle &= \delta_{k0} \\
+	\langle\psi(x), \phi(x-k)\rangle &= 0
+\end{align*}
+These relations translate to the frequency domain where they provide important constraints on the coefficients. In terms of the Fourier transformed sequences $A(\omega)\equiv \frac{1}{2}\sum_k a_k e^{-j\omega k}$ and $B(\omega)\equiv \frac{1}{2}\sum_k b_k e^{-j\omega k}$, we have
+\begin{align*}
+	\abs{A(\omega)}^2 + \abs{A(\omega+\pi)}^2 &=1 \\
+	\abs{B(\omega)}^2 + \abs{B(\omega+\pi)}^2 &=1 \\
+	B^*(\omega)A(\omega) + B(\omega+\pi)A^*(\omega+\pi) &=1
+\end{align*}
+The third equation clearly couples the coefficients $\{a_k\}$ and $\{b_k\}$ together and from it, we can find the relationship $ b_k = (-1)^ka^*_{1-k} $. This yields the full form of the mother wavelet in terms of the dilation equation coefficients:
+$$ \psi(x) = \sum_{k\in\Z} (-1)^ka_{1-k}^*\phi(2x - k) $$
+Consider now the example of the Haar wavelet. Previously it was found that the father wavelet in that case is the simple box function. 
+$$ \psi_\t{haar}(x) = \t{box}(2x) - \t{box}(2x-1)$$
+
+\newpage
+
+\section*{Appendix}
+\subsection*{A1. Derivation of Periodogram Variance}
+
+
+\subsection*{A2. Optimization with Linear Constraints}
+Consider an optimization problem of the form
+$$ \*v^* = \arg\max_{\*v\in V} \*v^\dagger A\*v  $$
+subject to the constraint $\*b^\dagger\*v = c$ for some known vector $\*b$, some real constant $c\in\R$, and an invertible matrix $A$. This can be understood geometrically as finding the $\*v$ that lies in the hyperplane defined by $\*b^\dagger\*v=c$ which is least affected by the linear transformation $A$. We write down a Lagrangian
+$$ \mathcal{L} = \*v^\dagger A\*v - \lambda \*v^\dagger\*b $$
+Note that since $c$ is real, the constraint is equivalently $\*v^\dagger\*b = \*b^\dagger\*v=c$. Taking the gradient with respect to the conjugate vector
+$$ \nabla_{\*v^\dagger}\mathcal{L} = A\*v - \lambda\*b = 0 $$
+leads to the equation $ \*v = \lambda A^{-1}\*b$. The constraint implies $\lambda = c/(\*b^\dagger A^{-1}\*b)$ so we find the final result
+$$ \*v^* = c\frac{A^{-1}\*b}{\*b^\dagger A^{-1}\*b} $$
+\subsection*{A3. Optimization with Quadratic Constraints}
+Instead of a linear constraint in the form $\*b^\dagger\*v=c$, suppose we have a quadratic constraint of the form
+$$ \*v^\dagger B\*v = c $$
+for a matrix $B$. In this case, the Lagrangian is
+$$ \mathcal{L} = \*v^\dagger A\*v - \lambda\*v^\dagger B\*v $$
+Setting the conjugate derivative to zero yields the equation 
+$$ A\*v = \lambda B\*v  $$
+which is known as the \textbf{generalized eigenvalue problem}. Note that if $B$ is invertible, then this can be rearranged to write $B^{-1}A\*v=\lambda\*v$ which is an ordinary eigenvalue problem for the matrix $B^{-1}A$. 
+
+In the special case where $B=\mathbbm{1}$, the constraint takes the form of an $\ell^2$-norm: $\|\*v\|_2^2=c$. Also in this case, we have the ordinary eigenvalue problem for $A$, so the solution is exactly the eigenvector of $A$ with the highest eigenvalue.
+
+\subsection*{A4. Calculus of Variations}
+Consider the problem where we seek a real-valued function $u:\Omega\to\R$ which optimizes a functional $J[u]$ of the form
+$$ J[u] = \int_\Omega dt\; \mathscr{L}(u(t)) $$
+where $\mathscr{L}$ is a differentiable function of its argument. The \textbf{functional derivative} of $J$ is defined by
+$$ \delta J [u] \equiv \lim_{\epsilon\to 0}\frac{J[u+\epsilon\phi] - J[u]}{\epsilon}$$
+where $\phi$ is an arbitrary \emph{test function}. With the integral form for $J$, the ``variation" $u+\epsilon\phi$ only appears through the integrand $\mathscr{L}$. We can expand to first order under the integral as  $\mathscr{L}(u+\epsilon\phi) = \mathscr{L}(u) + \epsilon \phi\; \partial_u\mathscr{L}(u) + \dots$ which when plugging into the functional derivative, readily allows the limit to be taken. Doing so, one finds
+$$ \delta J[u] = \int_\Omega dt\;\phi(t) \frac{\partial\mathscr{L}(u(t))}{\partial u} $$
+To optimize this value, we seek critical points and set $\delta J=0$. For this to be true for any test function $\phi$, we must have
+$$ \frac{\partial\mathscr{L}}{\partial u} = 0 $$
+This is a special case of the \emph{Euler-Lagrange equation} from the calculus of variations. In the more general case, the integrand $\mathscr{L}$ can depend on derivatives of $u$ as well. This adds additional derivative terms to the above equation which ultimately generates a differential equation that must be solved for $u$. 
+
+In maximum entropy estimation, we find the special form $\mathscr{L}(u) = \log u - \sum_m\lambda_m g_m(u)$ where $g_m(u)=0$ are constraints on the solution imposed with Lagrange multipliers). Thus we have
+$$ \frac{\partial\mathscr{L}}{\partial u} = \frac{1}{u} - \sum_m \lambda_m \frac{\partial g_m}{\partial u} = 0 $$
+When the constraints have the special linear form $g_m(u) = \alpha_m(t) u(t) -c_m$ for some known function $\alpha_m$ and known constant $c_m$, this can be rearranged to find the solution
+$$ u(t) = \frac{1}{\displaystyle\sum_m \lambda_m \alpha_m(t)}$$
+The multipliers are found through the constraints.
+
+
+
+	
+\end{document}

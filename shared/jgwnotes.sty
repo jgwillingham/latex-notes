@@ -1,0 +1,10 @@
+% Shared helpers for all notes. Optional: notes build fine without it.
+% Add macros used across several notes here; anything in shared/ is on the TeX path.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{jgwnotes}
+
+% \buildstamp -> "Built 2026-10-29 from commit abc1234" on CI, "Local build <date>" otherwise.
+% Typical use: \date{\buildstamp}
+\InputIfFileExists{buildinfo.tex}{}{\def\buildstamp{Local build \today}}
+
+\endinput

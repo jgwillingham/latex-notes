@@ -1,0 +1,191 @@
+\documentclass[onecolumn]{gwclass}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\graphicspath{{img/}}
+
+\newcommand{\man}{\mathcal{M}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\W}{\mathcal{W}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[theorem]
+\newtheorem{corollary}{Corollary}[theorem]
+\renewcommand\qedsymbol{$\blacksquare$}
+
+
+
+
+\title{Wavelets}
+\author{--- George Willingham ---}
+\date{}
+
+\begin{document}
+	\maketitle
+	
+	
+\section{Multiresolution Analysis}
+A \textbf{\emph{multiresolution analysis}} of $L^2(\mathbb{R})$ is a nested sequence of subspaces $\{V_j\}_{j\in\mathbb{Z}}$ along with a \textbf{\emph{scaling function}}\footnote{also called a father wavelet} $\phi$ which, at an intuitive level, captures finer details of functions at higher subspaces $j$. More specifically certain regularity and self-similarity conditions are satisfied:
+
+\begin{itemize}
+	\item $V_j \subset V_{j+1}$
+	
+	\item \emph{$g(x)\in V_j \iff g(2x)\in V_{j+1}$}
+	\item  $\exists\phi\in V_0$ \emph{such that} $V_0=\text{span}\{\phi(x-k)\::\:k\in\mathbb{Z}\}$
+\end{itemize}
+Additionally the union $\bigcup_j V_j$ must be dense\footnote{This just means that functions in $L^2(\mathbb{R})$ can be arbitrarily well approximated by functions in $\bigcup_j V_j$} in $L^2(\mathbb{R})$ and $\bigcap_j V_j = \{0\}$. Typically $\phi$ is considered to have compact support. While this is not strictly necessary it will be assumed in these notes.
+
+The scaling function $\phi$ plays a central role in defining a multiresolution analysis, but before discussing how to construct such a function, we must explore a few consequences of the above conditions. First, observe that since an arbitrary function $g$ in $V_0$ can be expanded in the translated functions $\{\phi(x-k)\::\:k\in\mathbb{Z}  \}$, we can write $g(2x)\in V_1$ as
+$$ g(2x) = \sum_{k\in\mathbb{Z}} c_k \phi(2x - k) $$
+and therefore the functions $\{\phi(2x-k)\::\:k\in\mathbb{Z}\}$ span $V_1$. More generally,
+$$ V_j = \text{span}\{ \phi(2^jx - k) \::\:k\in\mathbb{Z}\} $$
+Now since $V_j \subset V_{j+1}$ and the union of all $V_j$ is dense in $L^2(\mathbb{R})$, this tells us that as $j\to\infty$ the functions $\phi(2^jx-k)$ can approximate functions in $L^2(\mathbb{R})$ arbitrarily well. In fact as $j$ increases, we are capturing finer and finer details of functions by squeezing $\phi$'s support into smaller regions of $\mathbb{R}$. Or phrased another way, we are capturing increasingly small scale features.
+
+So if going from $V_j$ to $V_{j+1}$ amounts to taking into account smaller scale features, then those small features must belong in some sense to the part of $V_{j+1}$ that is not $V_j$. To formalize this, we can decompose $V_{j+1}$ into $V_j$ and its orthogonal complement $W_j$, sometimes known as the \textbf{\emph{detail space}}. Thus we have
+$$V_{j+1}=W_j\oplus V_j$$
+Clearly this allows for the decomposition $V_{j+1} = W_j\oplus W_{j-1}\oplus W_{j-2}\oplus\dots$ which as $j\to\infty$ leads to the important conclusion:
+$$ L^2(\mathbb{R}) = \bigoplus_{j\in\mathbb{Z}} W_j $$
+The detail spaces $W_j$ form an orthogonal decomposition of $L^2(\mathbb{R})$. The goal now is to find their basis functions which we will come to call \textbf{\emph{wavelets}}. 
+
+
+
+
+\section{Dilation Equations}
+There are several methods used to find scaling functions $\phi$ to construct a multiresolution analysis of $L^2(\mathbb{R})$, but they all typically begin with the same equation. Since $\phi$ belongs to $V_0$ but $V_0\subset V_1$ and $V_1$ is spanned by the functions $\{\phi(2x-k)\::\:k\in\mathbb{Z}\}$, we must be able to expand $\phi$ in terms of its dilated self:
+
+	$$\phi(x) = \sum_k a_k \phi(2x - k)$$
+This is a \textbf{\emph{dilation equation}} with coefficients $\{a_k\}$. It is analogous to a difference equation but is generally more challenging to solve. In fact, solutions are not even guaranteed to exist for an arbitrary set of coefficients. This is easily seen by integrating over $\mathbb{R}$:
+
+$$ \int_\mathbb{R}dx\;\phi(x) = \frac{1}{2}\sum_k a_k \int_\mathbb{R}d(2x-k)\;\phi(2x-k) \quad\quad\implies\quad\quad \sum_k a_k = 2$$
+Evidently the coefficients must satisfy $\sum_k a_k = 2$, else we have a contradiction and a solution cannot exist.
+
+
+In the simplest case of only a single coefficient $a_0=2$, the function which satisfies the dilation equation is the Dirac delta: $\delta(x)=2\delta(2x)$. 
+
+In the case of two coefficients $a_0=a_1 = 1$, the dilation equation is
+$$ \phi(x) = \phi(2x) + \phi(2x - 1) $$
+This has as its solution the box function $\t{box}(x)$ which is 1 for $x\in[0,1]$ and 0 otherwise. Indeed $\t{box}(2x)$ is only nonzero for $x\in[0,\frac{1}{2}]$ and $\t{box}(2x-1)$ is only nonzero for $x\in[\frac{1}{2},1]$ so their sum is 1 on $[0,1]$ and thus the dilation equation is satisfied. This is a very well known case which develops the \textbf{\emph{Haar wavelet}}.
+
+
+\section{Orthogonal Wavelets --- Conditions on Coefficients}
+
+Suppose we have found a scaling function $\phi$ which solves the dilation equation with coefficients $\{a_k\}$. Now the goal is to find basis functions for the detail spaces $W_j$. In particular, we will try to find a $\psi \in W_0$ such that the functions $\{\psi(x - k) \::\:k\in\mathbb{Z}\}$ form an orthonormal basis of $W_0$ --- we call $\psi$ a \textbf{\emph{mother wavelet}}. Notice that with a mother wavelet, we get bases for all other $W_j$ for free since $\psi(2^jx)$ lives in $W_j$ and all detail spaces are mutually orthogonal.
+
+Since $W_0$ is a subspace of $V_1$, a mother wavelet $\psi$ can be expanded as 
+$$ \psi(x) = \sum_{k\in\mathbb{Z}}b_k \phi(2x - k) $$
+As will now be shown, the coefficients $b_k$ are related to the coefficients $a_k$ in the dilation equation. From here several constraints on the coefficients will be derived as a consequence of orthogonality. Then finally, these constraints will lead to the relationship between coefficients $a_k$ and $b_k$.
+
+Consider now three orthogonality relations expressed in time and frequency domains\footnote{the Fourier transform is unitary so inner products are preserved (Plancherel's theorem)}:
+\begin{align*}
+	\textstyle{\langle \phi(x), \phi(x-k) \rangle =\langle \Phi(\omega), \Phi(\omega)e^{-ik\omega}\rangle = \delta_{0k}} \\
+	\textstyle{\langle \psi(x), \psi(x-k)\rangle= \langle \Psi(\omega), \Psi(\omega)e^{-ik\omega}\rangle = \delta_{0k}} \\
+	\textstyle{\langle \psi(x), \phi(x-k)\rangle = \langle\Psi(\omega), \Phi(\omega)e^{-ik\omega}\rangle = 0}
+\end{align*}
+In each of these, the frequency domain inner products are of the form $\langle F(\omega), G(\omega)e^{-ik\omega}\rangle$ which can be expressed in a different, more useful way:
+
+\begin{align*}
+	\langle F(\omega), G(\omega)e^{-ik\omega}\rangle &= \int_\mathbb{R}\frac{d\omega}{2\pi}F(\omega)G^*(\omega)e^{ik\omega} = \int_{0}^{2\pi}\frac{d\omega}{2\pi}\left[\sum_{\ell\in\mathbb{Z}}F(\omega + 2\pi\ell)G^*(\omega + 2\pi\ell)\right]e^{ik\omega}  
+\end{align*}
+The second equality can be viewed as taking the integral over $\mathbb{R}$ and splitting it into an infinite number of smaller integrals over regions of length $2\pi$ and then shifting the integrand in each of those integrals\footnote{$\int_\mathbb{R}f(\omega) = \sum_\ell \int_{\ell2\pi}^{(\ell+1)2\pi}f(\omega) = \int_0^{2\pi}\sum_\ell f(\omega + 2\pi\ell)$}. Since each of the orthogonality relations must be satisfied for all $k$, the following results are obtained:
+\begin{align*}
+	\textstyle{
+		\sum_{\ell\in\mathbb{Z}} |\Phi(\omega + 2\pi\ell)|^2 = 1} \\
+	\textstyle{ 
+		\sum_{\ell\in\mathbb{Z}} |\Psi(\omega + 2\pi\ell)|^2 = 1} \\
+	\textstyle{
+		\sum_{\ell\in\mathbb{Z}} \Psi(\omega + 2\pi\ell)\Phi^*(\omega + 2\pi\ell) = 0}
+\end{align*}
+Now to relate these conditions to the coefficients, we must use the expansions of $\phi$ and $\psi$ in terms of the functions $\{\phi(2x - k)\::\:k\in\mathbb{Z}\}$. Transforming both of these expansions to the frequency domain, we can use a general property of Fourier transforms\footnote{If $f(x)$ has Fourier transform $F(\omega)$ then $f(ax - s)$ has Fourier transform $\frac{1}{a}F(\frac{\omega}{a}) e^{-is\omega /a}$} to write 
+\begin{align*} 
+	\Phi(\omega) = A\left(\frac{\omega}{2}\right) \Phi\left(\frac{\omega}{2}\right) &&
+	\Psi(\omega) = B\left(\frac{\omega}{2}\right) \Phi\left(\frac{\omega}{2}\right) 
+\end{align*}
+where $A(\omega) = \frac{1}{2}\sum_k a_k e^{-ik\omega}$ and $B(\omega) = \frac{1}{2}\sum_k b_k e^{-ik\omega}$. Noting that the previous three equations could have been found just as well with $\omega\mapsto 2\omega$, the above equations yield:
+\begin{align*}
+	\textstyle{\sum_{\ell\in\mathbb{Z}} |A(\omega + \pi\ell)\Phi(\omega + \pi\ell)|^2 = 1} \\
+	\textstyle{\sum_{\ell\in\mathbb{Z}} |B(\omega + \pi\ell)\Phi(\omega + \pi\ell)|^2 = 1} \\
+	\textstyle{\sum_{\ell\in\mathbb{Z}} B(\omega + \pi\ell)A^*(\omega + \pi\ell)\:|\Phi(\omega + \pi\ell)|^2 = 0}
+\end{align*}
+Splitting these into even and odd terms, we can make use of the fact that $A$ and $B$ are $2\pi$-periodic. All three equations have the same general form and after this split look like:
+
+$$ X(\omega)\sum_{\ell\in\mathbb{Z}} |\Phi(\omega + 2\pi\ell)|^2 + X(\omega + \pi)\sum_{\ell\in\mathbb{Z}} |\Phi(\omega + 2\pi\ell + \pi)|^2 = \t{const}$$
+The sums over $\ell$ evaluate to 1 from a previous result and so we are left with a constraint on $X$, which is $AA^*$, $BB^*$, and $BA^*$ in the first, second and third equations respectively. Thus the following conditions are found:
+\begin{align*}
+	\textstyle{|A(\omega)|^2 + |A(\omega + \pi)|^2 = 1} \\
+	\textstyle{|B(\omega)|^2 + |B(\omega + \pi)|^2 = 1}\\
+	\textstyle{B(\omega)A^*(\omega) + B(\omega + \pi)A^*(\omega + \pi) = 0}
+\end{align*}
+Before continuing on to relate $\{b_k\}$ to $\{a_k\}$, it is worth pausing to make a few observations since these equations provide some useful information about the frequency domain properties of $A$ and $B$. Noting that\footnote{This follows from the dilation equation's existence condition: $A(0)=\frac{1}{2}\sum_k a_k = 1$} $A(0)=1$, it is easy to find from the above equations that $A(\pi)=0$, $B(0)=0$, and $B(\pi)=1$. Viewing the coefficients $\{a_k\}$ and $\{b_k\}$ as taps in an FIR filter, this suggests that $A$ is a lowpass filter and $B$ is a highpass filter. In fact, we are seeing the connection to \textbf{\emph{quadrature mirror filter banks}} which are closely related to the wavelet analysis here.
+
+Now, to relate the coefficients $\{a_k\}$ and $\{b_k\}$, we must use the third of the previous results. That equation clearly relates $A$ and $B$. Rearranging a bit, we may define a new function $\lambda$ such that:
+$$ \lambda(\omega)\equiv\frac{B(\omega)}{A^*(\omega + \pi)}= - \frac{B(\omega + \pi)}{A^*(\omega)}$$
+This function is clearly $2\pi$-periodic since it is defined in terms of $A$ and $B$, but more than that, it is easy to verify that it is $\pi$-antiperiodic: $\lambda(\omega + \pi) = -\lambda(\omega)$. In general, such a function can be written in the form $\lambda(\omega)=p(\omega)e^{-i\omega}$ for a $\pi$-periodic function $p$. Leaving the exact choice of $p$ open, we have:
+$$B(\omega) = p(\omega)e^{-i\omega}A^*(\omega + \pi) $$
+Now since $B(\pi)=A(0)=1$, the above equation at $\omega=\pi$ tells us that $p$ must satisfy $p(\pi)=-1$ (and therefore $p(0)=-1$). So the simplest choice of $p$ is to take $p(\omega)=-1$. 
+
+Writing out $A$ explicitly, we find a relationship:
+$$B(\omega) = \frac{-1}{2} e^{-i\omega}\sum_k a_k^* e^{ik(\omega + \pi)} = \frac{1}{2}\sum_k (-1)^{1-k} a_k^* e^{-i(1-k)\omega}  $$
+Reindexing as $k\mapsto 1-k$, we can identify the coefficients with $\{b_k\}$ and write $ b_k = (-1)^k a_{1-k}^* $. Therefore, for a scaling function $\phi$ which solves a dilation equation with coefficients $\{a_k\}$, a mother wavelet is given by
+
+$$\psi(x) = \sum_k (-1)^k a_{1-k}^*  \phi(2x - k) $$
+With the mother wavelet found, we can write $L^2(\mathbb{R}) = \t{span}\{\psi(2^jx - k) \::\: j,k\in\mathbb{Z} \}$ and so for any function in $L^2(\mathbb{R})$ there are coefficients $w_{jk}$ such that
+
+$$ f(x) = \sum_{j,k\in\mathbb{Z}} w_{jk} \psi(2^jx - k) \qquad\qquad\qquad w_{jk} = \langle f(x), \psi(2^jx - k) \rangle $$
+where the coefficients are calculated by simply projecting $f$ onto the appropriate wavelet. These coefficients define the \textbf{discrete wavelet transform} of the function $f$ with respect to the mother wavelet $\psi$.
+
+
+\section{The Cascade Algorithm}
+For an arbitrary set of coefficients, it is virtually impossible to analytically solve the dilation equation for $\phi$. As a consequence, iterative methods are often used instead. The typical solution is based on the \textbf{\emph{cascade algorithm}}. We start with the Fourier transformed dilation equation $\Phi(\omega) = A(\omega/2)\Phi(\omega/2)$. Now since $\Phi$ appears on the right side here, this equation can be iterated. So iterating $N$ times and then taking $N$ to $\infty$, we can write
+$$ \Phi(\omega) = \left[\prod_{n=1}^N A\left(\frac{\omega}{2^n}\right)\right] \Phi\left(\frac{\omega}{2^N}\right) \quad \xrightarrow{N\to\infty} \quad \Phi(\omega) = \left[\prod_{k=1}^\infty A\left(\frac{\omega}{2^k}\right)\right] \Phi(0) $$
+It is common to take\footnote{$\Phi(0)=\int_\mathbb{R}dx\;\phi(x)=1$} $\Phi(0)=1$ so that all ambiguity is removed and we can compute $\Phi$ with any set of scaling coefficients $\{a_k\}$. But as found in the previous section, the coefficients must satisfy certain conditions. Namely, we have to have
+$$ |A(\omega)|^2 + |A(\omega+\pi)|^2=1 $$
+With this satisfied, the iterated product above defines the cascade algorithm which can construct $\Phi$. Then the inverse Fourier transform provides $\phi$.
+
+
+
+\section{The Fast Wavelet Transform}
+With the multiresolution analysis just developed, a function $f\in V_j$ can be decomposed in two ways: either in terms of the $\{\phi(2^jx-k)\}$ which span $V_j$ or in terms of the orthogonal decomposition $V_j = W_{j-1}\oplus V_{j-1}$. In the latter, $f$ is broken into one term in $W_{j-1}$ and one term in $V_{j-1}$. With that, 
+
+\begin{align*}
+	f(x) = \sum_{k\in\mathbb{Z}} \sigma_{jk} \phi(2^jx - k) && \t{or} &&
+	f(x) = \underbrace{\sum_{k\in\mathbb{Z}} w_{j-1,k} \psi(2^{j-1}x - k)}_{\t{this is in } W_{j-1}} + \underbrace{\sum_{k\in\mathbb{Z}} \sigma_{j-1,k} \phi(2^{j-1}x - k)}_{\t{this is in } V_{j-1}}
+\end{align*}
+The coefficients are found by exploiting orthogonality: $\sigma_{jk} = \langle f(x), \phi(2^jx - k)\rangle$ or $w_{jk} = \langle f(x), \psi(2^jx - k)\rangle$. We can translate between these two representations by using the expansion of $\psi$ in terms of $\phi$. Particular, a simple shift of indices can be used to write $ \psi(2^{j-1}x-k) = \sum_{\ell\in\Z} b_{\ell-2k}\phi(2^jx - \ell) $. Taking an inner product $\langle f(x), \cdot \rangle$ with both sides here, a relationship between coefficients is found
+$$ w_{j-1,k}  = \sum_{\ell\in\mathbb{Z}} b_{\ell-2k}\;\sigma_{j\ell} $$
+Similarly, the dilation equation for $\phi$ can be used to derive a recursive equation for the $\sigma_{jk}$ coefficients. We have $\phi(2^{j-1}x - k)=\sum_\ell a_{\ell-2k} \phi(2^j - \ell)$ which projects onto $f$ as
+$$ \sigma_{j-1,k} = \sum_{\ell\in\Z} a_{\ell-2k}\sigma_{j\ell} $$ 
+Both of these equations can be viewed as linear filters applied to the coefficient sequence $\{\sigma_{jk} \::\: k\in\Z\}$ followed by a downsampling operation $\downarrow 2$. Recall that previously it was observed that the $a_k$ form a highpass filter and the $b_k$ form a lowpass filter. With this in mind, we can see that the wavelet decomposition can be computed with a filter bank. Starting the the full function $f\in V_j$, we can apply filters $A$ and $B$ to generate the wavelet coefficients $\{w_{j-1,k}\}$ as well as the scaling function coefficients $\{\sigma_{j-1,k}\}$. We keep the wavelet coefficients but pass on the $\sigma$'s to be filtered again. This continues to termination.
+
+In particular taking $f\in V_0$, this algorithm can be initialized by numerically evaluating the inner product to obtain the initial $\sigma_{0k}$:
+$$ \sigma_{0k}=\langle f(x), \phi(x-k)\rangle $$
+Often in practice, the initial coefficients are taken to be $f$ evaluated at the given sample points, but this not rigorously justifiable.
+
+
+
+
+\section{Common Wavelets}
+
+\subsection{The Haar Wavelet}
+The Haar wavelet is the simplest wavelet. The dilation equation for its construction was examined earlier --- it has two equal coefficients:
+$$ \phi(x) = \phi(2x) + \phi(2x - 1) $$
+The solution is the box function:
+$$ \phi_\t{haar}(x) = \t{box}(x) = \begin{cases}
+	1 & x \in [0,1]\\
+	0 & \t{else}
+\end{cases} $$
+With this scaling function, the mother wavelet can be assembled using the previously derived formula. This leads to 
+$$ \psi_\t{haar}(x) = \t{box}(2x) - \t{box}(2x-1) $$
+This function has the look of a single period of a square wave. It is 1 on $[0,\frac{1}{2}]$, it is $-1$ on $[\frac{1}{2}, 1]$, and it is zero everywhere else.
+
+
+\subsection{The Daubechies Wavelet}
+
+
+
+
+
+
+\end{document}

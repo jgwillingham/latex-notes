@@ -1,0 +1,245 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{physics}
+\usepackage[margin=1.5in]{geometry}
+\usepackage{amsmath}
+\usepackage{mathrsfs}
+\usepackage{amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{bbm}
+\usepackage{tikz-cd}
+\usepackage[framemethod=default]{mdframed}
+\usepackage{tcolorbox}
+
+
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\def \*#1{\boldsymbol{#1}}
+\renewcommand{\t}[1]{\text{#1}}
+\def \timeorder{\t{T}}
+\def \normalorder{\t{N}}
+
+
+\newmdenv[backgroundcolor=black!5,hidealllines=true,leftmargin=0mm,rightmargin=0mm,innertopmargin=1mm,innerbottommargin=1mm]{specbox}
+
+\newcommand{\header}[1]{
+	\vspace{1em}
+	\noindent\raisebox{-0.5em}{\Large\textbf{#1}}\\
+	\noindent\textcolor{MidnightBlue}{\rule{\textwidth}{2pt}}\\
+}
+
+%\newcommand{\definition}[2]{
+%	\newline
+%	\noindent\textcolor{MidnightBlue}{\rule{\textwidth}{1pt}}
+%	\vspace{-1.9em}
+%	\begin{specbox}
+%	\noindent\textbf{#1: }\emph{#2}
+%	\end{specbox}
+%	\vspace{-1.5em}
+%	\noindent\textcolor{MidnightBlue}{\rule{\textwidth}{1pt}}}
+
+
+\newcommand{\definition}[2]{
+	\begin{center}
+		\begin{tcolorbox}[colframe=MidnightBlue, colback=black!5, arc=2mm, outer arc=0.5mm, width=\linewidth, left=2mm, right=2mm]
+			\textbf{#1:} \emph{#2}	
+		\end{tcolorbox}
+	\end{center}\noindent}
+
+
+\newcommand{\sidenote}[1]{
+	\marginpar{\raggedright\small\textcolor{Bittersweet}{#1}}
+}
+
+\setlength{\marginparwidth}{1.2in}
+
+
+
+\title{\textbf{Lie Theory}}
+\author{--- George Willingham ---}
+\date{}
+
+\begin{document}
+	
+	\maketitle
+	\header{Matrix Lie Groups}
+	\noindent A Lie group is a kind of \textbf{topological group}. That is, they have all the algebraic structure of a group while also having topological (and in fact differentiable) structure. This is exactly what makes Lie theory so interesting; there is a rich interplay between these two arenas which manifests in ways that have deep implications in physics. Ultimately, the central topic of Lie theory is the \textbf{Lie algebra-Lie group correspondence} --- every Lie group has a corresponding algebra defined by its tangent space at the identity element. Note how something like this emerges only by combining algebraic and topological properties. The group structure singles out the identity element as a special point in the manifold and this singles out its tangent space as having particular importance. This will be the subject of a later chapter which will lead us into the representation theory of Lie groups where all the topological, differential, and algebraic concepts will come together into a neat framework. We begin with a definition:
+	\definition{Lie Groups}{A Lie group is a group $G$ that is also a smooth manifold. In particular, the group multiplication map $(g,h)\mapsto gh$ is smooth and so is the inverse map $g\mapsto g^{-1}$.}
+	Of particular importance are the so-called \textbf{matrix Lie groups} --- Lie groups that are defined by a particular set of matrices under matrix multiplication. These will be the focus of these notes since they are the most important in physics and engineering. The broadest matrix Lie group is the general linear group defined as the set of all invertible matrices of dimension $n$. In particular over field $\mathbb{K}$, we have
+	$$	\t{GL}(n;\mathbb{K}) \equiv \{g\in\mathbb{K}^{n\times n} \:|\:\exists g^{-1}\:\t{ such that } g^{-1}g = \mathbbm{1}\}$$
+	Every real or complex matrix Lie group is a subgroup of $\t{GL}(n;\mathbb{C})$. Some particularly important matrix Lie groups include the special linear group $\t{SL}(n)$ of all $n$-dimensional invertible matrices with determinant 1, the orthogonal and unitary groups $\t{O}(n)$ and $\t{U}(n)$, and their determinant 1 subgroups $\t{SO}(n)$ and $\t{SU}(n)$. Over field $\mathbb{K}$, these are defined as follows:
+	\begin{align*}
+		\t{SL}(n;\mathbb{K}) &\equiv \{g \in \t{GL}(n;\mathbb{K}) \:|\: \t{det}(g)=1 \}\\
+		\t{O}(n;\mathbb{K}) &\equiv \{ g\in\t{GL}(n;\mathbb{K}) \:|\: g^\t{T}g=\mathbbm{1} \} \\
+		\t{SO}(n;\mathbb{K}) &\equiv \{ g\in \t{GL}(n;\mathbb{K}) \:|\:g^\t{T}g=\mathbbm{1} \:\t{ and }\: \t{det}(g)=1 \}\\
+		\t{U}(n;\mathbb{K}) &\equiv \{ g\in \t{GL}(n;\mathbb{K}) \:|\: g^\dagger g=\mathbbm{1} \}\\
+		\t{SU}(n;\mathbb{K}) &\equiv \{ g\in\t{GL}(n;\mathbb{K}) \:|\: g^\dagger g = \mathbbm{1}\:\t{ and }\:\t{det}(g)=1 \}
+	\end{align*}
+	Here the field $\mathbb{K}$ is either $\mathbb{R}$ or $\mathbb{C}$. Note that $\t{U}(n;\mathbb{R})$ is the same as $\t{O}(n;\mathbb{R})$ but that $\t{O}(n;\mathbb{C})$ is \emph{not} the same as $\t{U}(n;\mathbb{C})$. Usually we use the notation $\t{O}(n)\equiv \t{O}(n;\mathbb{R})$ and $\t{U}(n)\equiv \t{U}(n;\mathbb{C})$.
+
+All of these matrix Lie groups have different topological properties that will play an important role in understanding them. In particular, compactness and connectedness will determine how simple the representation theory of a Lie group is. 
+\definition{Connectedness}{A matrix Lie group $G$ is called connected if for every $g,h\in G$, there is a continuous path from $g$ to $h$. That is, if there is a continuous function $\gamma:[0,1]\to G$ such that $\gamma(0)=g$ and $\gamma(1)=h$.
+	\\
+	\\
+	\textbf{Simple Connectedness: } A matrix Lie group $G$ is simply connected if $G$ is connected and for every closed path $\gamma:[0,1]\to G$ such that $\gamma(0)=\gamma(1)$, the loop $\gamma$ can be shrunk continuously to a point while staying in $G$.}
+To illustrate these topological properties consider the orthogonal group $\t{O}(n)\equiv \t{O}(n;\mathbb{R})$. By its definition, it follows that every element must have $\t{det}(g)=\pm 1$ but to get from the $+1$ part of the group to the $-1$ part, any continuous path through $\mathbb{R}^{n\times n}$ must necessarily pass through a singular (non-invertible) matrix with determinant 0. Therefore there are two separate connected components. One of these components, the part with $\t{det}(g)=1$ is precisely the group $\t{SO}(n)$ whereas the $\t{det}(g)=-1$ part is not a proper subgroup since it does not contain the identity. 
+
+Focusing now on the special case $n=3$,\sidenote{\textbf{Topology of SO(3)}: This group is famously not simply connected as made evident by a homeomorphism with the 3-ball with antipodal points identified. } it turns out that $\t{SO}(3)$ is connected, but \emph{not} simply connected. This can be understood by seeing that $\t{SO}(3)$ is topologically equivalent to the 3-ball with antipodal points identified. To see this, consider that $\t{SO}(3)$ is exactly the group of all rotations in 3-dimensional space. Since any rotation can be defined by an axis $\*n\in\mathbb{R}^3$ and an angle $\varphi\in[-\pi,\pi]$, we find that $\t{SO}(3)$ is similar to the 3-dimensional ball with radius $\pi$ by letting $\*n$ define a direction and letting $\varphi$ define the radial position of a point. Then one may note that the rotations $(\*n,\pi)$ and $(\*n,-\pi)$ are identical which means the antipodal points on the 3-ball must be identified. With this, consider the closed loop which starts at $(\*n,\pi)$, travels across the ball, and ends at $(\*n,-\pi)$. It is fairly easy to convince yourself that this path cannot possibly be continuously shrunk to a point, proving that $\t{SO}(3)$ is not simply connected.
+
+The relationship between $\t{O}(n)$ and $\t{SO}(n)$ highlights that there is something especially useful about the connected component of a group which contains the identity element. Indeed, it is the only component which can possibly form a subgroup.
+\definition{Identity Component}{The identity component $G_0$ of a matrix Lie group $G$ is the set of all $g\in G$ that can be reached by a continuous path from the identity element $\mathbbm{1}$. That is, there is a continuous function $\gamma:[0,1]\to G$ such that $\gamma(0)=\mathbbm{1}$ and $\gamma(1)=g$.}
+Of course for a connected group, the identity component is just the group itself. But in non-connected groups, the identity component plays an important role. In part, this is due to the fact $G_0$ is always a normal subgroup of $G$. To see that $G_0$ is a subgroup, consider a path $\gamma_g$ connecting the identity to $g\in G_0$ and another path $\gamma_h$ connecting the identity to $h\in G_0$. Then the path $\gamma_{gh}(t)=\gamma_g(t)\gamma_h(t)$ connects the identity to $gh$ so $G_0$ is closed. Further $G_0$ contains inverses, since taking the point-wise inverse $\gamma_g(t)^{-1}$ must be a smooth map from $\gamma_g$ to another path which connects the identity to $g^{-1}$. Finally for any arbitrary $h\in G$ and $g\in G_0$, the path $ h\gamma_g(t)h^{-1}$ connects the identity to $hgh^{-1}$ proving that $G_0$ is invariant under conjugation. Therefore $G_0$ is a normal subgroup of $G$:
+$$ G_0\trianglelefteq G $$
+
+
+
+
+
+
+\newpage
+
+\header{Lie Algebras}
+The definition of Lie algebras is not obviously related to Lie groups at all. They are simply algebras of a certain sort (vector spaces with a well-behaved vector product). In fact Lie algebras can be richly studied in their own rite, but in these notes we will be focused on their relationship to Lie groups. 
+\definition{Lie Algebra}{A Lie algebra is a vector space $\mathfrak{g}$ over some field $\mathbb{K}$ endowed with a binary operation $[\cdot,\cdot]:\mathfrak{g}\times\mathfrak{g}\to\mathfrak{g}$ known as the Lie bracket which has the following properties:
+\begin{itemize}
+	\setlength\itemsep{0.1em}
+	\item Bilinearity: $[ax+by,z] = a[x,z] + b[y,z]$ and $[x,ay+bz]=a[x,y] + b[x,z]$
+	\item Alternativity: $[x, x] = 0$
+	\item Jacobi identity: $[x,[y,z]]+[y,[z,x]] +[z,[x,y]]=0$
+\end{itemize}
+for all $x,y,z\in\mathfrak{g}$ and $a,b\in\mathbb{K}$.}
+For standard vector spaces without a vector product, isomorphisms are simple --- any vector spaces over the same field which have the same dimension are isomorphic. But now with the additional structure of a Lie bracket, it will be useful to define a more refined type of homomorphism and isomorphism so we can talk meaningfully about equivalent Lie algebras.\footnote{Note that for a Lie algebra $\mathfrak{g}$ over field $\mathbb{K}$, a Lie algebra homomorphism $\mathfrak{g}\to\mathfrak{h}$ is considered to be $\mathbb{K}$-linear.} A \textbf{Lie algebra homomorphism} between Lie algebras $\mathfrak{g}$ and $\mathfrak{h}$ is a linear map $\pi:\mathfrak{g}\to\mathfrak{h}$ such that $\pi([x,y]_\mathfrak{g})=[\pi(x),\pi(y)]_\mathfrak{h}$ for all $x,y\in\mathfrak{g}$. Note that the bracket operation could be totally different between Lie algebras but is still respected. This naturally leads us to the notion of a Lie algebra isomorphism which is a 1-to-1 and onto Lie algebra homormorphism.
+
+When working with Lie algebras, it will often be useful to make a particular choice of basis. The basis vectors in this context are called the \textbf{generators} of the algebra. By linearity, a Lie algebra is fully specified by the generators and their Lie brackets. In fact, for a $d$-dimensional Lie algebra $\mathfrak{g}$ with generators $x_1, \dots, x_d \in\mathfrak{g}$, their Lie brackets can always be written as linear combinations
+$$ [x_i, x_j] = \sum_{k=1}^d c_{ij}^kx_k $$
+where the constants $c_{ij}^k$ are called \textbf{structure constants} of the algebra. By bilinearity of the Lie bracket, this determines the Lie bracket between any two elements in $\mathfrak{g}$. Therefore a linear map $\pi:\mathfrak{g}\to\mathfrak{h}$ is a Lie algebra homomorphism if and only if
+$$ [\pi(x_i), \pi(x_j)] = \sum_{k=1}^dc_{ij}^k\pi(x_k) $$
+This will be useful when we aim to construct representations of Lie algebras. All we need is to find operators which satisfy the appropriate bracket relations.
+
+Just like ordinary vector spaces, Lie algebras can be combined through a direct sum $\mathfrak{g}\oplus\mathfrak{h}$. This is the algebra of pairs $(x,y)$ with bracket operation defined component-wise:
+$$ [(x_1,y_1), (x_2, y_2)] = ([x_1,x_2],  [y_1, y_2]) $$
+This implies that the two sub-algebras commute: $[(x,0), (0,y)]=0$. One example of where the direct sum of Lie algebras is important is in the concept of \emph{complexification}. When working with Lie algebras (and particularly with their representations) it will often be useful to extend from $\mathbb{R}$ to $\mathbb{C}$ where life is generally easier. By allowing complex linear combinations of a Lie algebra's generators, we are working with its \emph{complexification}. \definition{Complexification of a Lie Algebra}{The complexification of a real Lie algebra $\mathfrak{g}$, denoted as $\mathfrak{g}_\mathbb{C}$, is defined by the tensor product with the vector space $\mathbb{C}=\t{span}\{1, i\} $. That is,  $\mathfrak{g}_\mathbb{C}\equiv \mathfrak{g}\otimes_\mathbb{R}\mathbb{C}$. Equivalently, this is the space of formal sums $x+iy$ for all $x,y\in\mathfrak{g}$. We write
+$$ \mathfrak{g}_\mathbb{C} \equiv \mathfrak{g} \oplus i\,\mathfrak{g} $$
+The Lie bracket of $\mathfrak{g}$ extends linearly to a Lie bracket in $\mathfrak{g}_\mathbb{C}$ given by 
+	$$ [x+iy, u+iv] = [x,u] - [y,v] + i([x,v] + [y,u]) $$ 
+	The complexified Lie algebra has complex dimension equal to the real dimension of $\mathfrak{g}$. Or alternatively, $\mathfrak{g}_\mathbb{C}$ can be seen as a real algebra with twice the dimension of $\mathfrak{g}$.}
+Consider as an example the set of all $2\times 2$ Hermitian matrices $\t{H}_2 \equiv \{x\in\mathbb{C}^{2\times 2} \:|\: x^\dagger = x\}$. It is easy to see that this forms a vector space, and in fact this can be extended to a Lie algebra if we define the Lie bracket by the commutator $[x,y]\equiv xy - yx$. Now in general, we can write any matrix in $\t{H}_2$ in the following form:
+$$ \begin{pmatrix}
+	a & b + ic \\
+	b - ic & d
+\end{pmatrix}\quad\quad a,b,c,d\in\mathbb{R}$$
+This establishes $\t{H}_2$ as a real 4-dimensional Lie algebra. As a real algebra, it is easy to see that the complexification, $\t{H}_{2\mathbb{C}}=\t{H}_2\oplus i\t{H}_2$ is equivalent to simply allowing $a,b,c,d$ to be complex. In doing so, the Hermiticity is lost so we are left with the set of all complex $2\times 2$ matrices. Therefore the complexification of $\t{H}_2$  is simply the complex Lie algebra $\mathbb{C}^{2\times 2}$.
+
+Importantly, complexification is not invertible --- two non-isomorphic algebras can have the same complexification. In the inverse problem we ask, for a complex Lie algebra $\mathfrak{g}$, what real algebra $\mathfrak{g}_0$ has $\mathfrak{g}=\mathfrak{g}_0 \oplus i\mathfrak{g}_0$. In other words, what real algebra has $\mathfrak{g}$ as its complexification? We call $\mathfrak{g}_0$ a \textbf{real form} of $\mathfrak{g}$. 
+	
+
+With\sidenote{\textbf{Lie Algebra of a Lie Group}} the basics of Lie algebras established, we now turn to the so-called \textbf{matrix Lie algebras}, i.e. the Lie algebras associated with matrix Lie groups. The core machinery in this relationship is the exponential matrix. 
+\definition{Lie Algebra of a Matrix Lie Group}{For a matrix Lie group $G$, there is an associated Lie algebra $\mathfrak{g}$ defined by all the matrices $x$ such that $e^{tx}$ is in $G$ for all real numbers $t$:
+$$ \mathfrak{g} \equiv \{ x\in \mathbb{C}^{n\times n} \:|\:e^{tx}\in G \: \t{ for all } t\in\mathbb{R}\:  \} $$
+The Lie bracket is given by the commutator $ [x,y]\equiv xy-yx $.}
+That the above definition does in fact define a Lie algebra needs proof. First let's show that $\mathfrak{g}$ is even a vector space. If $x$ is in $\mathfrak{g}$, it comes for free that for $a\in\mathbb{R}$, $ax$ is in $\mathfrak{g}$ because of the "for all $t$" condition. To show that $\mathfrak{g}$ is closed under addition, consider the relation
+$$e^{t(x+y)}=\lim_{n\to\infty}(e^{tx/n}e^{ty/n})^n$$
+This is in $G$ for any finite $n$ and since $G$ is closed, the limit must also be contained in $G$. With this, we have proven that $\mathfrak{g}$ is in fact a vector space. It is worth noting that this specifically defines a vector space over $\mathbb{R}$, though it is possible for $\mathfrak{g}$ to be a complex vector space also. 
+
+To complete the proof that $\mathfrak{g}$ is not just a vector space, but a Lie algebra, we now must show that $\mathfrak{g}$ is closed under the Lie bracket $[x,y]=xy-yx$. To do so, first observe that for any $g\in G$ and $x\in\mathfrak{g}$, we have
+$$ gxg^{-1}\in\mathfrak{g} $$
+This is true since $G$ is defined as a matrix Lie group which means $g\in \t{GL}(n;\mathbb{C})$, and for any invertible matrix $g$, the exponential map satisfies $ e^{tgxg^{-1}}=ge^{tx}g^{-1} $. That this is true is seen by noting $(gxg^{-1})^n=gx^ng^{-1}$ so the equality is satisfied term by term in the power series expansion. So now to show that the commutators are contained in $\mathfrak{g}$, consider the derivative
+$$ \frac{d}{dt}(e^{tx}ye^{-tx})\big|_{t=0} = \lim_{h\to 0} \frac{e^{hx}ye^{-hx} - y}{h} = xy - yx $$
+For any $h$, this is in $\mathfrak{g}$ and so the limit must also give an element of $\mathfrak{g}$. Therefore, we have proven that $\mathfrak{g}$ is in fact a Lie algebra.
+
+Now before diving into some examples, let's consider how some general properties at the Lie group level translate into properties of the Lie algebra. Many Lie groups are defined so their elements all have determinant 1. In terms of the Lie algebra then, we must have $\t{det}(e^{tx})= e^{t\,\t{tr}(x)}=1$. For this to be true for all $t$, the Lie algebra must satisfy $\t{tr}(x)=0$ --- \emph{the unit determinant Lie group condition translates into a trace zero Lie algebra condition}. 
+
+Next consider a Lie group which has unitary elements: $g^\dagger = g^{-1}$. In terms of the exponential map, this becomes $e^{tx^\dagger}=e^{-tx}$. For this to be true, we must have $x^\dagger = -x$ --- \emph{the unitary Lie group condition translates into a skew-Hermitian Lie algebra condition}. Similarly for orthogonal groups, we find that real orthogonality at the Lie group level translates into skew-symmetry at the Lie algebra level ($x^\t{T}=-x$). With this, we can write down the Lie algebras corresponding to all the matrix Lie groups introduces at the beginning of these notes:
+\begin{align*}
+	\mathfrak{gl}(n;\mathbb{C}) &= \mathbb{C}^{n\times n} \\
+	\mathfrak{sl}(n;\mathbb{C}) &= \{  x\in\mathbb{C}^{n\times n} \:|\: \t{tr}(x)=0\} \\
+	\mathfrak{o}(n;\mathbb{R}) &= \{  x\in\mathbb{R}^{n\times n}\:|\: x^\t{T}=-x\} \\
+	\mathfrak{so}(n;\mathbb{R}) &= \{  x\in\mathbb{R}^{n\times n}\:|\: x^\t{T}=-x \:\t{ and }\:\t{tr}(x)=0\} \\
+	\mathfrak{u}(n;\mathbb{C}) &= \{x\in\mathbb{C}^{n\times n} \:|\: x^\dagger = -x\} \\
+	\mathfrak{su}(n;\mathbb{C}) &= \{  x\in\mathbb{C}^{n\times n}\:|\: x^\dagger = -x \:\t{ and }\:\t{tr}(x)=0\}
+\end{align*}
+In all of these, the Lie bracket is the commutator $[x,y]=xy-yx$.
+
+These Lie algebras should all be understood as \textbf{real} Lie algebras --- they consist only of real linear combinations of their generators. To emphasize, it is worth being more explicit with one example. Consider $\mathfrak{su}(2;\mathbb{C})$, the set of all complex $2\times 2$ matrices that are skew-Hermitian and traceless. In general such a matrix can be written
+$$ \begin{pmatrix}
+	ia & b + ic \\
+	-b+ic & -ia
+\end{pmatrix} \in\mathfrak{su}(2;\mathbb{C}) $$
+for real numbers $a,b,c\in\mathbb{R}$. This proves that $\mathfrak{su}(2;\mathbb{C})$ is a real and 3-dimensional algebra. 
+
+
+.
+
+
+\newpage
+\header{Representation Theory}
+The main goal in these notes is to develop the representation theory of Lie groups. But the easiest way to do that is by developing the representation theory of Lie algebras and then using the Lie algebra-Lie group correspondence to construct a representation of the full group. Often this works by starting with a real Lie algebra $\mathfrak{g}$ of a matrix Lie group $G$, finding representations of its complexification $\mathfrak{g}_\mathbb{C}$, and then using the exponential map to translate those algebra representations into group representations.
+\definition{Lie Group Representation}{A finite-dimensional representation of a matrix Lie group $G$ is a Lie group homomorphism $\Pi:G\to\t{GL}(V)$ where $V$ is a vector space with finite dimension.
+\\
+\\\textbf{Lie Algebra Representation: }A finite-dimensional representation of a Lie algebra $\mathfrak{g}$ is a Lie algebra homomorphism $\pi:\mathfrak{g}\to\mathfrak{gl}(V)$ where $V$ is a vector space with finite dimension.}
+Additionally, a \emph{real} representation is one where $V$ is a real vector space. So representations should be thought of as \emph{linear actions} that respect the algebraic structure of a group or algebra. 
+
+Representations can often be broken into smaller parts. Consider for example, a group $G$ with representation $\Pi$ on vector space $V$. If there is a subspace $W\subset V$ such that for every $w\in W$ and $g\in G$ we find $\Pi(g)w\in W$ then we call $W$ an \textbf{invariant subspace}. There is always one trivial invariant subspace consisting of just the zero vector $W=\{0\}$. Tnese invariant spaces harbor \textbf{subrepresentations} since by just restricting $\Pi$ to act on $W$, that would also define a valid representation of the group. When $\Pi$ does not have any nontrivial invariant subspaces, it is called an \textbf{irreducible representation}. This applies just as well to Lie algebra representations.
+\definition{Relationship Between $\*\Pi$ and $\*\pi$}{Let $G$ be a matrix Lie group with Lie algebra $\mathfrak{g}$. For any finite-dimensional representation $\Pi:G\to\t{GL}(V)$, there is a unique Lie algebra representation $\pi:\mathfrak{g}\to\mathfrak{gl}(V)$ such that
+$$ \Pi(e^{x})=e^{\pi(x)} $$
+for all $x\in\mathfrak{g}$. The representation $\pi$ is computed as
+$$ \pi(x) = \frac{d}{dt}\Pi(e^{tx})\big|_{t=0} $$
+This satifies $\pi(gxg^{-1})=\Pi(g)\pi(x)\Pi(g)^{-1}$ for all $x\in\mathfrak{g}$ and $g\in G$.}
+These representations are related particularly closely when $G$ is a connected group since every $g\in G$ can be written as $g=e^{x_1}e^{x_2}\dots e^{x_n}$ for some $x_1,\dots,x_n\in\mathfrak{g}$. In fact it turns out that a representation $\Pi$ of a connected Lie group is irreducible \emph{if and only if} the associated Lie algebra representation $\pi$ is irreducible.
+
+So now, we turn to developing the machinery necessary for constructing representations of arbitrary Lie algebras (and therefore simply connected Lie groups). To do this, it helps to take a shift in perspective. Lie algebras are just vector spaces with this additional bracket thing that behaves like multiplication --- so what if we can treat the brackets as familiar matrix multiplications? Well it turns out we can do exactly that. For any element $x\in\mathfrak{g}$, we can define a linear map $\mathfrak{g}\to\mathfrak{g}$ by the bracket with $x$. This is called the \textbf{adjoint representation} and we define it here:
+
+\definition{Adjoint Representation}{For a Lie algebra $\mathfrak{g}$, every element $x\in\mathfrak{g}$ has a corresponding linear map (called its adjoint map) $\t{ad}_x:\mathfrak{g}\to\mathfrak{g}$ defined by:
+$$ \t{ad}_x(y) = [x,y] $$}
+The adjoint maps from all the elements in a Lie algebra actually do form a proper representation of $\mathfrak{g}$ on $\mathfrak{g}$ itself. Observe that $\t{ad}$ is a Lie algebra homomorphism due to the Jacobi identity:
+\begin{align*} 
+	[\t{ad}_x, \t{ad}_y](z) &= \t{ad}_{[x,y]}(z) \\
+ [x, [y, z]] - [y, [x, z]] &= [[x,y], z] \\
+ [x, [y, z]] + [y, [z, x]] + [z, [x,y]] &= 0
+\end{align*}
+Through the adjoint representation, we have a neat way of studying Lie algebras through these corresponding linear transformations. Consider an element $x\in\mathfrak{g}$ for which we want the adjoint representation. For generators $e_1\dots e_d$, bilinearity immediately yields 
+$$\t{ad}_x(y) = \sum_{i,j=1}^d x^i[e_i,e_j]y^j = \sum_{k=1}^d \bigg(\sum_{i,j=1}^d x^i c_{ij}^k y^j\bigg)e_k$$
+Or more succinctly, the matrix representation is $[\t{ad}_x]_j^{\:k} = \sum_i x^ic^k_{ij} $. So then the structure constants of the algebra fully determine the matrix entries of the adjoint representation.
+
+With the adjoint representation defined, we can now define the useful \textbf{Killing form}.
+
+\definition{Killing Form}{The Killing form is a symmetric bilinear map $B:\mathfrak{g}\times\mathfrak{g}\to \mathbb{K}$ defined so that for any $x,y\in\mathfrak{g}$, we have
+$$ B(x,y) \equiv \t{tr}(\t{ad}_x \circ \t{ad}_y) $$}
+With the basis-dependent matrix representations this can be computed as a linear transformation on the tensor product space $B = B_{ij} e^i \otimes e^j$. Here we have
+$$ B_{ij} = \t{tr}(\t{ad}_i\circ \t{ad}_j) = \sum_{m,n=1}^d c_{im}^{\:\:n} c_{jn}^{\:\,m} $$
+
+
+
+
+
+And what better way to simplify a problem on vector spaces than to diagonalize! This perhaps can motivate defining \textbf{commuting subalgebras}. A subalgebra is just like it sounds --- it is a subset of a Lie algebra which itself forms another Lie algebra. The \emph{commuting} property on the other hand means that $[x,y]=0$ of all $x,y$ in the subalgebra. We will be particularly interested in a \emph{maximal} commuting subalgebra. That is, we want to find a space of commuting elements that is as big as possible. This defines the Cartan subalgebra
+
+\definition{Cartan Subalgebra}{In a Lie algebra $\mathfrak{g}$, a Cartan subalgebra $\mathfrak{h}\subseteq \mathfrak{g}$ is a maximal commutative subalgebra such that for every $x\in\mathfrak{h}$, $\t{ad}_x$ is diagonalizable. That is,	$[x,y]=0$ }
+Of course, if $\mathfrak{g}$ is commutative, then it is its own Cartan subalgebra. In general however, a Cartan subalgebra must be found so that every element commutes with every other \emph{and} they are all diagonalizable. That is, 
+$$ \t{ad}_x(y) = 	 $$
+	
+
+\newpage
+
+Complexification is important because it has a universal property. Specifically	, all Lie algebra homomorphisms from real Lie algebras to complex Lie algebras factor \emph{uniquely} through complexification.
+\definition{Universal Property (Complexification)}{Let $\mathfrak{g}$ be a real Lie algebra with complexification $\mathfrak{g}_\mathbb{C}$ and let $\mathfrak{h}$ be an arbitrary complex Lie algebra. Every Lie algebra homomorphism $\pi:\mathfrak{g}\to\mathfrak{h}$ extends uniquely to a Lie algebra homomorphism $\pi_\mathbb{C}:\mathfrak{g}_\mathbb{C}\to \mathfrak{h}$ given by
+	$$ \pi_\mathbb{C}(x+iy) = \pi(x) + i\,\pi(y)$$
+for all $x,y\in\mathfrak{g}$.}
+Or more categorically, for any such $\pi$, the homomorphism $\pi_\mathbb{C}$ in the following diagram is unique:
+$$
+\begin{tikzcd}[ampersand replacement=\&]
+	\mathfrak{g}\arrow[r] \arrow[rd, "\pi"] \& \mathfrak{g}_\mathbb{C}\arrow[d, "\pi_\mathbb{C}"] \\
+	\& \mathfrak{h}
+\end{tikzcd}$$
+This has convenient consequences for representation theory where we consider the special case $\mathfrak{h}=\mathfrak{gl}(V)$. When we are trying to construct representations of a real Lie algebra $\mathfrak{g}$, the universal property tells us that the complex representations of $\mathfrak{g}$ are in 1-to-1 correspondence with those of its complexification $\mathfrak{g}_\mathbb{C}$ (up to isomorphism). Typically it is easier to work over the complex numbers, so this theorem will be a workhorse in the representation theory of Lie algebras.
+
+Say we have a Lie algebra $\mathfrak{g}$ and its complexification $\mathfrak{g}_\mathbb{C}$. To construct representations, it will be extremely useful to try to break $\mathfrak{g}_\mathbb{C}$ into its smallest ``parts". As a vector space, it is natural to seek a blockwise decomposition of the space like we do with eigenvector decompositions. To incorporate the bracket structure of the Lie algebra
+
+As an important example, consider the representation theory of $\t{SU}(2)$.\sidenote{\textbf{Representation theory of $\t{SU(2)}$}}Recall that we previously found that the corresponding Lie algebra is defined by the set of all complex $2\times 2$ matrices that are skew-Hermitian and traceless:
+$$ \mathfrak{su}(2) = \{x\in\mathbb{C}^{2\times 2}\:|\: x^\dagger = -x \t{  and  } \t{tr}(x)=0\} $$
+This is a 3-dimensional real algebra and we now seek its representations. 	
+
+
+
+\end{document}

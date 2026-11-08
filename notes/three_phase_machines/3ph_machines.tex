@@ -1,0 +1,182 @@
+\documentclass[onecolumn]{gwclass}
+\usepackage[utf8]{inputenc}
+
+
+
+
+\title{Three Phase Machines: Drive and Control}
+\author{--- George Willingham ---}
+\date{}
+
+
+\begin{document}
+	\maketitle
+	
+	\section{Introduction: Rotating Fields}
+	A 3-phase machine will generally consist of a stator which has three solenoidal windings arranged in a ``Y", or \emph{star}, configuration. They are equally spread in angle so that each is $2\pi/3$ radians from the others. It will be useful to define the unit vectors along the axis of each stator winding and write $\*e_a, \*e_b,$ and $\*e_c$ for phases $a,b,$ and $c$. Aligning the stator's $a$ phase with the $x$ direction, these can be written in the $xy$-basis as
+	\begin{align*}
+		\*e_a &= \*e_x \\
+		\*e_b &= \cos(2\pi/3)\*e_x + \sin(2\pi/3)\*e_y \\
+		\*e_c &= \cos(4\pi/3)\*e_x + \sin(4\pi/3)\*e_y
+	\end{align*}
+	More explicitly, the last two are $ \*e_b = (-\*e_x + \sqrt{3}\*e_y)/2$ and $ \*e_c = -\sqrt{3}(\*e_x + \*e_y)/2 $.
+	Assuming perfect solenoid fields, each winding will generate a constant magnetic field which is oriented along its axis. A perfect solenoid generates an axial field $B=\mu n i$ where $n$ is the windings per unit length and $i$ is the current in the winding. In the middle of the stator, the total field is the sum of the contributions from all three phases so we have
+	$$ \*B \propto i_a\*e_a + i_b\*e_b + i_c\*e_c $$
+	In a 3-phase system, the currents are designed to all be oscillating at drive frequency $\omega^\star$ but to be spread equally in phase so that 
+	\begin{align*}
+		i^\star_a &= \cos(\omega^\star t) \\
+		i^\star_b &= \cos(\omega^\star t - 2\pi/3)\\
+		i^\star_c &= \cos(\omega^\star t - 4\pi/3)
+	\end{align*}
+	Plugging this into the total B-field, a trig identity can be used to find that in the $xy$ basis, the total field rotates perfectly
+	$$ \*B \propto \begin{pmatrix}
+		\cos(\omega^\star t) \\
+		\sin(\omega^\star t)
+	\end{pmatrix} $$
+	This is the essential ideal feature of polyphase machines. The stator windings generate a rotating magnetic field.
+	\section{Torque}
+	Now suppose we introduce a rotor into the middle of the stator which has a magnetic moment $\*m$ given by $\*m=m\*e_\theta$ where $\*e_\theta=\cos(\theta)\*e_x + \sin(\theta)\*e_y$ is the unit vector oriented along the direction $\theta$ relative to the $x$-axis (i.e. relative to the stator $a$ phase). The torque felt by the rotor is then $\*\tau = \*m\times\*B$ which evaluates to 
+	$$ \*\tau = -\tau_\t{max} \sin( \theta - \omega^\star t)\*e_z $$
+	where $\tau_\t{max}\equiv mB$ is the maximum possible torque given field strength and magnetic moment. The time-dependent torque equation contains the the basic physics of a three phase motor. It is convenient and conventional to define the \textbf{torque angle} $\delta$ by
+	$$ \delta\equiv \theta - \omega^\star t $$
+	which is just the angular difference between the rotating field and the rotor moment. If the rotor has moment of inertia $I$, then we can relate the torque to its motion through $I\ddot{\theta}=\tau$, or in terms of the torque angle, this is
+	$$ \ddot{\delta} = - \alpha^2 \sin(\delta) $$
+	where $\alpha=\sqrt{mB/I}$ is a resonant frequency. Indeed, this equation of motion is exactly the same as that of the pendulum. When $\delta$ is small enough, the small angle approximation yields a harmonic oscillator equation $\ddot{\delta}=-\alpha^2\delta$ which of course has stable oscillating solutions with frequency $\alpha$. In this way, the motion of the rotor in the rotating field is stable at steady state. The real challenge is ramping up a motor from rest. The oscillations of $\delta$ indicate oscillations of $\theta$ around the target $\omega^\star t$ --- a phenomenon known as \textbf{hunting}.
+	
+	\section{Induction Machines}
+	In an induction machine, the rotor does not have a permanent magnetic moment. Instead it relies on the stator field to \emph{induce} a moment which then experiences a torque. The induction process only occurs when the stator field has a changing flux through the rotor winding. Faraday's law tells us the induced voltage in the rotor is $v_r=-\frac{d\lambda_r}{dt}$ where $\lambda_r$ is the flux through the rotor. The flux depends on the difference in angle between the rotor and the field, i.e. the torque angle $\delta$. In particular, it is easy to see that we can write $\lambda_r=\lambda_\t{max}\cos(\delta)$. The flux is at a maximum when the field and rotor are parallel. So then Faraday's law yields 
+	$$ v_r = \lambda_\t{max} \dot{\delta}\sin(\delta)  $$
+	Through the impedance of the rotor winding, this will cause a current to flow which in turn leads to a magnetic moment and a torque. In general, this is a nonlinear equation which makes it difficult to derive an explicit expression for the induced moment. However, we can linearize the motion of the rotor and write $\theta=\omega t$ which simplifies the above equation to
+	$$ v_r = \lambda_\t{max}\omega_s \sin(\omega_s t) $$
+	where $\omega_s\equiv \omega - \omega^\star$ is the \textbf{slip frequency}. This can be written in phasor form as $v_r = \t{Re}\{\tilde{v}_r e^{j\omega_s t} \}$ for phasor $\tilde{v}_r=-j\lambda_\t{max}\omega_s$. Then with the complex rotor impedance $Z_r(\omega)=|Z_r(\omega)|e^{j\phi_r(\omega)}$, the complex induced current is determined by Ohm's law $\tilde{v}_r=\tilde{i}_rZ_r$. The resulting real-valued current is
+	$$ i_r = \frac{\lambda_\t{max}\omega_s}{|Z_r(\omega_s)|}\sin(\omega_s t - \phi_r(\omega_s)) $$
+	The resulting magnetic moment is axial with magnitude $m= f_ri_r$ where $f_r$ is a constant related to the number of turns in the rotor winding and its cross-sectional area. The resulting torque is
+	$$ \tau = - f_r\frac{\lambda_\t{max}\omega_s}{\abs{Z_r(\omega_s)}}\sin(\omega_s t - \phi_r(\omega_s))\sin(\omega_s t) $$
+	Now suppose that the rotor has three arms equally spread in angle just like the stator windings. The torque on each of the other arms would be just like the above expression except phase shifted by $\pm 2\pi/3$. Then the total torque on the rotor would be the sum of the torques on all the three. With a trig identity\footnote{$\sum_{k=0}^2\sin(x-k2\pi/3-\phi)\sin(x-k2\pi/3)=\frac{3}{2}\cos(\phi)$}, the total torque comes out to the simpler form
+	$$ \tau_3 = - f_r\frac{3}{2}\frac{\lambda_\t{max}\omega_s}{\abs{Z_r(\omega_s)}}\cos(\phi_r(\omega_s)) $$
+	By including the additional arms, the torque has become time independent, depending only on the slip frequency $\omega_s$. A standard model for the rotor impedance is $Z_r(\omega)=r_r + j\omega \ell_r$ leading to a torque with explicit form
+	$$ \tau_3 = -f_r\frac{3}{2}\frac{\lambda_\t{max}}{\ell_r}\frac{\gamma_r\omega_s}{1 + \gamma_r^2\omega_s^2} $$
+	where $\gamma_r = \ell_r/r_r$ is the time constant for the rotor.
+	
+	
+	\section{Induction Circuit Equations}
+	Now the general circuit equations for a 3 phase induction motor will be derived. We start by defining the 3 phase vectors such as $\*i_r=( i_{ra}\; i_{rb}\;i_{rc})^\t{T}$ for the voltages, currents, and fluxes across/through each rotor and stator winding. Then the circuit equations are
+	\begin{align*}
+		\*0=\*v_r&= r_r\*i_r + \frac{d\*\lambda_r}{dt} \\
+		\*v_s &= r_s\*i_s + \frac{d\*\lambda_s}{dt}
+	\end{align*}
+	The rotor in an induction motor is generally short circuited since it only relies on the magnetic coupling with the rotor --- each rotor winding is conductively isolated. Therefore we have the voltage around the loop $\*v_r=\*0$.
+	
+	The flux through the rotor has contributions from each stator winding but also from each of the other rotor windings which are generating fields of their own due to their induces currents. Therefore we write $\*\lambda_r = L_{rr}\*i_r + L_{rs}\*i_s$ for the self-inductance matrix $L_{rr}$ and mutual inductance matrix $L_{rs}$. The rotor's self-inductance matrix is fixed since the spatial relationship of the rotor arms is fixed. With each rotor arm identical, it is of the form
+	$$ L_{rr} = \begin{pmatrix}
+		l_r & m_r & m_r \\
+		m_r & l_r & m_r \\
+		m_r & m_r & l_r
+	\end{pmatrix} $$
+	where $l_r$ is each winding's self inductance and $m_r$ is the mutual inductance between rotor windings. 
+	
+	The mutual inductance matrix on the other hand is more complicated because the spatial relationship between the rotor and stator is changing in time. Consider that the field due to stator phase $a$ will produce a flux through rotor phase $a$ which is proportional to $\cos(\theta)$. And similarly, the flux through the other rotor arms is $\cos(\theta\pm 2\pi/3)$. In general, we can write the mutual inductance as
+	$$  L_{rs} = m_{rs}\begin{pmatrix}
+		\cos(\theta) & \cos(\theta - 2\pi/3) & \cos(\theta+2\pi/3) \\
+		\cos(\theta + 2\pi/3) & \cos(\theta) & \cos(\theta - 2\pi/3) \\
+		\cos(\theta - 2\pi/3) & \cos(\theta + 2\pi/3) & \cos(\theta)
+	\end{pmatrix} $$
+	where $m_{rs}$ is the mutual inductance between rotor and stator windings when they are parallel.
+	
+	Similar considerations can be made for the stator so that the resulting circuit equations are now
+	\begin{align*}
+		\*0 &= r_r\*i_r + L_{rr}\frac{d\*i_r}{dt} + \frac{d(L_{rs}\*i_s)}{dt} \\
+		\*v_s &= r_s\*i_s + L_{ss}\frac{d\*i_s}{dt} + \frac{d(L_{sr}\*i_r)}{dt}
+	\end{align*}
+	Note that for the complete rotor-stator circuit, the inductance matrices appear as
+	$$ \begin{pmatrix}
+		\*\lambda_r \\
+		\*\lambda_s
+	\end{pmatrix} =\begin{pmatrix}
+	L_{rr} & L_{rs} \\
+	L_{sr} & L_{ss}
+\end{pmatrix}\begin{pmatrix}
+\*i_r \\
+\*i_s
+\end{pmatrix}$$
+Reciprocity demands that the full inductance matrix is symmetric which implies that $L_{sr}=L_{rs}^\t{T}$.
+
+\section{The Clarke Transformation}
+In a three phase machine, the stator windings are typically connected in a star configuration which implies that the currents through each phase must satisfy $i_a+i_b+i_c=0$. When the pahse impedanced are balanced such that $Z_a=Z_b=Z_c$, this also implies a condition on the voltages $ v_a+v_b+v_c=0 $. These conditions can be viewed as geometric constraints. Defining the vector $\*n=(1\;1\;1)^\t{T}$, we have
+$$ \*n\cdot\*i = 0 \qquad\qquad \*n\cdot\*v=0 $$
+This implies that the current and voltage vectors are orthogonal to $\*n$ and are therefore confined to a two dimensional subspace. In this light, it seems natural to change basis and move into the 2D subspace where we can entirely drop one variable. The linear transformation for this is known as the \textbf{Clarke transformation}, or the $\alpha\beta$ transformation, and it has matrix 
+$$ \mathcal{C} = \sqrt{2/3}\begin{pmatrix}
+	1 & -1/2 & -1/2\\
+	0 & \sqrt{3}/2 & -\sqrt{3}/2
+\end{pmatrix} $$
+Applying this change of basis to the circuit equations, the vectors all transform as $\*i\mapsto \mathcal{C}\*i$ and the matrices transform as $L\mapsto\mathcal{C}L\mathcal{C}^\t{T}$. This simplifies the resulting inductance matrices a great deal. The self inductance matrix for the rotor is in fact diagonalized
+$$ \mathcal{C}L_{rr}\mathcal{C}^\t{T} = \ell_r\mathbbm{1} $$
+where we have defined the new inductance constant $\ell_r\equiv l_r-m_r$. This is similarly true for the stator matrix. The mutual inductance transforms to become
+$$ \mathcal{C}L_{rs}\mathcal{C}^\t{T} =m\underbrace{\begin{pmatrix}
+	\cos(\theta) & \sin(\theta) \\
+	-\sin(\theta) & \cos(\theta)
+\end{pmatrix}}_{R_\theta} $$
+where $m\equiv 3m_{rs}/2$ is a new mutual inductance constant and we can recognize the matrix $R_\theta$ as simply a rotation matrix. So then, in the Clarke basis the circuit equations become
+\begin{align*}
+	\*0 &= r_r\*i_r + \ell_r\frac{d\*i_r}{dt} + m\frac{d(R_\theta\*i_s)}{dt} \\
+	\*v_s &= r_s\*i_s + \ell_s\frac{d\*i_s}{dt} + m\frac{d(R_\theta^\t{T}\*i_r)}{dt}
+\end{align*}
+The presence of the matrix $R_\theta$ here has important physical meaning. Observe that in the rotor equation, the stator current only appears through $R_\theta\*i_s$ while in the stator equation, the rotor current only appears through $R_\theta^\t{T}\*i_r$. The rotation matrix is precisely the transformation which takes a stationary observer and sends it rotating alongside the rotor as $\theta$ and $R_\theta^\t{T}$ is its inverse. So in fact, we can understand each equation as transforming the other current to their rotating frame of reference. In this way, these two equations are written in two distinct reference frame and we would do well to put them both into the same frame. 
+
+In general, we can move to a frame rotating arbitrarily as $\eta=\eta(t)$ by transforming the stator equation with $R_\eta$ and transforming the rotor equation with $R_{\eta-\theta}$ (the rotor equation is already spinning as $\theta$). Applying these transformations, the circuit equations are
+\begin{align*}
+	\*0 &= r_rR_{\eta-\theta}\*i_r + \ell_rR_{\eta-\theta}\frac{d\*i_r}{dt} + mR_{\eta-\theta}\frac{d(R_\theta\*i_s)}{dt} \\
+	R_\eta\*v_s &= r_sR_\eta\*i_s + \ell_sR_\eta\frac{d\*i_s}{dt} + mR_\eta\frac{d(R_\theta^\t{T}\*i_r)}{dt}
+\end{align*}
+To complete the transformation, we need the rotor variables to only appear in in their transformed form $R_{\eta-\theta}\*i_r$ and all the stator variables to appear as $R_\eta\*i_s$. To do so, we make use of the following identity\footnote{Derived by applying the product rule and inserting $\mathbbm{1}$ as $R_a\frac{d(R_b\*i)}{dt} = \frac{d(R_aR_b\*i)}{dt} - \frac{dR_a}{dt}\underbrace{R_a^\t{T}R_a}_{\mathbbm{1}}R_b\*i$. Then it can be shown that $\frac{dR_a}{dt}R_a^\t{T} = - \dot{a}R_{\frac{\pi}{2}}^\t{T}$ }
+$$ R_a \frac{d(R_b\*i)}{dt} = \frac{d(R_{a+b}\*i)}{dt} + \dot{a}R_{\frac{\pi}{2}}^\t{T}R_{a+b}\*i $$
+where $R_{\frac{\pi}{2}}^\t{T}=\tiny\begin{pmatrix}
+	0 & -1\\ 1 & 0
+\end{pmatrix}$. Applying this, the circuit equations take their fully transformed forms in terms of $\*i_r^\eta\equiv R_{\eta-\theta}\*i_r$ and $\*i_s^\eta\equiv R_\eta\*i_s$:
+\begin{align*}
+	\*0 &= r_r\*i_r^\eta + \ell_r\frac{d\*i_r^\eta}{dt} + m\frac{d\*i_s^\eta}{dt} + (\dot{\eta}-\dot{\theta})R_{\frac{\pi}{2}}^\t{T}\left[\ell_r\*i_r^\eta + m\*i_s^\eta\right]\\
+	\*v_s^\eta &= r_s\*i_s^\eta + \ell_s\frac{d\*i_s^\eta}{dt} +m \frac{d\*i_r^\eta}{dt} + \dot{\eta}R_{\frac{\pi}{2}}^\t{T}\left[ \ell_s\*i_s^\eta + m\*i_r^\eta \right]
+\end{align*}
+This can be written in a more transparent matrix form as
+$$ \begin{pmatrix}
+	0 \\
+	0\\
+	v_{ds}^\eta \\
+	v_{qs}^\eta
+\end{pmatrix} = 
+\begin{pmatrix}
+	r_r + \ell_r p & -(\dot{\eta}-\dot{\theta})\ell_r & mp & -(\dot{\eta} - \dot{\theta})m \\
+	(\dot{\eta}-\dot{\theta})\ell_r & r_r + \ell_r p & (\dot{\eta}-\dot{\theta})m & mp \\
+	mp & -\dot{\eta}m & r_s + \ell_sp & -\dot{\eta}\ell_s  \\
+	\dot{\eta}m & mp & \dot{\eta}\ell_s & r_s + \ell_s p
+\end{pmatrix}\begin{pmatrix}
+i_{dr}^\eta\\
+i_{qr}^\eta\\
+i_{ds}^\eta\\
+i_{qs}^\eta
+\end{pmatrix}$$
+where $p\equiv\frac{d}{dt}$.
+
+One particularly useful reference frame is the \textbf{synchronous frame} where $\eta=\omega^\star t$ so we are rotating along with the stator magnetic field. In this case, the circuit equations become
+$$ \begin{pmatrix}
+	0 \\
+	0\\
+	v_{ds}^\star \\
+	v_{qs}^\star
+\end{pmatrix} = 
+\begin{pmatrix}
+	r_r + \ell_r p & \omega_s\ell_r & mp & \omega_sm \\
+	-\omega_s \ell_r & r_r + \ell_r p & -\omega_s m & mp \\
+  mp & -\omega^\star m & 	r_s + \ell_sp & -\omega^\star\ell_s\\
+	\omega^\star m & mp & \omega^\star\ell_s & r_s + \ell_s p
+\end{pmatrix}\begin{pmatrix}
+	i_{dr}^\star\\
+	i_{qr}^\star\\
+	i_{ds}^\star\\
+	i_{qs}^\star
+\end{pmatrix}$$
+where $\omega_s=\dot{\theta} - \omega^\star$ is the slip frequency.
+
+\section{Field Oriented Control}
+
+\end{document}

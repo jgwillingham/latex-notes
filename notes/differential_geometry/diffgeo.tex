@@ -1,0 +1,292 @@
+\documentclass[onecolumn]{gwclass}
+\usepackage[utf8]{inputenc}
+
+
+\usepackage{tikz-cd}
+
+
+\newcommand{\man}{\mathcal{M}}
+\newcommand{\R}{\mathbb{R}}
+
+\title{\vspace{2in}\Huge\bfseries \color{\stylecolor}Notes on Differential Geometry}
+\author{--- George Willingham ---}
+\date{}
+
+\begin{document}
+	\maketitle
+	
+	\newpage
+	\tableofcontents
+	
+	\newpage
+	
+	\section{Manifolds}
+	\subsection{Homeomorphisms}
+	These notes begin where a standard multivariable calculus course might end. A solid understanding of differential and integral calculus over $\R^m$ is assumed so that we are prepared to turn to the more general setting of \emph{manifolds}. A manifold is simply a topological space which looks like ordinary Euclidean space around each point. The intuition (and much of the terminology) comes from our every day experience on a spherical earth. When looking at a map, we rarely need to take into account the full shape of the planet since at any point, the nearby area is well approximated by a flat map. Inching into more technical language, this means that around every point on the earth, there is a neighborhood which is \textbf{homeomorphic} to an open subset of $\R^2$. A \textbf{homeomorphism} is a bijection between topological spaces $\varphi:\man\to\mathcal{N}$ which is continuous and has a continuous inverse $\varphi^{-1}$. Two spaces are said to be homeomorphic if such a map exists between them --- it is a notion of equivalence (isomorphism) between topological spaces. When I say that each point on the earth has a neighborhood which is homeomorphic to an open subset of $\R^2$, this is really nothing more than the observation that we can impose coordinates $(x,y)$ on our local area and use them effectively in a map. With this intuition, we are ready for the full definition of a manifold:
+	\definition{Manifold}{A manifold is a topological space $\man$ which is locally homeomorphic to Euclidean space. Around every point $p\in\man$, there is a neighborhood $U_p\subseteq\man$ which is homeomorphic to an open set of $\R^m$ for some $m$.} 
+	While nice and general, this definition in terms of unadorned topological spaces can allow for some truly pathological constructions. In order to not get bogged down in topological details, we will work only with \textbf{smooth manifolds} in these notes. That is, manifolds which not only look like $\R^m$ around every point, but are well behaved enough for us to do calculus. To give a precise notion of what this means, we need to be able to construct appropriate maps on our manifolds.
+	
+	\subsection{Charts, Atlases, \& Transition Maps}
+	Suppose we have a manifold $\man$. By definition, every point $p\in\man$ has a neighborhood $U_p$ along with a homeomorphism $\varphi:U_p\to\R^m$. We will call $\varphi$ the \textbf{coordinate function} since it assigns to every point in $U_p$ a set of $m$ coordinate values\footnote{Note that coordinate indices will sometimes appear as superscripts $x^i$ and sometimes as subscripts $x_i$. This is a way of indicating whether an object is covariant or contravariant, a topic which will be discussed in the section on tensors. } $\varphi(p)=(x^1,\dots,x^m)$. The combination $(U_p,\varphi)$ is called a \textbf{chart} on the manifold $\man$ and we will often call $U_p$ a \textbf{coordinate patch}. Since everywhere on a manifold looks locally like $\mathbb{R}^m$, we can define a complete set of charts which cover all of $\man$ and we naturally call the result an \textbf{atlas}. So for some index set $\mathcal{I}$, an atlas is a set of charts $\mathcal{A}=\{ (U_i, \varphi_i)\:|\: i\in\mathcal{I} \}$ such that
+	$$ \man = \bigcup_{i\in\mathcal{I}} U_i $$
+	The terminology is suggestive of the proper intuition. An atlas of the earth requires many maps/charts for different patches of its surface and each of these maps is appropriately treated as a \emph{flat} space. This is precisely what we are doing here.
+	
+	Now with an atlas of $\man$, it is natural to ask how we can translate from one local coordinate patch to another. Consider two coordinate patches $U_i$ and $U_j$ which have nonempty intersection $U_i \cap U_j \neq \emptyset$. While each patch has its own coordinates $\varphi_i$ and $\varphi_j$, they might not agree and so we need a way to transition from one to the other. This is done with a \textbf{transition map} $t_{ij}: U_i\cap U_j \to U_i\cap U_j $ defined by
+	$$ t_{ij} = \varphi_j\circ \varphi_i^{-1} $$
+	Clearly this takes the coordinates in $(U_i, \varphi_i)$ maps them back to $\man$ and then applies the coordinate function $\varphi_j$ for the other patch $U_j$. With this, we are able to fully navigate an arbitrary manifold $\man$ by using our existing knowledge of $\R^m$. 
+	
+	\subsection{Differentiation on Manifolds}
+	Suppose we have a real-valued function $f:\man\to\R$. With a coordinate patch $(U_p,\varphi_i)$, we can now define differentiable functions on a manifold using our existing knowledge of calculus on $\R^m$. The function $f$ is said to be differentiable if $f\circ \varphi_i^{-1}: \R^m\to \R$ is differentiable. This feels natural enough, however there are always alternative coordinate functions $\varphi_j$ that we could use instead and this presents a technical hiccup. Even if the coordinate functions $\varphi_i$ and $\varphi_j$ are differentiable, the transition map $\varphi_j\circ\varphi_i^{-1}$ is not necessarily so. To work cleanly with smooth manifolds, we need to require a \textbf{differentiable atlas} containing only differentiable transition functions.
+	
+	
+	
+	
+	\section{Tangent Spaces}
+	\subsection{Equivalence Classes of Curves}
+	
+	With differentiable functions on manifolds defined, we can begin to work out the theory of differential calculus on manifolds. Consider a curve $c:I\to\mathcal{M}$ which is parameterized by an open set $I\subset\R$ that contains $0$. For every point along the curve $c(t)\in\man$, there is a coordinate patch $(U_{c(t)},\varphi)$ allowing us to express the curve in coordinates as $ \varphi\circ c : I \to \R^m $. Ordinary vector calculus can be applied to the resulting function and so we can take a derivative. The derivative of $c$ at the point $c(t)$ is defined by
+	$$ c'(t) = \frac{d}{dt}(\varphi\circ c) $$
+	Intuitively, if we view $c$ as a trajectory through $\man$, then $c'(t)$ is its velocity at time $t$. 
+	
+	Now suppose we have two curves $c_1,c_2:I\to\man$ which pass through a point $p$ so that $c_1(0)=c_2(0)=p$. If both curves have the same derivative at $p$ (i.e. $c_1'(0)=c_2'(0)$), then they are said to be equivalent curves. Indeed, it is straight forward to show that having the same derivative at a point constitutes an equivalence relation on the set of differentiable curves through $p\in\man$. Further, this set of equivalence classes $[c]$ has a natural linear structure inherited from $\R^m$ and so it forms a vector space. We call this the \textbf{tangent space at $\*p$} and we denote it by $T_p\man$.
+	\definition{Tangent Space}{At a point $p\in\man$, the tangent space $T_p\man$ is the space of equivalence classes of curves $[c]$ defined by the equivalence relation $c_1\sim c_2 \implies c_1'(0)=c_2'(0)$}
+	The equivalence classes indeed do not actually depend on the specific choice of coordinate function so this is fully general. Intuitively, the tangent space at $p$ is the space of all possible velocity vectors at that point.
+	
+	\subsection{Directional Derivatives}
+	
+	Recall from standard calculus, that the directional derivative of a real-valued function $f:\R^m\to\R$ at point $x$ along direction $v$ is defined by
+	$$ D_vf(x) \equiv \lim_{t\to 0}\frac{f(x+vt) - f(x)}{t}$$ 
+	Our goal is to now extend this to real-valued functions on arbitrary manifolds $f:\man\to\R$. The above definition can be viewed as looking at how the function $f$ varies along the curve $c(t)=x+vt$ which passes through $x$ moving in the direction $v$. Knowing how to differentiate curves on $\man$, this point of view can be easily generalized. The directional derivative of $f$ at $p$ along the direction $v$ can be computed by considering a curve $c:I\to\man$ such that $c(0)=p$ and $c'(0)=v$. With this, we can define the \textbf{directional derivative} by
+	$$ D_vf(x) \equiv \frac{d}{dt}(f\circ c)\big|_{t=0} $$ 
+	Indeed, since $f\circ c$ is a function $I\to \R$, ordinary calculus can be applied. It is useful however, to break it down further and look at how this works in local coordinates. With a coordinate function $\varphi$, we can write $f\circ c = (f\circ \varphi^{-1})\circ(\varphi\circ c)$. The first function $\varphi\circ c:I\to\R^m$ provides explicit coordinates for the curve $x^i(t)=(\varphi\circ c)^i(t)$ and the second function $f\circ\varphi^{-1}:\R^m\to \R$ is just a scalar field on $\R^m$ so ordinary calculus can be applied. Through the standard chain rule, we have
+	$$ D_vf(x) = \frac{\partial(f\circ\varphi^{-1})}{\partial x^i}\frac{dx^i}{dt}\bigg|_{t=0} $$
+	Typically however, we suppress the coordinate function $\varphi$ with the understanding that $f$ can be written in local coordinates as needed. Since by definition, the derivative of the curve at $t=0$ is the vector $v$ with components $(v^1,\dots, v^m)$, we may write the compact form
+	$$ D_vf(p) = v^i \partial_i f$$
+	It will be useful to consider $D_v$ on its own as a differential operator which acts on scalar functions to give their directional derivative at $p$ along $v$. This is simply written $D_v = v^i\partial_i$ making it fairly obvious that this operator is fully determined by the vector $v$ (given some choice of local coordinates). So in fact, the operators $D_v$ are 1-to-1 with the tangent space vectors $v\in T_p\man$ and this is an alternative way to define the tangent space at a point: \emph{the space of directional derivative operators at $p$}. In fact they also naturally have a vector space structure since they are linear: $D_{av+bu}=aD_v + bD_u$. Based on this, it will be useful moving forward to adopt the notation where tangent vectors are denoted by
+	$$ v = v^i\partial_i $$
+	where we use the compact, albeit awkward, notation for the tangent space basis vectors $\partial_i$. The directional derivative of $f$ along $v$ is then just written $v(f)=v^i\partial_if$.
+	
+	
+	\subsection{Cotangent Spaces --- What is $df$?}
+	Classically, when geometers and physicists would talk about how a function $f:\man\to\R$ changes, they would talk in terms of \emph{infinitesimals} $df$. While intuitively sensible, there is no rigorous foundation for defining $df$ through some kind of limit as might be expected. However, there is still a way of putting $df$ on solid rigorous ground. Consider that when we talk about how $f$ changes at a point $p$, we must specify \emph{in what direction} we are talking about. In other words, we must specify a vector in the tangent space $T_p\man$ to get out a value in $\R$ telling us how $f$ changes in that direction. With this insight, one may see that $df$ must be viewed as a \textbf{linear functional} on the tangent space, i.e. an element of the dual space $T_p^*\man$. We call $T_p^*\man$, the \textbf{cotangent space} at $p$ and it consists of all linear functionals
+	 $$\omega:T_p\man\to\mathbb{R}$$
+	For a choice of local coordinates where the tangent space has basis $(\partial_1,\dots,\partial_m)$, we can adopt the canonical basis for the cotangent space by picking those $dx^i\in T_p^*\man$ such that $dx^i(\partial_j)=\delta^i_{\;j}$. Then any covector can be written
+	$$ \omega = \omega_i dx^i $$
+	The notation $dx^i$ for the basis covectors is admittedly awkward and is largely a historical artifact. But it serves as a nice reminder how the cotangent space is related to classical differentials. Indeed, with this machinery, the differential $df$ can now be understood as a covector in $T_p^*\man$ which has the special form\footnote{ This is formally identical to the classical ``total differential" of $f$}
+	$$df = \partial_i f dx^i$$
+	Its components are simply the derivatives of $f$ at $p$ along each coordinate direction. In this case, the action of $df$ on a tangent vector $v=v^j\partial_j$ is 
+	$$ df(v) = \partial_i f dx^i(v^j\partial_j) = v^j\partial_i f \;dx^i(\partial_j) = v^i\partial_i f = D_v f$$
+	Evidently then, its action on the tangent space yields precisely the directional derivatives of $f$. It is in this sense that $df$ can be understood as an ``infinitesimal change" in $f$. If we continue to pull the thread here, we end up studying \emph{differential forms}, or k-forms, a topic covered in a later section of these notes.
+	
+	
+	\section{Vector Fields \& Flows}
+	
+	\subsection{Tangent Bundles}
+	
+	While we will often want to focus on a small coordinate patch on a manifold to look at things locally, it will also prove useful to take a more global view of things. Every point on a manifold has an associated tangent space which we have defined locally. We can \emph{bundle} all the tangent spaces together to form what is known as the \textbf{tangent bundle of a manifold}. 
+	\definition{Tangent Bundle}{On a manifold $\man$, the tangent bundle $T\man$ is defined as the set of all tangent spaces on $\man$:
+		$$ T\man \equiv \bigcup_{p\in\man} T_p\man $$}
+	This is a special example of a more general kind of global object called a vector bundle\footnote{Vector bundles are in turn a special example of a fiber bundle, a more advanced topic covered in a later section of these notes}. Vector bundles will be discussed more broadly later on. We can similarly define a \textbf{cotangent bundle} as the set of all cotangent spaces. We denote this with a star $T^*\man$.
+	
+	\subsection{Vector Fields}
+	
+	Vector fields are familiar territory from standard calculus over $\R^m$. Now in the setting of general manifolds, we must generalize to account for more general spaces. With the concept of a tangent space, we can define a vector field as a map which assigns to each point $x\in\man$ an element of the tangent space over that point. 
+	\definition{Vector Field}{A vector field $F$ on a manifold $\man$ is a map $ F:\man \to T\man $ such that 
+		$$ F(x) \in T_x\man $$}
+	On smooth manifolds, we can define the set of all smooth vector fields 
+	$$ \mathfrak{X}(\man) \equiv \{ \t{all smooth vector fields on }\man \} $$
+	In many fields, vector fields will also have a time dependence making them a bit more interesting. 
+	
+	\subsection{Flow of a Vector Field}
+	
+	Just as tangent vectors are related to derivatives of curves on the underlying manifold, vector fields are related to \textbf{flows}.  Consider a time dependent vector field $F:\R\times\man\to T\man$. If $I\subseteq\R$ is an interval of time containing $0$, then a flow for $F$ is a map $\phi:I\times\man\to\man$ which satisfies the following:
+	\begin{align*}
+		\phi(0,x) &= x \qquad\qquad\quad\:\:\qquad\forall x\in\man \\
+		\frac{d}{dt}\bigg|_{t=t^*}\phi(t,x) &= F(t^*, \phi(t^*,x))\qquad \forall x\in\man ,\: t^*\in I
+	\end{align*}
+	In words, a flow is a time dependent function on $\man$ such that the velocity (time derivative) of the flow at any point is the vector field $F$.
+	
+	
+	
+	\newpage
+	\section{Tensors}
+	
+	\subsection{Covariance \& Contravariance}
+	
+	Throughout these notes, there is much talk about coordinates and coordinate patches, but it must be emphasized that ultimately, coordinates \emph{should not matter}. That is, our understanding of geometry must be entirely indifferent to how we choose to describe that geometry, i.e. what coordinate system we choose. This is a fundamental principle and is at the heart of why geometry finds so much use in physics, even in more abstract settings. In physics, where our aim is to understand nature, it should go without saying that our theories and predictions must be independent of how we set up our coordinate system. Nature \emph{does not care} and neither do the geometric objects that we study here. 
+	
+	With this philosophy in mind, let us look closer at how vectors transform. Consider a vector space $V\cong\mathbb{R}^m$ with basis $(\*e_1,\dots,\*e_m)$. Any $\*v\in V$ can be written as the sum $\*v=v^i\*e_i$ where $v^i$ are the components, or \emph{coordinates}, of $\*v$ in this basis. Since the vector $\*v$ is a \textbf{geometric object}, it is exactly the sort of thing which should be independent of how we choose to describe it. So suppose we want to switch to a different basis set $(\tilde{\*e}_1,\dots,\tilde{\*e}_m)$ which is related to the original basis through $\tilde{\*e}_i = A_{ij}\*e_j$. For $\*v$ to be independent of basis, we must have $v^i\*e_i = \tilde{v}^i\tilde{\*e}_i$. By inserting an identity $\mathbbm{1}=A^{-1}A$ into this, we can relate coordinates in either basis:
+	$$ \*v=v^i(A_{ij}^{-1}A_{jk})\*e_k = \underbrace{(v^i A_{ij}^{-1})}_{\t{contravariant}}\underbrace{(A_{jk}\*e_k)}_{\t{covariant}} = \tilde{v}^i \tilde{\*e}_i = \*v$$
+	The coordinates in the new basis are $\tilde{v}^i = v^iA^{-1}_{ij}$. Notice that $\*v$ remains independent of basis due to the fact that $A$ acts one way on the basis and another way on the components. We say $A$ acts on the basis as a \textbf{covariant transformation} and acts on the components as a \textbf{contravariant transformation} (through the inverse).
+	
+	To bring this discussion into the context of differential geometry, consider a chart on a manifold $U\cong\R^m$ with local coordinates $(x^1,\dots,x^m)$. A new coordinate system looks like $(\tilde{x}^1,\dots,\tilde{x}^m)$ where each new value is a function of the original coordinates $\tilde{x}^i=\tilde{x}^i(x^1,\dots, x^m)$. Under such a transformation, derivative operators (and therefore tangent space basis vectors) transform via the chain rule:
+	$$ \tilde{\partial}_i = \frac{\partial x^j}{\partial \tilde{x}^i} \partial_j $$
+	This can be recognized as the inverse of the \textbf{Jacobian} of the transformation $J^i_{\;j}=\frac{\partial \tilde{x}^i}{\partial x^j}$. Since the tangent basis vectors transform via $J^{-1}$, we say this is a covariant transformation, and the components of tangent vectors must transform contravariantly via $J$.
+	\definition{Covariance \& Contravariance}{Consider a coordinate patch on a manifold $U\subset\man$ with local coordinates $(x^1,\dots,x^m)$. Under a change to a new coordinate system $(\tilde{x}^1,\dots,\tilde{x}^m)$, a covariant transformation looks like
+		$$ \tilde{\partial}_i = \frac{\partial x^j}{\partial\tilde{x}^i} \partial_j $$
+		A contravariant transformation looks like
+		$$ \tilde{v}^i = \frac{\partial \tilde{x}^i}{\partial x^j} v^j $$}
+	
+	
+	\subsection{The Tensor Product $\*\otimes$}
+	
+	Suppose we have two vector spaces $U$ and $V$ which we would like to combine into a single vector space. What is the most general way of doing this? We want to find a new vector space constructed out of $U\times V$ which preserves as much structure as possible for each space $U$ and $V$. One way to approach this is to consider arbitrary bilinear maps $B$ from $U\times V$ to some other vector space $W$ and insist that they are fully equivalent to a \emph{linear} map on our new combined space. We will define the \textbf{tensor product space} $U\otimes V$ through the following property: every bilinear map $B:U\times V\to W$ factors uniquely through $(\*u,\*v)\stackrel{\otimes}{\mapsto}\*u\otimes\*v$ as a linear map. The tensor product map $\otimes$ is also assumed bilinear. We draw the diagram
+	$$
+	\begin{tikzcd}[ampersand replacement=\&]
+		U\times V\arrow[r, "\otimes"] \arrow[rd, "B"] \& U\otimes V\arrow[d, "L"] \\
+		\& W
+	\end{tikzcd}$$
+	understanding that for any $B$, the linear map $L$ is unique. This is the \textbf{universal property} of the tensor product. It is called ``universal" because one can prove that any two spaces which satisfy this property must be isomorphic. So no matter how we construct $U\otimes V$, we always end up with the same space up to isomorphism. We will call the elements of a tensor product space \textbf{tensors}.
+	
+	With this definition, there is an easy way to construct the tensor product space explicitly. Supposing we have basis $(\*\alpha_1,\dots,\*\alpha_m)$ for $U$ and basis $(\*\beta_1,\dots,\*\beta_n)$ for $V$, then bilinearity allows us to decompose the action of $B$ as
+	$$ B(\*u,\*v)=B\left( u^i\*\alpha_i,  v^j\*\beta_j\right) =  u^i v^j B(\*\alpha_i, \*\beta_j) $$
+	The idea is to now recast this as a linear transformation $L$ of the formal product $\*u\otimes\*v$. Let us construct $U\otimes V$ as the vector space with basis formed by all the pairs $\*\alpha_i\otimes\*\beta_j$ of which there are $m n$. Therefore the dimension of the tensor product space is 
+	$$\dim(U\otimes V) = \dim(U)\times \dim(V)$$ 
+	and every vector $\*y\in U\otimes V$ has the form $ \*y = y^{ij}\;\*\alpha_i\otimes\*\beta_j $ for some components $y^{ij}$. In the special case where $\*y$ factors as $\*y=\*u\otimes\*v$, bilinearity of the tensor product gives
+	$$ (\*u\otimes\*v)^{ij} = u^iv^j $$
+	These are simply outer products revealing that the tensor product is a sort of generalization of the outer product. On these vectors, we can define the linear transformation $L$ so that it matches the bilinear action on the basis vectors by writing the matrix representation $L^k_{\;ij} \equiv B^k(\*\alpha_i,\*\beta_j)$. Since $L$ is fully determined by how $B$ acts on basis vectors and $B$ is also fully determined this way, it is straight forward to see that $L$ is unique and therefore we have satisfied the universal property. We now can write
+	$$ B^k(\*u,\*v) = L^k(\*u\otimes\*v) =   L^k_{\;ij} u^iv^j $$
+	By viewing the index $ij$ as a single index rather than two separate indices, this naturally leads to the construction of the \textbf{Kronecker product}, a concrete realization of the tensor product space. The Kronecker product of two vectors is
+	$$ \*u\otimes\*v = \begin{pmatrix}
+		u^1\*v \\
+		\vdots \\
+		u^m\*v
+	\end{pmatrix} $$
+	This is just one way to \emph{vectorize} the tensor product space to make it appear in the standard column vector form. 
+	
+	\subsection{Linear Maps as Tensors}
+	It is illustrative to consider the special example of the tensor product of a vector space $V$ with its dual $V^*$. The resulting space $V\otimes V^*$ is actually isomorphic to $\t{Hom}(V,V)$, the vector space of linear maps $V\to V$. This can easily be seen by examining the tensor basis formed from standard basis vectors $\*e_i\otimes\*e^j$. Viewed as outer products, each basis vector corresponds to a square matrix $\delta^i_{\;j}$ which is zero everywhere except at element $ij$. Obviously linear combinations of these matrices can form any matrix $L$ and therefore any linear transformation $V\to V$. Thus we may write
+	$$ V\otimes V^*  \cong \t{Hom}(V,V)$$
+	This can of course be extended to linear maps between dissimilar vector spaces where we have the more general isomorphism $V\otimes U^*\cong \t{Hom}(U,V)$. The sketchy proof above would really be just as valid for $V\otimes V$ so one may wonder why we use the dual space $V^*$ at all. The reason is that the dual naturally already acts on $V$ so the isomorphism is more ``natural" this way. Indeed, proving the isomorphism in a basis-independent way remains easy when using the dual space.
+	
+	\subsection{The Direct Sum $\*\oplus$}
+	
+	When it comes to combining vector spaces, there is a canonical alternative to the tensor product which is simpler, but less general. Starting again with the cartesian product of vector spaces $U\times V$, we can make a single vector space out of this by extending the basic operations of vector addition and scalar multiplication to be performed \emph{elementwise} on pairs $(\*u,\*v)$. We define the \textbf{direct sum} $U\oplus V$ as all the pairs $\*u\oplus\*v$ along with the elementwise operations:
+	\begin{align*}
+		(\*u_1\oplus\*v_1) + (\*u_2\oplus\*v_2) &= (\*u_1+\*u_2)\oplus( \*v_1+\*v_2)\\
+		a(\*u\oplus\*v) &= a\*u \oplus a\*v
+	\end{align*}
+	This can be understood as nothing more than the concatenation of one vector space by another. We can view elements of the direct sum as
+	$$ \*u\oplus\*v = \begin{pmatrix}
+		\*u \\
+		\*v
+	\end{pmatrix} $$
+	Indeed, it is not hard to see that with bases $(\*\alpha_1,\dots,\*\alpha_m)$ for $U$ and $(\*\beta_1,\dots,\*\beta_n)$ for $V$, the direct sum admits the basis consisting of vectors $\*\alpha_i\oplus\*0$ as well as $\*0\oplus\*\beta_j$ making it clear the dimension of the resulting space is $ \dim(U\oplus V) = \dim(U) + \dim(V) $.
+	
+	\subsection{Tensor Algebras}
+	
+	With the tensor product defined, we are equipped with a way to combine vector spaces in a universal way.
+	
+	\definition{Tensor}{For vector space $V$, a rank $(r,s)$ tensor is an element of the product space
+		$$ T^r_s(V)\equiv\underbrace{V\otimes \dots \otimes V}_{\t{$r$ times}}\otimes \underbrace{V^*\otimes \dots \otimes V^*}_{s \t{ times}} $$}
+	As defined, tensors can be classified by their \textbf{rank} $(r,s)$. The first entry $r$ is called the \emph{contravariant rank} of the tensor and the second entry $s$ is called the \emph{covariant rank}. A simple vector in $V$ is a tensor of rank $(1,0)$ while an element of the dual space $V^*$ has rank $(0,1)$. 
+	
+	There is an alternative definition of tensors that is often found in the literature and is worth mentioning. A rank $(r,s)$ tensor is sometimes defined as a multilinear map
+	$$\underbrace{V^*\times \dots\times V^*}_{r \t{ times }} \times \underbrace{V\times \dots \times V}_{s \t{ times}} \to \R$$
+	This is entirely equivalent to the given definition in terms of a tensor product space. The isomorphism between these definitions can be seen by canonically identifying $V$ with its double dual $V^{**}$ consisting of maps $V^*\to\R$. From this point of view, every element in the tensor product space consists of $r$ maps $V^*\to \R$ and $s$ maps $V\to \R$ all of which are linear. It is not a stretch from here to see that this is equivalent to the multilinear map as defined above.
+	
+	Often we will be interested in tensors that are \emph{purely covariant} ($r=0$) or \emph{purely contravariant} ($s=0$). In this case, we just drop the other index in the $T_s^r(V)$ notation. So the space of purely contravariant tensors is denoted $T^r(V)\equiv T^r_0(V)$. From here, we can combine tensors of all ranks into one \textbf{tensor algebra}, denoted by simply $T(V)$. This is done by taking the direct sum of every product space:
+	\definition{Tensor Algebra}{The tensor algebra over a vector space $V$ includes purely contravariant tensors of any rank:
+	$$ T(V) \equiv \bigoplus_{r=0}^\infty T^r(V) $$
+	The space $T^0(V)$ is conventionally identified as the underlying field $\R$.}
+	The space $T(V)$ is truly an \textbf{algebra} in the sense of being a vector space endowed with a vector multiplication operation. Here, that multiplication is simply the tensor product $\otimes$ where we can observe the following \textbf{graded property}
+	$$ T^r(V)\otimes T^k(V) \cong T^{r+k}(V) $$
+	
+	
+	
+	\subsection{Tensor Fields}
+	Bringing our focus back to differential geometry, over a manifold $\man$ the natural vector space that we are working with is the tangent space $T_p\man$ over a point $p$. So now then, we can extend from vector fields to more general \textbf{tensor fields} where we assign to every $p\in \man$ a tensor. 
+	\definition{Tensor Field}{On a manifold $\man$, a tensor field of rank $(r,s)$ is a map $ T:\man \to T^r_s( T\man )  $ such that $T(p)\in T^r_s(T_p\man)$ for every point $p\in\man$. Locally, a tensor field is of the form
+	$$ T(p) = T^{i_1\dots i_r}_{j_1\dots j_s}(p) \partial_{i_1}\otimes \dots \otimes \partial_{i_r} \otimes dx^{j_1}\otimes \dots \otimes dx^{j_s} $$}
+	
+	\newpage
+
+	
+	
+	\section{Differential Forms}
+	
+	\subsection{Exterior Algebra}
+	
+	With tensors understood, we can now introduce a special class of tensors which will prove especially useful. These are the \textbf{antisymmetric tensors}. For now, to keep the discussion general, we will work outside of the context of differential geometry and focus on an arbitrary vector space $V$. Antisymmetric tensors in the space $T^k(V)\equiv V^{\otimes k}$ are of the form $T=T^{i_1\dots i_k}\*e_{i_1}\otimes\dots\otimes \*e_{i_k}$ where the coefficients satisfy
+	$$ T^{\dots i \dots j\dots} = - T^{\dots j\dots i\dots} $$
+	Under any exchange of indices, the tensor picks up a minus sign. At first glace, it is non-obvious why we might be interested in antisymmetric tensors, but it turns out they are deeply rooted in geometry. The sign of such a tensor is related to the \textbf{orientation} of a geometric object. When we exchange two indices, it amounts to flipping that orientation thus picking up a factor of $-1$. As motivation, consider for example the area computed through the cross product in $\R^3$: $\*v_1\times\*v_2$. This has a direction (orientation) but also tells us the area spanned by $\*v_1,\*v_2$. In a sense, the \emph{exterior algebra} developed in this section is a generalization of the cross product which is algebraically nicer and works in any dimension.
+ 	
+	The space of all antisymmetric tensors can be formally defined through an antisymmetrization process. Any arbitrary tensor in $T^k(V)$ can be \emph{antisymmetrized} with a map $\t{Alt}:T^k(V)\to T^k(V)$ defined by\footnote{A simple example is illuminating: $\t{Alt}(u\otimes w)= \frac{1}{2}\left( u\otimes w - w\otimes u \right)$. Observe that $\t{Alt}(u\otimes u)=0$}
+	$$ \t{Alt}(\*v_1\otimes \dots \otimes \*v_k) \equiv \frac{1}{k!}\sum_{\sigma\in S_k}\t{sgn}(\sigma)\; \*v_{\sigma(1)}\otimes\dots\otimes \*v_{\sigma(k)} $$
+	where $S_k$ is the symmetric group and $\t{sgn}(\sigma)=\pm 1$ is the sign of the permutation $\sigma$. Since $V^{\otimes k}$ is spanned by basis vectors of the form $\*e_{i_1}\otimes \dots\otimes \*e_{i_k}$, the space containing all antisymmetric tensors can be obtained through the linear action of $\t{Alt}$ on $T^k(V)$. This space is called the \textbf{$k^\t{th}$ exterior power} of $V$ and is denoted and defined through
+	$$ \textstyle{\bigwedge}^k(V) \equiv \t{Alt}(T^k(V)) $$
+	Since $\wedge^k(V)$ is spanned by the antisymmetrized basis vectors of the tensor space $T^k(V)$, the dimension of the space is determined by the number of ways the basis vectors of $V$ can be ordered. If $V$ has dimension $m$, then 
+	$$ \dim \;\textstyle{\bigwedge}^k(V) = \displaystyle{m\choose k} $$
+	Just as we defined the tensor algebra, it will be useful to combine the exterior powers for all $k$. The resulting space $\bigwedge(V)$ contains all antisymmetric tensors over $V$ and is known as the \textbf{\emph{exterior algebra}} or \textbf{\emph{Grassman algebra}}:
+	$$ \textstyle{\bigwedge} = \textstyle{\bigwedge}^0 \oplus \textstyle{\bigwedge}^1 \oplus\dots \oplus\textstyle{\bigwedge}^k \oplus \dots $$
+	The exterior algebra inherits several features from the parent space. First and foremost, it has a natural product (inherited from the tensor product) which makes it into an associative algebra. We call this the \textbf{\emph{exterior product}}, or \textbf{\emph{wedge product}}, $\wedge$ and it is defined by
+	$$ u\wedge w \equiv \t{Alt}(u\otimes w) $$
+	Sometimes an additional constant is included out front, but it is not necessary. It only makes a few results come out nicer. Key to this definition is the anticommutativity: $u\wedge w = - w\wedge u$. Another important property is the \textbf{\emph{graded structure}} of the exterior algebra. In other words, in the direct sum decomposition, we have $\bigwedge^{k}\wedge \bigwedge^n \cong \bigwedge^{k+n}$. This comes directly from the underlying tensor algebra for which $T^k\otimes T^n \cong T^{k+n}$.
+	
+	\subsection{Forms}
+	
+	Now we return to the perspective of differential geometry. Consider the $k^{th}$ exterior power of a cotangent space: $\bigwedge^kT^*_x\mathcal{M}$. This tensor space has elements which look like $\omega_{i_1\dots i_k}dx^{i_1}\wedge\dots\wedge dx^{i_k}$. These are each only defined over a single point, but we can extend this to cover the entire manifold $\mathcal{M}$. We just need to define something which assigns to every point in the manifold one of these antisymmetric tensors. 
+	\definition{k-Form}{A k-form on a manifold $\mathcal{M}$ is a map $\omega:\mathcal{M}\to \textstyle{\bigwedge}^k(\mathbb{R}^m)^*$ such that for every $x\in\man$, we have $\omega(x)\in \textstyle{\bigwedge}^kT^*_x\mathcal{M}$. The space of all k-forms is denoted
+		$$ \Omega^k(\mathcal{M}) \equiv \{ \t{all differential k-forms on } \mathcal{M} \} $$}
+	The first couple $k$ give familiar spaces: $\Omega^0(\mathcal{M})$ is just the space of functions $\mathcal{M}\to\mathbb{R}$ and $\Omega^1(\mathcal{M})$ is the space of all covector fields on $\mathcal{M}$. 
+	
+	
+	\subsection{The Exterior Derivative}
+	Recall from the section on cotangent spaces that when a covector has the special form $df = \partial_i f dx^i$ for some function $f$, it has the nice property that its action on any $v\in T_x\mathcal{M}$ gives the directional derivative of $f$ along $v$. In this way the 1-form $df$ can be thought of as a derivative of the 0-form $f$. It is natural to wonder then how we might generalize this to a derivative on all k-forms. The natural definition comes from noticing that any k-form contains 0-forms as coefficients. That is, for any k-form $\omega$,
+	$$\omega= \underbrace{\omega_{i_1\dots i_k}}_{\t{this is a 0-form}}dx^{i_1}\wedge\dots\wedge dx^{i_k}$$
+	So knowing how to take a derivative of a 0-form, we define the derivative of a k-form by
+	
+	$$ d\omega \equiv d\omega_{i_1\dots i_k} \wedge dx^{i_1}\wedge \dots \wedge dx^{i_k} $$
+	Evaluating the derivative of the 0-form then provides a more explicit definition.
+	\definition{Exterior Derivative}{The exterior derivative is a map $d:\Omega^k(\mathcal{M})\to \Omega^{k+1}(\mathcal{M})$ defined so that for any k-form $\omega$ in local coordinates written
+		$$ \omega = \omega_{i_1,\dots i_k} dx^{i_1}\wedge\dots \wedge dx^{i_k} $$
+		we have its exterior derivative
+		$$ d\omega = d\omega_{i_1,\dots i_k}\wedge dx^{i_1}\wedge\dots \wedge dx^{i_k} $$
+		$$ d\omega \equiv \frac{\partial \omega_{i_1\dots i_k}}{\partial x^{i_0}} \;dx^{i_0} \wedge \dots \wedge dx^{i_k} $$}
+	This has one particularly important property that needs to be explored. Consider what happens when we take a "second derivative" $d(d\omega)$. For simplicity consider a 0-form $f$. Its exterior derivative $df$ can be calculated no problem with the above formula and the derivative $d(df)$ can then also be calculated. The result, the second exterior derivative of $f$, is
+	$$ d(df) = \frac{\partial f}{\partial x^i \partial x^j}\;dx^i\wedge dx^j = 0 $$
+	That this is 0 follows from the antisymmetry of $\wedge$. Since the partial derivatives are symmetric (the order of differentiation doesn't matter) but the exterior product is antisymmetric, the sum will contain both $\partial_{ij}f dx^i\wedge dx^j$ and $-\partial_{ji}f dx^i\wedge dx^j$ for all $i,j$. These terms cancel so that the end result is identically 0. This can easily be shown to be the case for general k-forms $\omega$ so we can write the important result:
+	$$ d(d\omega)=0 $$ 
+	
+	
+	\subsection{The Poincar\'e Lemma}
+	
+	
+	\section{Affine Connections}
+	\subsection{Covariant Derivatives}
+	\definition{Affine Connection}{An affine connection on a manifold $\man$ is an $\R$-bilinear map $\nabla:\mathfrak{X}(\man)\times\mathfrak{X}(\man)\to \mathfrak{X}(\man)$, denoted through $\nabla_XY\equiv\nabla(X,Y)$, which satisfies the following properties. For any $X,Y\in\Gamma(\man)$ and any $f:\man\to \R$
+	\begin{align*}
+		\nabla_{fX}Y &= f\nabla_X Y \\
+		\nabla_X(fY) &= f\nabla_XY + X(f)Y
+	\end{align*}}
+	The second property is called the \textbf{Leibniz rule} and is precisely what makes a connection like a derivative. We call $\nabla_X$ the \textbf{covariant derivative with respect to $\*X$}. Locally, the bilinearity of the connection means that it is fully determined by its action on basis vectors. So writing $\nabla_i\equiv \nabla_{\partial_i}$, we must have 
+	$$ \nabla_i(\partial_j) = \Gamma^k_{\;ij}\partial_k $$
+	where we call $\Gamma^k_{\;ij}$ the \textbf{connection coefficients} of $\nabla$. In local coordinates, a connection is fully specified by its coefficients and in fact, we can use this to now write the covariant derivative of any vector field $Y=Y^j\partial_j$ as
+	$$ [\nabla_iY]^k = \partial_iY^k + \Gamma^k_{\;ij}Y^j $$
+	Importantly, note that the connection coefficients do \emph{not} define a tensor. Indeed, it is not too difficult to prove that under a coordinate transformation $x\mapsto \tilde{x}$, the properties of the connection imply
+	$$ \tilde{\nabla}_i(\tilde{\partial}_j) =
+	\underbrace{\left( \frac{\partial^2 x^q}{\partial \tilde{x}^i\partial \tilde{x}^j} + \frac{\partial x^r}{\partial \tilde{x}^i}\frac{\partial x^s}{\partial \tilde{x}^j}\Gamma^q_{\;rs} \right)\frac{\partial \tilde{x}^k}{\partial x^q}}_{\tilde{\Gamma}^k_{\;ij}}\tilde{\partial}_k $$
+	So in fact, the transformed connection coefficients contain not only a tensorial part, but a second derivative part which clearly makes it non-geometric. The covariant derivative of a vector field remains geometric
+
+	\subsection{Parallel Transport}
+	\subsection{Torsion}
+	\subsection{Curvature}
+	
+	\section{Riemmanian Geometry}
+	\subsection{Metric Tensors}
+	\subsection{The Levi-Civita Connection}
+	\subsection{Calculus of Variations \& Geodesics}
+	
+
+	\section{Fiber Bundles}
+	\subsection{Vector Bundles}
+	\subsection{Structure Groups \& G-Bundles}
+	\subsection{Principal Bundles}
+	\subsection{Ehressman Connections}
+	
+	
+	\section{Differential Topology}
+	\subsection{The Gauss-Bonnet Theorem}
+
+	
+\end{document}

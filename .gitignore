@@ -1,0 +1,21 @@
+# Compiled notes are built by GitHub Actions and published to Pages; never commit them.
+# (Only main.pdf is ignored, so PDF figures included by a note are still committed.)
+notes/**/main.pdf
+_site/
+
+# Generated build stamp
+shared/buildinfo.tex
+
+# LaTeX build files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv

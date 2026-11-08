@@ -1,0 +1,274 @@
+\documentclass[twocolumn]{gwclass}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[theorem]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{definition}{Definition}
+\renewcommand\qedsymbol{$\blacksquare$}
+
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+\title{Compressed Sensing}
+\author{--- George Willingham ---}
+\date{}
+
+\begin{document}
+	\maketitle
+	\tableofcontents
+	\section{Sparse Recovery}
+	\subsection{Underdetermined Linear Systems}
+	Many applications in signal processing involve a ground truth signal $\*x\in\C^n$ from which we obtain a vector of \emph{linear measurements} $\*y\in\C^m$. This is a measurement model of the general form
+	$$ \*y=A\*x $$
+	for a known matrix $A\in\C^{m\times n}$. The goal is to then recover the ground truth signal $\*x$ from the measurements $\*y$. This problem has three different regimes of interest. First, when $m=n$ and $A$ is full rank, we can simply compute the inverse to find $\*x=A^{-1}\*y$. Second, when $m>n$, $A$ is tall and the linear system is overdetermined so $A$ does not have an inverse. In this case, the standard approach is to construct the least squares estimate $\hat{\*x}= \arg\min_{\*z} \|\*y - A\*z\|_2^2$ which yields the closed form $\hat{\*x}=(A^\dagger A)^{-1}A^\dagger \*y$. 
+	
+	The third and final case is when $m<n$. In this case, $A$ is fat and the linear system is underdetermined so there are infinitely many solutions. The least squares approach fails since $A$ does not have full column rank making $A^\dagger A$ non-invertible. Indeed, there is an infinite set of solutions given by\footnote{Proof: Suppose $\*z$ is a solution so that $\*y=A\*x=A\*z$. This implies $A(\*z-\*x)=0$ so $\*z-\*x\in\ker A$. Therefore, $\*z$ can always be written $\*z=\*x+\*v$ for $\*v\in\ker A$}
+	$$ \mathcal{S} = \{\*x + \*v\:|\: \*v\in\ker A\} $$
+	Consequently, it is impossible to recover the signal $\*x$ from the data $\*y$. However, it is feasible that some additional information about $\*x$ could make it possible to single it out among all the vectors in $\mathcal{S}$.
+	
+	\subsection{Sparsity \& the $\ell_0$-Norm}
+	Compressed sensing is the theory of reconstructing $\*x$ from underdetermined measurements $\*y$ when we have the additional information that $\*x$ is \textbf{sparse} (i.e. mostly zeros). The concept of sparsity is quantified by the so-called $\ell_0$-``norm" defined by the number of non-zero components in a vector:
+	
+	\begin{definition}
+		The $\ell_0$-norm of a vector $\*x\in\C^n$ is 	$ \|\*x\|_0 \equiv \#\{ x_i \:|\: x_i\neq 0\} $
+	\end{definition}
+
+	Note that, properly speaking, this is not a norm. It satisfies the triangle inequality $\|\*a+\*b\|_0\leq \|\*a\|_0+\|\*b\|_0$ and is also zero uniquely for the zero vector $\|\*0\|_0=0$, but it is not homogeneous (clearly $\|a\*x\|_0=\|\*x\|_0$). 
+	
+	\begin{definition}
+		A vector $\*x\in\C^n$ is called \textbf{$\*k$-sparse} if it has no more than $k$ nonzero components, i.e. $\|\*x\|_0\leq k$. The set of all $k$-sparse vectors is denoted $\Sigma_k \equiv \{ \*x\in\mathbb{C}^n \:|\: \|\*x\|_0\leq k\}$
+	\end{definition}
+	Note that this is inclusive so that so that if $l<k$, then $\Sigma_l\subset \Sigma_k$. In words, $l$-sparse vectors are also $k$-sparse. Additionally, we define the support of a vector by the index set corresponding to the nonzero components:
+	\begin{definition}
+		The \textbf{support} of a vector $\*x$ is denoted and defined by $ \t{supp}(\*x) \equiv \{i\in\mathbb{N} \:|\: x_i\neq 0\} $
+	\end{definition}
+	Making use of this new language, we can now say that any $k$-sparse vector $\*x\in\Sigma_k$ has $\ell_0$-norm given by $\|\*x\|_0=\abs{\t{supp}(\*x)}\leq k$. 
+	
+	With this bit of terminology, we can discuss some useful properties of sparse vectors. Consider two vectors $\*x_1,\*x_2\in\Sigma_k$ and their sum $\*x_1+\*x_2$. It is fairly easy to see that the sum is, at most, $2k$-sparse. Indeed, any index where both $\*x_1$ and $\*x_2$ are zero is guaranteed to be zero in the sum, so the only possible change in sparsity can occur over $\t{supp}(\*x_1)\cup \t{supp}(\*x_2)$. The number of elements in a union of sets $A$ and $B$ is $ \abs{A\cup B} = \abs{A} + \abs{B} - \abs{A\cap B}$ making it clear that the support of $\*x_1+\*x_2$ is guaranteed to be no larger than $2k$.
+	$$ \forall\; \*x_1,\*x_2\in\Sigma_k \quad\quad \*x_1+\*x_2 \in \Sigma_{2k} $$
+	A converse statement can also be made. If $\*x\in\Sigma_{2k}$, then it can always be written (non-uniquely) as the sum of two $k$-sparse vectors
+	$$ \*x\in\Sigma_{2k} \implies \exists \*x_1,\*x_2\in\Sigma_k \quad \*x=\*x_1+\*x_2 $$ 
+	These facts will prove useful.
+	
+	\subsection{Sparse Recovery with $\ell_0$-Minimization}
+	With sparsity defined, we are now prepared to state the goal of compressed sensing:
+	\begin{definition}
+		For a known wide matrix $A\in\C^{m\times n}$, a \textbf{recovery program} is a map $\Delta:\C^m\to\C^n$ which attempts to invert $A$ over a set of sparse vectors.
+	\end{definition}
+	\begin{definition}
+		For a matrix $A$, a recovery program $\Delta$ is said to achieve \textbf{exact $\*k$-sparse recovery} if for all $\*x\in\Sigma_k$, we have $\Delta(A\*x)=\*x$.
+	\end{definition}
+	Note that $\Delta$ cannot possibly be linear. Intuitively, this is expected since it would make $\Delta$ equivalent to the nonexistent inverse matrix $A^{-1}$. Indeed note that the standard basis vectors $\*e_1,\dots,\*e_n$ are all $k$-sparse for $k>0$. So then by linearity, recovering any sparse vector from a linear $\Delta$ would imply recovering any $\*x\in\C^n$ which is impossible.
+	
+	The foundational approach is to consider the case where $\*x$ is the unique \emph{most} sparse vector in the solution space. In this case, a reasonable recovery program is constrained $\ell_0$-minimization:
+	$$ \Delta_0(A\*x)\equiv \arg\min_{\*z\in\C^n} \|\*z\|_0\quad\t{subject to}\quad A\*z=A\*x $$
+	We now ask the question: \emph{under what conditions will $\Delta_0$ achieve exact $k$-sparse recovery?} Well in the event that the ground truth signal $\*x$ is truly the sparsest vector in the solution space, then this will obviously work. Phrased another way, we can say that this program will work if $\*x$ is the only $k$-sparse vector in the solution space. That is
+	$$ \mathcal{S}\cap \Sigma_k = \{\*x\} $$
+	This is a necessary and sufficient condition for $\Delta_0$ to achieve exact $k$-sparse recovery. Now since the solution space is $\mathcal{S}=\{\*x+\*v\:|\:\*v\in\ker A\}$, the above condition will clearly translate into a condition on the kernel of the measurement matrix $A$. In fact, we have the following theorem:
+	\begin{theorem}
+		These statements are equivalent:
+	\begin{enumerate}
+		\setlength\itemsep{0.01em}
+		\item $\Delta_0$ achieves exact $k$-sparse recovery
+		\item The solution space contains only one $k$-sparse vector: $\mathcal{S}\cap \Sigma_k = \{\*x\}$
+		\item The kernel of $A$ contains no nontrivial $2k$-sparse vectors: $\ker A \cap \Sigma_{2k}=\{\*0\}$
+		\item Any set of $2k$ or fewer columns of $A$ are linearly independent
+	\end{enumerate}
+	\end{theorem}
+	\noindent\textbf{Proof}\\
+	Suppose $\mathcal{S}\cap\Sigma_k=\{\*x,\*z\}$ for some $\*z\neq \*x$. This means $A\*x=A\*z$ which implies $A(\*x-\*z)=0$ so $\*x-\*z\in\ker A$. Also since $\*x,\*z\in\Sigma_k$, the difference is in $\Sigma_{2k}$. So more than one $k$-sparse vector in $\mathcal{S}$ implies a nontrivial $2k$-sparse vector in $\ker A$. The contrapositive then proves that $(3)\implies (2)$.
+	\\
+	\\
+	Going the other way, suppose $\ker A\cap\Sigma_{2k}=\{\*0,\*v\}$ for some nonzero vector $\*v$. Since $\*v\in\Sigma_{2k}$, it can always be decomposed as $\*v=\*x_1-\*x_2$ for $\*x_1,\*x_2\in\Sigma_k$. Then $A\*v=0$ implies $A\*x_1=A\*x_2$ which means that $\*x_1,\*x_2\in\mathcal{S}\cap\Sigma_k$ so there is more than one $k$-sparse vector in the solution space. The contrapositive proves that $(2)\implies (3)$.
+	\\
+	\\
+	Now to prove $(3)$ and $(4)$ are equivalent. Suppose there is a set of $2k$ or fewer linearly dependent columns of $A$. This implies the existence of a $2k$-sparse vector in $\ker A$ which is zero everywhere except where it can select out those $2k$ columns to satisfy $A\*v=0$. So $(3)\implies (4)$.
+	\\
+	\\
+	Going the other way, suppose $\ker A\cap\Sigma_{2k}=\{\*0,\*v\}$ for some vector $\*v$. This implies $A\*v=0$ and since $\*v$ is $2k$-sparse, this selects out of $A$ a set of $2k$ or fewer columns and sets their linear combination to zero. Therefore those columns must be linearly dependent. Therefore $(4)\implies(3)$.
+	\\
+	\qedsymbol{}
+	\\
+	\\
+	These four statements are sufficient conditions for exact sparse recovery and it is worth making a few observations. First, consider that every set of $2k$ or fewer columns of $A$ must be linearly independent and that for $m$ measurements, each column is in $\C^m$. So to allow for a set of $2k$ linearly independent columns, we have to have $m\geq 2k$ measurements. The bare minimum for exact $k$-sparse recovery is $2k$ measurements. Intuitively, this tells us that the more sparse the ground truth signal is, the less data we need. 
+	
+	Second, the linear independence of every $2k$ columns also implies that the matrix $A$ cannot be especially sparse. 
+	
+	\section{$\*\ell_1$-Relaxation}
+	\subsection{Basis Pursuit}
+	The $\ell_0$-minimization is guaranteed to work when the sufficient conditions are met, but practically speaking, it is not very useful. To actually compute the most sparse vector in the solution space is an NP-Hard problem requiring a brute force search. To put sparse recovery into practice, we need a recovery program that not only has some guarantee of success, but also can be evaluated in a computationally efficient way. The standard approach here is to relax the optimization problem to the ``nearest" convex optimization problem which can be solved with well-studied techniques. Specifically, we replace the $\ell_0$-minimization with $\ell_1$-minimization.
+	\begin{definition}
+		\textbf{Basis Pursuit} is the $\ell_1$-relaxation of the $\ell_0$-minimization problem. It is defined by
+		$$\Delta_1(A\*x) \equiv \arg\min_{\*z\in\C^n} \|\*z\|_1 \quad\t{subject to}\quad A\*z=A\*x$$
+	\end{definition}
+	One way to motivate this relaxation is to observe that the $\ell_1$ ball $\mathcal{B}_1 \equiv \{  \*x\in\C^n \:|\: \|\*x\|_1\leq 1\}$ is the convex hull of $\{\*x\in\C^n \:|\: \|\*x\|_0\leq 1 \t{ and }\|\*x\|_\infty\leq 1\}$ which can be thought of as the $\ell_0$ ball.	
+	
+	\subsection{The Null Space Property (NSP)}
+	We now ask the question: \emph{under what conditions does basis pursuit yield the most sparse vector in the solution space?} Or in other words, when do we find $\Delta_1=\Delta_0$? To address this question, it will be useful to first introduce some new notation. For a vector $\*x$ and an index set $\mathcal{I}\subseteq\{1,\dots,n\}$, we denote by $\*x_{\scriptscriptstyle\mathcal{I}}$ the vector with components given by
+	$$ (\*x_{\scriptscriptstyle\mathcal{I}})_i \equiv \begin{cases}
+		x_i & i\in\mathcal{I}\\
+		0 & i\notin\mathcal{I}
+	\end{cases} $$
+	So $\*x_{\scriptscriptstyle\mathcal{I}}$ zeros out every component not represented in $\mathcal{I}$. Further, we will use the complement $\mathcal{I}^c$ which contains all the indices \emph{not} in $\mathcal{I}$ to decompose any vector as $\*x=\*x_{\scriptscriptstyle\mathcal{I}} + \*x_{\scriptscriptstyle\mathcal{I}^c}$. A useful observation is that this decomposition gives the $\ell_1$-norm as $\|\*x\|_1 = \|\*x_{\scriptscriptstyle\mathcal{I}}\|_1 + \|\*x_{\scriptscriptstyle\mathcal{I}^c}\|_1$.
+	
+	Now the important \emph{null space property} will be introduced, providing a powerful look into the validity of the $\ell_1$-relaxation.
+
+	\begin{definition}
+		A matrix $A$ is said to satisfy the \textbf{null space property (NSP)} of order $k$ if for any index set $\mathcal{I}$ of size $k$, every  $\*v\in\ker A$ has the property $\|\*v_{\scriptscriptstyle\mathcal{I}}\|_1 < \|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1$
+	\end{definition}
+
+	This means that every vector in $\ker A$ has the property that any set of $k$ or fewer components will have a smaller $\ell_1$ total than the remaining components. We now state and prove an important theorem: 
+	
+	\begin{theorem}
+		Basis pursuit with matrix $A$ achieves exact $k$-sparse recovery if and only if $A$ has the null space property of order $k$.
+	\end{theorem}
+	\noindent\textbf{Proof}\\
+	First we will prove that if $A$ satisfies the null space property, then any $k$-sparse vector $\*x$ is necessarily the solution to the $\ell_1$-relaxation problem: $\Delta_1(A\*x)=\*x$. 
+	
+	Accordingly consider a $k$-sparse vector $\*x$ and an arbitrary $\*z\in\C^n$ such that $A\*x=A\*z$. With $\*v\equiv\*x-\*z$, we have $A\*v=0$ so $\*v\in\ker A$. If $\*x$ is supported over an index set $\mathcal{I}$ of size $k$, then we may note that $\*v_{\scriptscriptstyle\mathcal{I}}=\*x - \*z_{\scriptscriptstyle\mathcal{I}}$ and similarly $\*v_{\scriptscriptstyle\mathcal{I}^c}=-\*z_{\scriptscriptstyle\mathcal{I}^c}$. If $A$ satisfies the null space property of order $k$, then it can be applied to $\*v$ to find $\|\*x - \*z_{\scriptscriptstyle\mathcal{I}}\|_1 < \|\*z_{\scriptscriptstyle\mathcal{I}^c}\|_1$. Adding $\|\*z_{\scriptscriptstyle\mathcal{I}}\|_1$ to both sides, we can combine terms on the right as $ \|\*z_{\scriptscriptstyle\mathcal{I}^c}\|_1 + \|\*z_{\scriptscriptstyle\mathcal{I}}\|_1 = \|\*z\|_1 $. On the left, the triangle inequality gives $\|\*x\|_1\leq \|\*x - \*z_{\scriptscriptstyle\mathcal{I}}\|_1 + \|\*z_{\scriptscriptstyle\mathcal{I}}\|_1$. Therefore we find the inequality $\|\*x\|_1 < \|\*z\|_1$ implying that $\*x$ has smaller $\ell_1$-norm than any other vector in the solution space and therefore $\Delta_1(A\*x)=\*x$.
+	\\
+	\\
+	Conversely, we will assume that for any $\*x\in\Sigma_k$, we have $\Delta_1(A\*x)=\*x$. Then for any nonzero $\*v\in\ker A$, we must have $\Delta_1(A\*v_{\scriptscriptstyle\mathcal{I}})=\*v_{\scriptscriptstyle\mathcal{I}}$ where $\mathcal{I}$ is any index set of size $k$. Since $A\*v=0$, we have $A\*v_{\scriptscriptstyle\mathcal{I}}=A (-\*v_{\scriptscriptstyle\mathcal{I}^c})$, implying that $-\*v_{\scriptscriptstyle\mathcal{I}^c}$ is in the solution space. But since $\*v_{\scriptscriptstyle\mathcal{I}}$ is the minimizer of $\ell_1$ norm over the solution space by assumption, we must have $\|\*v_{\scriptscriptstyle\mathcal{I}}\|_1 < \|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1$ which is precisely the null space property of order $k$.
+	\\
+	\qedsymbol
+	\\\\
+	The null space property is therefore a necessary and sufficient condition for exact sparse recovery with basis pursuit. This is a fundamental result in compressed sensing which tells us that computationally efficient procedures for sparse recovery are possible. That said, the null space property is fairly abstract and there is no clear way to check if any given matrix has this property.
+	
+	\section{Stability}
+	\subsection{Approximate Sparsity}
+	We have found sufficient conditions for exact sparse recovery using either $\Delta_0$ or $\Delta_1$, but they rely on the fact that the ground truth $\*x$ is \emph{exactly} $k$-sparse. It will be of greater practical interest to consider the case when $\*x$ may not be \emph{exactly} $k$-sparse, but is only approximately $k$-sparse. In jargon, an approximately sparse vector is called \emph{compressible} since only a few components capture most of the weight so the small components can be discarded with minimal information loss. To quantify this, we define the \emph{best $k$-term approximation error}
+	\begin{definition}
+		For a vector $\*x\in\C^n$, the \textbf{best $\*k$-term approximation error} is
+		$\displaystyle \sigma_k(\*x)\equiv \min_{\*s\in\Sigma_k}\|\*x-\*s\|_1 $
+	\end{definition}
+
+	In words, $\sigma_k(\*x)$ is the $\ell_1$ distance between $\*x$ and the closest $k$-sparse vector. This serves as a measure of how $k$-sparse any given vector is. Indeed any $\*x\in\Sigma_k$ has $\sigma_k(\*x)=0$.
+	
+	It is easy to show that $\sigma_k(\*x)$ can be calculated quite easily. To compute it, consider the index set $\mathcal{I}$ corresponding to the $k$ largest magnitude components in $\*x$. With this, it is clear by definition that $\*x_{\scriptscriptstyle\mathcal{I}}$ is $k$-sparse, and in fact it is the closest $k$-sparse vector to $\*x$ in the $\ell_1$ sense. Consequently, the approximation error evaluates as simply $\sigma_k(\*x)=\|\*x-\*x_{\scriptscriptstyle\mathcal{I}}\|_1$, or equivalently
+	$$ \sigma_k(\*x) = \|\*x_{\scriptscriptstyle\mathcal{I}^c}\|_1 $$
+	In words, $\sigma_k(\*x)$ is the $\ell_1$-norm of $\*x$ after zeroing out its $k$ highest magnitude components.
+	
+
+	
+	\subsection{Stable Sparse Recovery}
+	We now seek a sparse recovery program which will be \emph{stable} in the sense that it achieves exact $k$-sparse recovery but also achieves \emph{approximate} recovery for approximately sparse vectors. This ensures that if a $k$-sparse vector is slightly perturbed such that is not exactly $k$-sparse anymore, our stable recovery program will still be able to recover it at least approximately. 
+	\begin{definition}
+		Given a matrix $A$, a recovery program $\Delta:\C^m\to\C^n$ is said to achieve \textbf{stable $\*k$-sparse recovery} with constant $C$ if for every $\*x\in \C^n$, we have $ \|\Delta(A\*x) - \*x\|_1 \leq C \sigma_k(\*x) $.
+	\end{definition}
+	Stable recovery in this sense clearly implies exact recovery and ensures that the accuracy of the recovery program is directly related to how sparse the true signal is. 
+	
+	\subsection{The Stable NSP}
+	Following the result that the null space property is equivalent to exact sparse recovery of basis pursuit, we will now seek a more general form of the null space property in hopes of proving the stability of basis pursuit
+	\begin{definition}
+		A matrix $A$ is said to satisfy the \textbf{stable NSP} of order $k$ with constant $\rho\in(0,1)$ if for any index set $\mathcal{I}$ of size $k$, every $\*v\in\ker A$ has the property $\|\*v_{\scriptscriptstyle\mathcal{I}}\|_1 \leq \rho \|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1$
+	\end{definition}
+	This concept of the stable NSP turns out to be equivalent to a constraint on the solution space. Specifically, we have the following theorem:
+	\begin{theorem}
+		A matrix $A$ satisfies the stable NSP of order $k$ with constant $\rho$ if and only if every $\*x,\*z\in\C^n$ for which $A\*z=A\*x$ satisfies
+		$$ \|\*z - \*x\|_1 \leq \frac{1+\rho}{1-\rho}\big( \|\*z\|_1 - \|\*x\|_1 + 2\|\*x_{\scriptscriptstyle\mathcal{I}^c}\|_1 \big) $$
+		for any size $k$ index set $\mathcal{I}$.
+\end{theorem}
+	\noindent \textbf{Proof}\\
+	First we will prove that the inequality in Theorem 3.1 implies the stable NSP. For an arbitrary $\*v\in\ker A$ and an index set $\mathcal{I}$ with size $k$, we have $A(\*v_{\scriptscriptstyle\mathcal{I}} + \*v_{\scriptscriptstyle\mathcal{I}^c})=0$ which implies $A\*v_{\scriptscriptstyle\mathcal{I}} = A(-\*v_{\scriptscriptstyle\mathcal{I}^c})$. Applying the desired inequality to vectors $\*v_{\scriptscriptstyle\mathcal{I}}$ and $-\*v_{\scriptscriptstyle\mathcal{I}^c}$, we can find $\|\*v_{\scriptscriptstyle\mathcal{I}}\|_1 + \|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1 \leq \frac{1+\rho}{1-\rho}\big[ \|\*v_{\scriptscriptstyle\mathcal{I}}\|_1 - \|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1 \big]$. This can be rearranged to find the stable NSP $\|\*v_{\scriptscriptstyle\mathcal{I}}\|_1 \leq \rho \|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1$.
+	\\
+	\\
+	Going the other way, suppose $A$ satisfies the stable NSP with constant $\rho$. For $\*x,\*z$ such that $A\*x=A\*z$, we have $\*v\equiv\*z-\*x\in\ker A$. The stable NSP then gives $\|\*v_{\scriptscriptstyle\mathcal{I}}\|_1 \leq \rho \|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1$. Adding $\|\*v_{\scriptscriptstyle\mathcal{I}^c}\|$ to both sides, this becomes
+	$\|\*v\|_1 \leq (1+\rho) \|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1$. Applying the triangle inequality and adding zero, one can easily derive $ \|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1= \|\*z\|_1 - \|\*x\|_1 + \|\*v_{\scriptscriptstyle\mathcal{I}}\|_1 + 2\|\*x_{\scriptscriptstyle\mathcal{I}^c}\|_1$. Applying the stable NSP here and rearranging, we get $ (1-\rho)\|\*v_{\scriptscriptstyle\mathcal{I}^c}\|_1\leq \|\*z\|_1 - \|\*x\|_1 + 2\|\*x_{\scriptscriptstyle\mathcal{I}^c}\|_1$. Combining inequalities, the desired inequality is found.
+	\\
+	\qedsymbol
+	\\\\
+	This general result implies that the $\Delta_1$ recovery program, i.e. basis pursuit, is stable as long as $A$ satisfies the stable NSP. The stability result is recovered from the inequality in Theorem 3.1 by taking $\*z\mapsto \Delta_1(A\*x)$. Doing so, we have $\|\*x_{\scriptscriptstyle\mathcal{I}^c}\|_1=\sigma_k(\*x)$ and the following result holds:
+	\begin{corollary}
+		If a matrix $A$ satisfies the stable NSP of order $k$ with constant $\rho$, then basis pursuit achieves stable $k$-sparse recovery with constant $2\frac{1+\rho}{1-\rho}$. That is,
+		$$ \|\Delta_1(A\*x)-\*x\|_1 \leq2\frac{1+\rho}{1-\rho}\sigma_k(\*x) $$
+	\end{corollary}
+
+\section{Sparse Recovery in Noise}
+	\subsection{Robust Sparse Recovery}
+	At this point, we have found sufficient conditions for the $\ell_1$-minimization problem to achieve stable $k$-sparse recovery. To make matters more realistic, we will now consider the case where the measurements are \emph{noisy} having the form
+	$$ \*y = A\*x + \*\eta $$
+	for some noise term $\*\eta$ which has bounded $\ell_2$-norm $\|\*\eta\|_2 \leq \epsilon$. Clearly when $\*\eta=0$, this is simply the problem already studied. So now we want to prove another form of stability for the $\Delta_1$ recovery program. Namely, the error in the recovered estimate $\hat{\*x}=\Delta_1(A\*x)$ somehow scales with the noise.
+
+	\begin{definition}
+		Given a matrix $A$ and noise $\*\eta$ such that $\|\*\eta\|_2\leq \epsilon$, a recovery program $\Delta:\C^m\to\C^n$ is said to achieve \textbf{robust $\*k$-sparse recovery} with constants $C_1$ and $C_2$ if for any $\*x\in\C^n$, we have $\|\Delta(A\*x+\*\eta)\|_1 \leq C_1 \sigma_k(\*x) + C_2 \|\*\eta\|_2$
+	\end{definition}
+	In words, this just means that the recovery program should be stable to both approximately sparse signals and noisy signals as long as the noise is small (provided $C_1$ and $C_2$ are not large).
+		
+	\subsection{Basis Pursuit Denoising}
+	In the presence of noise, the standard basis pursuit problem $\Delta_1$ is inappropriate since it constrains the solution space too tightly. We need to allow for some flexibility to account for the noise. To this end, we define a new recovery program:
+
+	\begin{definition}
+		Given a matrix $A$ and measurements $\*y=A\*x+\*\eta$ for power-limited noise $\|\*\eta\|_2\leq \epsilon$, the \textbf{basis pursuit denoising} problem is defined by
+		$$ \Delta_1^\epsilon(\*y) \equiv \arg\min_{\*z\in\C^n} \|\*z\|_1 \quad\t{subject to}\quad \|\*y - A\*z\|_2\leq \epsilon $$
+	\end{definition}
+	In words, we seek the $\ell_1$-minimizing vector $\*z$ such that $A\*z$ is sufficiently close to the measurements $\*y$. ``Sufficiently close" is determined by an a priori bound on the noise $\epsilon$. 
+	
+	\subsection{The Robust NSP}
+	Along the same lines as before, we will now define a null space property which will provide a sufficient condition for robust recovery. However, in the noisy case, the ``null space property" is actually not a null space property at all as it does not say anything about $\ker A$. 
+	
+	\begin{definition}
+		A matrix $A\in\C^{m\times n}$ is said to satisfy the \textbf{robust NSP} of order $k$ with constants $\rho\in(0,1)$ and $\tau>0$ if for any any index set $\mathcal{I}$ of size $k$, every $\*z\in\C^n$ satisfies $\|\*z_{\scriptscriptstyle\mathcal{I}}\|_1 \leq \rho \|\*z_{\scriptscriptstyle\mathcal{I}^c}\|_1 + \tau\|A\*z\|_2$
+	\end{definition}
+	Note the $\ell_2$-norm used in the new term. Clearly when $\*z$ is in $\ker A$, that term vanishes and this reduces to the stable NSP, so the robust NSP implies stability. With this, we now state prove that this is a sufficient condition for robust sparse recovery
+	
+	\begin{theorem}
+		If a matrix $A$ satisfies the robust NSP of order $k$ with constants $\rho\in(0,1)$ and $\tau>0$, then basis pursuit denoising ($\Delta_1^\epsilon$) achieves robust $k$-sparse recovery such that for measurements $\*y=A\*x+\*\eta$ with power-limited noise $\|\*\eta\|_2\leq \epsilon$, we have
+		$$ \|\Delta_1^\epsilon(\*y)-\*x\|_1 \leq 2\frac{1+\rho}{1-\rho}\sigma_k(\*x) + \frac{4\tau}{1-\rho}\epsilon $$
+	\end{theorem}
+	The proof of this is not so different from the proof of basis pursuit's stability. There is a stronger \emph{if and only if} statement which can be proven that utilizes an inequality just like Theorem 3.1 except with an additional term on the right $	\frac{2\tau}{1-\rho}\|A(\*z-\*x)\|_2$. This proof is omitted here since it would be mostly a repetition of Theorem 3.1 with small changes.
+	
+	Theorem 4.1 can be extended so that the error $\Delta_1^\epsilon(\*y)-\*x$ is measured with an arbitrary $\ell_p$-norm.
+
+\newpage
+	
+	\section{Uniqueness \& Coherence}
+	\subsection{Spark \& The Uncertainty Principle}
+	In everything so far, it has been taken for granted that the ``most sparse" vector in the solution space is unique. But it will be crucially important to prove under what conditions, the maximally sparse vector (i.e. the value of $\Delta_0(A\*x)$) is unique. For this, we define a useful quantity introduced by Donoho and Elad called the \emph{spark} of a matrix: 
+	\begin{definition}
+		The \textbf{spark} of a matrix $A$ is the smallest number of linearly dependent columns in $A$
+	\end{definition}
+	To build an understanding of spark, first suppose $A$ is a square orthogonal matrix. Since no two columns are linearly dependent, the spark does not exist. Now if we add one more column, making $A$ underdetermined, then some set of columns \emph{must} be linearly dependent. If $A$ contains two identical columns, then clearly those two are linearly dependent so we have $\t{spark}(A)=2$. Even if the new column does not match any of the others exactly, it is necessarily a linear combination of some of the other columns. The question is \emph{how many are needed?} The spark of the matrix answers this question. Observe that this discussion makes clear a lower bound: $ \t{spark}(A) \geq 2 $.
+	
+	With this, we will now prove an \emph{uncertainty principle} which says that any two vectors in the solution space cannot be arbitrarily sparse. 
+	
+	\begin{theorem}
+		For any non-equal $\*\gamma_1,\*\gamma_2\in\C^n$ such that $A\*\gamma_1=A\*\gamma_2$, we have $ \|\*\gamma_1\|_0 + \|\*\gamma_2\|_0 \geq\t{spark}(A) $
+	\end{theorem}
+	\noindent \textbf{Proof}\\
+	If two vectors $\*\gamma_1,\*\gamma_2\in\C^n$ satisfy $A\*\gamma_1=A\*\gamma_2$, then we have $A(\*\gamma_1 - \*\gamma_2)=0$ so the difference $\*\gamma_1-\*\gamma_2$ is in $\ker A$. The equation $A(\*\gamma_1-\*\gamma_2)=0$ implies that $A$ has at least $\|\*\gamma_1 - \*\gamma_2\|_0$ linearly dependent columns. By definition of spark, this gives $\|\*\gamma_1 - \*\gamma_2\|_0 \geq \t{spark}(A)$. Applying the triangle inequality, we obtain the desired inequality.\\
+	\qedsymbol
+	
+	This result tells us that any two vectors in the solution space must have at least $\t{spark}(A)$ nonzero components between them. As an immediate consequence, if any $\*\gamma_1\in\mathcal{S}$ has $\|\*\gamma_1\|_0 < \t{spark}(A)/2$, then any other $\*\gamma_2$ must have $\|\*\gamma_2\|_0>\t{spark}(A)/2$. This leads us to conclude:
+	
+	\begin{corollary}
+		Any vector $\*\gamma\in\C^n$ which has $\|\*\gamma\|_0 < \t{spark}(A)/2$ is the unique maximally sparse vector in the solution space
+	\end{corollary}
+	
+	\subsection{Coherence}
+	At this point, we shift our attention to a new quantity called the \emph{coherence} of a matrix.
+	
+	\begin{definition}
+		For a matrix $A\in\C^{m\times n}$ with columns $\*a_1, \dots,\*a_n$ that are $\ell_2$-normalized as $\|\*a_i\|_2=1$, the \textbf{coherence} is
+		 $\displaystyle\mu_1(A)\equiv \max_{i\neq j} \abs{\langle \*a_i, \*a_j\rangle}$
+	\end{definition}
+	It is useful to define a more general quantity which limits the maximum over a subset of columns.
+	
+	\begin{definition}
+		If $\mathcal{K}_i$ denotes an index set of size $k$ which excludes $i$, then the $\*k$\textbf{-column coherence} of a matrix $A$ with $\ell_2$-normalized columns $\*a_1 \:\dots\:\*a_n$ is defined by $\displaystyle\mu_k(A)\equiv  \max_{i,\mathcal{K}_i }\sum_{j\in\mathcal{K}_i} \abs{\langle\*a_i,\*a_j\rangle}$
+	\end{definition}
+	Clearly the ordinary coherence $\mu_1(A)$ is the special case of the $k$-column coherence when $k=1$. Since absolute values are summed, we also clearly have $\mu_1(A) \leq \mu_k(A) \leq k \mu_1(A)$
+	
+	\begin{theorem}
+		If $A$ is a matrix with $\ell_2$-normalized columns, then for all $k$-sparse vectors $\*x\in\Sigma_k$, we have
+		$$ 1-\mu_{k-1}(A) \leq \frac{\|A\*x\|_2^2}{\|\*x\|_2^2} \leq 1 + \mu_{k-1}(A) $$
+	\end{theorem}
+	\noindent\textbf{Proof}\\
+	Let $\mathcal{I}$ denote an arbitrary index set of size $k$. If $A_{\scriptscriptstyle\mathcal{I}}$ denotes the matrix constructed out of the columns of $A$ indexed by $\mathcal{I}$, then for a $k$-sparse index $\*x\in\Sigma_k$ supported on $\mathcal{I}$, we have $A\*x=A_{\scriptscriptstyle\mathcal{I}}\*x_{\scriptscriptstyle\mathcal{I}}$ and therefore $\|A\*x\|_2^2=\|A_{\scriptscriptstyle\mathcal{I}}\*x_{\scriptscriptstyle\mathcal{I}}\|_2^2=\*x^\dagger_{\scriptscriptstyle\mathcal{I}}A^\dagger_{\scriptscriptstyle\mathcal{I}}A_{\scriptscriptstyle\mathcal{I}}\*x_{\scriptscriptstyle\mathcal{I}}$. The matrix $A_{\scriptscriptstyle\mathcal{I}}^\dagger A_{\scriptscriptstyle\mathcal{I}}$ has elements $(A_{\scriptscriptstyle\mathcal{I}}^\dagger A_{\scriptscriptstyle\mathcal{I}})_{ij}=\langle\*a_i,\*a_j\rangle$ where the diagonal is all ones since the columns are $\ell_2$-normalized. Additionally the matrix is positive semidefinite so $\|A_{\scriptscriptstyle\mathcal{I}}\*x_{\scriptscriptstyle\mathcal{I}}\|_2^2$ is bounded from above and below by real eigenvalues $\lambda_\t{max},\lambda_\t{min}$ so that $\lambda_\t{min}\|\*x\|_2^2\leq\|A\*x\|_2^2 \leq \lambda_\t{max}\|\*x\|_2^2$. From here, the Gershgorin circle theorem states that the eigenvalues of $A_{\scriptscriptstyle\mathcal{I}}^\dagger A_{\scriptscriptstyle\mathcal{I}}$ are contained in the union of discs centered at 1 with radii $r_i=\sum_{j\in\mathcal{I}\backslash\{i\}}|\langle\*a_i,\*a_j\rangle| \leq \mu_{k-1}(A)$. So every eigenvalue satisfies $1-\mu_{k-1}(A)\leq\lambda\leq 1+\mu_{k-1}(A)$ which then yields the desired result.
+	\\\qedsymbol
+	
+	
+\end{document}
