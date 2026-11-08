@@ -72,8 +72,6 @@
 		\end{tcolorbox}
 	\end{center}\noindent\hspace{-1.5ex}
 }
-% diffgeo and linear_algebra call this \definition.
-\providecommand{\definition}{\boxdefinition}
 
 \setlength{\marginparwidth}{1.9cm}
 \newcommand{\sidenote}[1]{
